@@ -1,0 +1,124 @@
+[
+  {
+    "id": "ra",
+    "nama": "RA Al-Amin",
+    "jenis": "Raudhatul Athfal",
+    "icon": "school",
+    "warna": "#2E7D32",
+    "profil": "Raudhatul Athfal (RA) Al-Amin merupakan satuan pendidikan anak usia dini berciri khas Islam yang memberikan layanan pendidikan bagi anak melalui proses pembelajaran yang menyenangkan, islami, dan sesuai dengan tahap perkembangan anak. RA Al-Amin berupaya memberikan pengalaman belajar yang seimbang antara perkembangan nilai agama dan moral, kemampuan kognitif, bahasa, sosial-emosional, fisik-motorik, serta kreativitas anak. Pembelajaran dilaksanakan melalui kegiatan bermain dan belajar yang terarah dengan mengedepankan keteladanan, pembiasaan ibadah, pengenalan Al-Qur'an, pembentukan karakter, serta pengembangan kemandirian anak.",
+    "jadwal": {
+      "label": "Jadwal Belajar",
+      "hari": "Senin–Jumat",
+      "waktu": "07.00–11.00"
+    },
+    "program": [
+      "Pendidikan agama dan pembentukan akhlak sejak dini.",
+      "Pengenalan Al-Qur'an dan doa-doa harian.",
+      "Pengembangan kemampuan dasar anak.",
+      "Pembentukan kemandirian dan kedisiplinan.",
+      "Pengembangan kreativitas dan potensi anak.",
+      "Pembelajaran melalui bermain yang menyenangkan."
+    ],
+    "ppdb": true
+  },
+
+  {
+    "id": "tpq",
+    "nama": "TPQ Al-Amin",
+    "jenis": "Taman Pendidikan Al-Qur'an",
+    "icon": "menu_book",
+    "warna": "#8E6C3A",
+    "profil": "Taman Pendidikan Al-Qur'an (TPQ) Al-Amin merupakan lembaga pendidikan keagamaan yang berfokus pada pembelajaran Al-Qur'an dan dasar-dasar agama Islam bagi anak-anak. TPQ Al-Amin diarahkan untuk membentuk generasi yang dekat dengan Al-Qur'an, mampu membaca Al-Qur'an dengan baik, memahami dasar-dasar agama, serta terbiasa menerapkan akhlak Islami dalam kehidupan sehari-hari.",
+    "jadwal": {
+      "label": "Jadwal Belajar",
+      "hari": "Senin–Sabtu",
+      "waktu": "16.00–17.30"
+    },
+    "program": [
+      "Membaca Al-Qur'an.",
+      "Tahsin dan perbaikan bacaan.",
+      "Hafalan surat-surat pendek.",
+      "Hafalan doa dan hadits pilihan.",
+      "Praktik ibadah.",
+      "Akhlak dan adab Islami."
+    ],
+    "ppdb": true
+  },
+
+  {
+    "id": "mdt",
+    "nama": "MDT Al-Amin",
+    "jenis": "Madrasah Diniyah Takmiliyah",
+    "icon": "mosque",
+    "warna": "#1565C0",
+    "profil": "Madrasah Diniyah Takmiliyah (MDT) Al-Amin merupakan lembaga pendidikan keagamaan yang memberikan penguatan pendidikan agama Islam kepada peserta didik. MDT Al-Amin memberikan pembelajaran keislaman secara terstruktur dengan memperkenalkan berbagai bidang ilmu agama yang menjadi dasar bagi pembentukan pemahaman keislaman peserta didik. Pembelajaran diarahkan tidak hanya pada penguasaan materi, tetapi juga pada kemampuan mengamalkan ilmu dalam kehidupan sehari-hari.",
+    "jadwal": {
+      "label": "Jadwal Belajar",
+      "hari": "Senin–Sabtu",
+      "waktu": "16.00–17.30"
+    },
+    "program": [
+      "Al-Qur'an dan Hadits.",
+      "Aqidah dan Akhlak.",
+      "Fikih dan praktik ibadah.",
+      "Sejarah Kebudayaan Islam.",
+      "Hadiah Puji.",
+      "Tahfidz dan Tahsin Juz 30.",
+      "Pembiasaan akhlak dan adab Islami."
+    ],
+    "ppdb": true
+  },
+
+  {
+    "id": "pesantren",
+    "nama": "Pesantren Salafiyah Khusus Putri Al-Amin",
+    "jenis": "Pesantren Salafiyah",
+    "icon": "auto_stories",
+    "warna": "#00695C",
+    "profil": "Pesantren Salafiyah Al-Amin merupakan bagian dari lingkungan pendidikan Yayasan Pendidikan Islam Al-Amin Al-Ma'arif yang diarahkan sebagai wadah pendidikan dan pembinaan keislaman secara lebih intensif. Pesantren menjadi ruang bagi santri untuk memperdalam ilmu agama, membangun kemandirian, membiasakan kehidupan yang disiplin, serta mengembangkan akhlak dan tanggung jawab. Pendidikan pesantren memadukan pembelajaran keagamaan dengan pembinaan karakter dan kehidupan sehari-hari sehingga santri diharapkan mampu menjadi pribadi yang berilmu, berakhlak, mandiri, dan bermanfaat.",
+    "jadwal": {
+      "label": "Jadwal Harian",
+      "hari": "Menyesuaikan Program",
+      "waktu": "Kegiatan Terjadwal"
+    },
+    "program": [
+      "Pendalaman ilmu agama berbasis kitab kuning.",
+      "Tafsir Al-Qur'an.",
+      "Hadits.",
+      "Aqidah.",
+      "Akhlak.",
+      "Fikih.",
+      "Ushul Fikih.",
+      "Nahwu.",
+      "Sharf.",
+      "Balaghah.",
+      "Kedisiplinan dan kemandirian.",
+      "Pembinaan karakter Islami dan tanggung jawab."
+    ],
+    "ppdb": true
+  },
+
+  {
+    "id": "majelis-taklim",
+    "nama": "Majelis Taklim Al-Hasanah",
+    "jenis": "Majelis Taklim",
+    "icon": "groups",
+    "warna": "#AD8B3A",
+    "profil": "Majelis Taklim Al-Hasanah merupakan wadah pembinaan keagamaan bagi masyarakat yang menjadi bagian dari ikhtiar yayasan dalam menghadirkan pendidikan Islam yang tidak berhenti pada usia sekolah. Majelis Taklim menjadi ruang untuk belajar agama, memperkuat silaturahmi, meningkatkan pemahaman keislaman, serta membangun kepedulian dan kebersamaan di tengah masyarakat. Kegiatan dilaksanakan dalam bentuk kajian keislaman, peringatan hari besar Islam, serta kegiatan sosial dan kemasyarakatan.",
+    "jadwal": {
+      "label": "Jadwal Kajian",
+      "hari": "Jumat",
+      "waktu": "08.00–10.00"
+    },
+    "program": [
+      "Kajian keislaman.",
+      "Pembinaan akhlak.",
+      "Kajian Al-Qur'an dan Hadits.",
+      "Kajian Fikih.",
+      "Silaturahmi.",
+      "Peringatan Hari Besar Islam.",
+      "Kegiatan sosial dan kemasyarakatan."
+    ],
+    "ppdb": false
+  }
+]

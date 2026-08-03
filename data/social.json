@@ -1,0 +1,51 @@
+{
+  "website": {
+    "title": "Yayasan Pendidikan Islam Al-Amin Al-Ma'arif",
+    "description": "Website resmi Yayasan Pendidikan Islam Al-Amin Al-Ma'arif yang menaungi RA Al-Amin, TPQ Al-Amin, MDT Al-Amin, Pesantren Salafiyah Khusus Putri Al-Amin, dan Majelis Taklim Al-Hasanah."
+  },
+
+  "kontak": {
+    "alamat": "Kp. Lebakwangi RT 003/RW 002, Desa Parung, Kecamatan Parung, Kabupaten Bogor, Jawa Barat",
+    "email": "alaminalmaarif@gmail.com",
+    "whatsapp": {
+      "nomor": "6285717797429",
+      "nama": "Muhammad Irham Muthi'illah",
+      "jabatan": "Sekretaris Yayasan",
+      "pesan": "Assalamu'alaikum, saya ingin mendapatkan informasi mengenai Yayasan Pendidikan Islam Al-Amin Al-Ma'arif."
+    }
+  },
+
+  "googleMaps": {
+    "embed": "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d27475.389631134898!2d106.7338467054234!3d-6.433757259921051!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69e9f7ed4aff83%3A0xfd2c62845e8ac94f!2sRA.%20Al-Amin!5e0!3m2!1sid!2sid!4v1785579916097!5m2!1sid!2sid"
+  },
+
+  "mediaSosial": {
+    "youtube": {
+      "nama": "YouTube",
+      "url": "https://www.youtube.com/@ypialaminalmaarif",
+      "aktif": true
+    },
+
+    "facebook": {
+      "nama": "Facebook",
+      "url": "https://www.facebook.com/profile.php?id=61559341152550",
+      "aktif": true
+    },
+
+    "instagram": {
+      "nama": "Instagram",
+      "url": "https://www.instagram.com/ypi.alaminalmaarif/",
+      "aktif": true
+    },
+
+    "tiktok": {
+      "nama": "TikTok",
+      "url": "",
+      "aktif": false
+    }
+  },
+
+  "copyright": {
+    "text": "© 2026 Yayasan Pendidikan Islam Al-Amin Al-Ma'arif. All Rights Reserved."
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "tahun_ajaran": "2027/2028",
+
+  "status": {
+    "buka": true,
+    "keterangan": "Pendaftaran Peserta Didik Baru telah dibuka."
+  },
+
+  "brosur": {
+    "judul": "Brosur PPDB Yayasan Pendidikan Islam Al-Amin Al-Ma'arif",
+    "file": "assets/brosur/brosur-ppdb.pdf",
+    "thumbnail": "assets/brosur/brosur.jpg"
+  },
+
+  "kontak": {
+    "nama": "Muhammad Irham Muthi'illah",
+    "jabatan": "Sekretaris Yayasan",
+    "whatsapp": "6285717797429"
+  },
+
+  "unit": [
+    {
+      "id": "ra",
+      "nama": "RA Al-Amin",
+      "formulir": "https://docs.google.com/forms/d/e/1FAIpQLSeYh4vePmmT_47J-B2gG_0zR59xleegOWxCYd0cl_Bkx0_ePQ/viewform",
+      "aktif": true
+    },
+    {
+      "id": "tpq",
+      "nama": "TPQ Al-Amin",
+      "formulir": "https://docs.google.com/forms/d/e/1FAIpQLSdRAOSmxPt4JkHtu5hilziFtPw2kRdRyX5gwMsAZEbywkYNbw/viewform",
+      "aktif": true
+    },
+    {
+      "id": "mdt",
+      "nama": "MDT Al-Amin",
+      "formulir": "https://docs.google.com/forms/d/e/1FAIpQLScw4sf28_CQY8yHnZe5Tl5KiUYDpg4Mztkg5GDYSMEgVxZBrQ/viewform",
+      "aktif": true
+    },
+    {
+      "id": "pesantren",
+      "nama": "Pesantren Salafiyah Khusus Putri Al-Amin",
+      "formulir": "https://docs.google.com/forms/d/e/1FAIpQLSe88BSu7LNfeIvqOVpvgeoEMLb1vMcugfeHCTjwl6BZOk1eIw/viewform",
+      "aktif": true
+    }
+  ]
+}
