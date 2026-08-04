@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Dokumentasi - Yayasan Al-Amin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#f5f7f6;color:#18352a;display:flex;justify-content:center;padding:28px 16px}
+.card{width:100%;max-width:560px;background:#fff;border-radius:18px;padding:26px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+h1{margin:0 0 8px;font-size:25px}.sub{margin:0 0 22px;color:#65736d;line-height:1.5}
+.picker{display:block;width:100%;border:2px dashed #b8c8c0;border-radius:14px;padding:28px 18px;text-align:center;cursor:pointer;background:#fafcfb}
+input[type=file]{display:none}.count{margin:14px 0;color:#53635c;font-size:14px}
+button{width:100%;border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer;background:#1f6b4f;color:white}
+button:disabled{opacity:.55;cursor:not-allowed}.progress{margin-top:18px;display:none}
+.bar-wrap{height:10px;background:#e7ece9;border-radius:99px;overflow:hidden}.bar{width:0;height:100%;background:#1f6b4f;transition:width .2s}
+.status{margin-top:10px;font-size:14px;line-height:1.5;white-space:pre-line}.success{color:#17633f}.error{color:#a12828}
+.note{margin-top:20px;padding:12px 14px;border-radius:10px;background:#f4f7f5;color:#5d6963;font-size:13px;line-height:1.5}
+</style>
+</head>
+<body>
+<main class="card">
+<h1>Upload Dokumentasi</h1>
+<p class="sub">Yayasan Pendidikan Islam Al-Amin Al-Ma'arif</p>
+<label class="picker" for="photos"><strong>📷 Pilih foto kegiatan</strong><br><span style="font-size:13px;color:#69756f">Bisa memilih banyak foto sekaligus</span></label>
+<input id="photos" type="file" accept="image/*" multiple>
+<div id="count" class="count">Belum ada foto dipilih.</div>
+<button id="uploadBtn" type="button" disabled>UPLOAD FOTO</button>
+<div id="progress" class="progress"><div class="bar-wrap"><div id="bar" class="bar"></div></div><div id="status" class="status"></div></div>
+<div class="note">Foto yang berhasil diunggah akan otomatis masuk ke galeri website yayasan.</div>
+</main>
+<script>
+const CLOUD_NAME="k8jsv9np";
+const UPLOAD_PRESET="yayasan_gallery";
+const GALLERY_TAG="yayasan-gallery";
+const photos=document.getElementById("photos"),count=document.getElementById("count"),uploadBtn=document.getElementById("uploadBtn"),progress=document.getElementById("progress"),bar=document.getElementById("bar"),status=document.getElementById("status");
+
+photos.addEventListener("change",()=>{const n=photos.files.length;count.textContent=n?`${n} foto dipilih.`:"Belum ada foto dipilih.";uploadBtn.disabled=n===0});
+
+function uploadOne(file){
+ return new Promise((resolve,reject)=>{
+  const data=new FormData();
+  data.append("file",file);
+  data.append("upload_preset",UPLOAD_PRESET);
+  data.append("tags",GALLERY_TAG);
+  const xhr=new XMLHttpRequest();
+  xhr.open("POST",`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+  xhr.onload=()=>{if(xhr.status>=200&&xhr.status<300)resolve(JSON.parse(xhr.responseText));else reject(new Error(xhr.responseText||`HTTP ${xhr.status}`))};
+  xhr.onerror=()=>reject(new Error("Koneksi ke Cloudinary gagal."));
+  xhr.send(data);
+ });
+}
+
+uploadBtn.addEventListener("click",async()=>{
+ const files=Array.from(photos.files);if(!files.length)return;
+ uploadBtn.disabled=true;photos.disabled=true;progress.style.display="block";status.className="status";bar.style.width="0%";
+ let success=0,failed=0;
+ for(let i=0;i<files.length;i++){
+  try{await uploadOne(files[i]);success++}catch(err){failed++;console.error("Upload gagal:",files[i].name,err)}
+  bar.style.width=Math.round(((i+1)/files.length)*100)+"%";
+  status.textContent=`Proses: ${i+1} / ${files.length}\nBerhasil: ${success} | Gagal: ${failed}`;
+ }
+ if(failed===0){status.className="status success";status.textContent=`✅ Selesai! ${success} foto berhasil diupload.\nFoto otomatis diberi tag yayasan-gallery.`}
+ else{status.className="status error";status.textContent=`Selesai dengan catatan.\nBerhasil: ${success} | Gagal: ${failed}\nFoto yang gagal bisa dicoba upload kembali.`}
+ uploadBtn.disabled=false;photos.disabled=false;
+});
+</script>
+</body>
+</html>
