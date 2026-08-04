@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yayasan-alamin-almaarif.netlify.app/sitemap.xml
