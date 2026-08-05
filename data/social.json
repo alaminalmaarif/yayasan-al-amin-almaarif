@@ -40,8 +40,14 @@
 
     "tiktok": {
       "nama": "TikTok",
-      "url": "",
-      "aktif": false
+      "url": "https://www.tiktok.com/@yayasanalaminalmaarif",
+      "aktif": true
+    },
+
+    "x": {
+      "nama": "X",
+      "url": "https://x.com/al_amin59706",
+      "aktif": true
     }
   },
 

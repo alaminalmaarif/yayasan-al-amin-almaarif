@@ -116,7 +116,7 @@
       <div class="hero-overlay" aria-hidden="true"></div>
       <div class="hero-content" data-aos="fade-up">
         <h1 id="heroTitle"></h1>
-        <p>.</p>
+        <p></p>
         <a href="#ppdb" class="btn-primary">Daftar Sekarang</a>
       </div>
     </section>
@@ -219,7 +219,14 @@
           <h2 id="videoTitle">Video Terbaru</h2>
           <p>Video terbaru dari kanal YouTube Yayasan.</p>
         </div>
-        <div id="youtubeContainer" aria-live="polite"></div>
+        <div id="youtubeContainer" class="youtube-grid" aria-live="polite"></div>
+        
+        <div class="center">
+          <button id="loadMoreYoutube" type="button" class="btn-primary" hidden>
+            Lihat Lebih Banyak
+          </button>
+        </div>
+
         <div class="center">
           <a id="youtubeButton" class="btn-secondary" target="_blank" rel="noopener noreferrer" hidden>
             <i class="fa-brands fa-youtube" aria-hidden="true"></i>

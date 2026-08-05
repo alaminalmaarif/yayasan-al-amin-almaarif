@@ -34,7 +34,8 @@ const CONFIG = Object.freeze({
   youtube: Object.freeze({
     channelUrl: "https://www.youtube.com/@ypialaminalmaarif",
     channelId: "UC5ailsw8uuQsQhJ7zvy68oQ",
-    apiKey: "AIzaSyDeWLR64BnvmycnvkQPDaTVoJTDklNTq4A"
+    apiKey: "AIzaSyDeWLR64BnvmycnvkQPDaTVoJTDklNTq4A",
+    pageSize: 4
   }),
 
   features: Object.freeze({

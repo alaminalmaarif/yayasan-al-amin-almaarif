@@ -1,3 +1,6 @@
+let youtubeVideos = [];
+let visibleYoutubeItems = 0;
+
 async function getYouTubeData(endpoint, parameters) {
   const url = new URL(`https://www.googleapis.com/youtube/v3/${endpoint}`);
 
@@ -27,9 +30,59 @@ function setYouTubeMessage(message) {
   container.replaceChildren(status);
 }
 
+function createYoutubeItem(video) {
+  const videoId = video.contentDetails.videoId;
+  const title = video.snippet.title || "Video Yayasan Al-Amin";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "youtube-item";
+
+  const player = document.createElement("iframe");
+  player.className = "youtube-player";
+  player.title = title;
+  player.src =
+    `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?rel=0&playsinline=1`;
+  player.loading = "lazy";
+  player.allow =
+    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+  player.allowFullscreen = true;
+  player.referrerPolicy = "strict-origin-when-cross-origin";
+
+  const caption = document.createElement("p");
+  caption.className = "youtube-caption";
+  caption.textContent = title;
+
+  wrapper.append(player, caption);
+
+  return wrapper;
+}
+
+function renderNextYoutubePage() {
+  const container = document.getElementById("youtubeContainer");
+  const loadMoreButton = document.getElementById("loadMoreYoutube");
+
+  if (!container || !loadMoreButton) return;
+
+  const nextVideos = youtubeVideos.slice(
+    visibleYoutubeItems,
+    visibleYoutubeItems + CONFIG.youtube.pageSize
+  );
+
+  nextVideos.forEach(video => {
+    container.append(createYoutubeItem(video));
+  });
+
+  visibleYoutubeItems += nextVideos.length;
+
+  loadMoreButton.hidden = visibleYoutubeItems >= youtubeVideos.length;
+}
+
 async function loadYoutubeVideos() {
   const container = document.getElementById("youtubeContainer");
-  if (!container) return;
+  const loadMoreButton = document.getElementById("loadMoreYoutube");
+  const youtubeButton = document.getElementById("youtubeButton");
+
+  if (!container || !loadMoreButton) return;
 
   try {
     const channelData = await getYouTubeData("channels", {
@@ -51,29 +104,37 @@ async function loadYoutubeVideos() {
     const playlistData = await getYouTubeData("playlistItems", {
       part: "snippet,contentDetails",
       playlistId: uploadsPlaylistId,
-      maxResults: "5"
+      maxResults: "20"
     });
 
-    const latestVideo = (playlistData.items || []).find(item => {
-      return item.contentDetails && item.contentDetails.videoId;
+    youtubeVideos = (playlistData.items || []).filter(item => {
+      return (
+        item.contentDetails &&
+        item.contentDetails.videoId &&
+        item.snippet
+      );
     });
 
-    if (!latestVideo) {
+    if (youtubeVideos.length === 0) {
       throw new Error("Belum ada video publik yang dapat ditampilkan.");
     }
 
-    const player = document.createElement("iframe");
-    player.className = "youtube-player";
-    player.title = "Video terbaru kanal YouTube Yayasan Pendidikan Islam Al-Amin Al-Ma'arif";
-    player.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(latestVideo.contentDetails.videoId)}?rel=0&playsinline=1`;
-    player.loading = "lazy";
-    player.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    player.allowFullscreen = true;
-    player.referrerPolicy = "strict-origin-when-cross-origin";
+    visibleYoutubeItems = 0;
+    container.replaceChildren();
 
-    container.replaceChildren(player);
+    renderNextYoutubePage();
+
+    loadMoreButton.addEventListener("click", renderNextYoutubePage);
+
+    if (youtubeButton) {
+      youtubeButton.href = CONFIG.youtube.channelUrl;
+      youtubeButton.hidden = false;
+    }
+
   } catch (error) {
     console.error("YouTube Error:", error);
-    setYouTubeMessage(`Video terbaru belum dapat dimuat: ${error.message}`);
+    setYouTubeMessage(
+      `Video belum dapat dimuat: ${error.message}`
+    );
   }
 }
