@@ -1,0 +1,2345 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Semesteran | Dashboard Kepala RA Al-Amin Al-Ma'arif</title>
+<style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+
+    /* ==========================================
+       HEADER
+    ========================================== */
+
+    .page-header {
+      background: #0f766e;
+      color: white;
+      padding: 20px 24px;
+    }
+
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 20px;
+    }
+
+
+    .header-title {
+      margin: 0;
+      font-size: 24px;
+    }
+
+
+    .header-subtitle {
+      margin: 6px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+
+    .back-button {
+      border: none;
+      border-radius: 8px;
+
+      padding: 10px 16px;
+
+      background: white;
+      color: #0f766e;
+
+      font-weight: 600;
+      cursor: pointer;
+
+      text-decoration: none;
+    }
+
+
+    .back-button:hover {
+      opacity: 0.9;
+    }
+
+
+
+    /* ==========================================
+       KONTEN
+    ========================================== */
+
+    .page-content {
+      max-width: 1200px;
+      margin: 0 auto;
+
+      padding: 30px 24px;
+    }
+
+
+    .page-toolbar {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+
+    .page-intro {
+      background: white;
+
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+
+      padding: 24px;
+
+      flex: 1;
+    }
+
+
+    .page-intro h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+
+    .page-intro p {
+      margin: 0;
+
+      color: #6b7280;
+
+      line-height: 1.6;
+    }
+
+
+    .page-intro ul {
+      margin: 14px 0 0;
+      padding-left: 20px;
+
+      color: #6b7280;
+
+      line-height: 1.7;
+    }
+
+
+
+    /* ==========================================
+       TOMBOL TAMBAH
+    ========================================== */
+
+    .add-button {
+      align-self: flex-start;
+
+      display: inline-flex;
+
+      align-items: center;
+      justify-content: center;
+
+      gap: 6px;
+
+      border: none;
+      border-radius: 8px;
+
+      padding: 11px 16px;
+
+      background: #0f766e;
+      color: white;
+
+      font-weight: 600;
+      cursor: pointer;
+
+      white-space: nowrap;
+    }
+
+
+    .add-button:hover {
+      opacity: 0.9;
+    }
+
+
+
+    /* ==========================================
+       FORM
+    ========================================== */
+
+    .form-container {
+      display: none;
+
+      background: white;
+
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+
+      padding: 24px;
+
+      margin-bottom: 24px;
+    }
+
+
+    .form-container.active {
+      display: block;
+    }
+
+
+    .form-container h3 {
+      margin: 0 0 20px;
+
+      font-size: 20px;
+    }
+
+
+    .form-description {
+      margin: -10px 0 20px;
+
+      color: #6b7280;
+
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+
+    .form-group label {
+      display: block;
+
+      margin-bottom: 6px;
+
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+
+      width: 100%;
+
+      padding: 10px 12px;
+
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+
+      font: inherit;
+
+      background: white;
+    }
+
+
+    .form-group textarea {
+
+      min-height: 120px;
+
+      resize: vertical;
+    }
+
+
+    .form-actions {
+
+      display: flex;
+
+      gap: 10px;
+
+      margin-top: 20px;
+    }
+
+
+    .save-button,
+    .cancel-button {
+
+      border: none;
+
+      border-radius: 8px;
+
+      padding: 10px 16px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+    }
+
+
+    .save-button {
+
+      background: #0f766e;
+      color: white;
+    }
+
+
+    .cancel-button {
+
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+
+
+    /* ==========================================
+       DAFTAR KEGIATAN
+    ========================================== */
+
+    .activities-section {
+      margin-top: 24px;
+    }
+
+
+    .activities-section h2 {
+
+      margin: 0 0 16px;
+
+      font-size: 20px;
+    }
+
+
+    .activity-card {
+
+      background: white;
+
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+
+      padding: 20px;
+
+      margin-bottom: 14px;
+    }
+
+
+    .activity-meta {
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      align-items: center;
+
+      gap: 8px;
+
+      margin-bottom: 10px;
+    }
+
+
+    .activity-date {
+
+      font-size: 13px;
+
+      color: #6b7280;
+    }
+
+
+    .activity-badge {
+
+      display: inline-block;
+
+      background: #ecfdf5;
+      color: #047857;
+
+      border-radius: 6px;
+
+      padding: 4px 8px;
+
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+
+    .activity-badge.status-rencana {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+
+    .activity-badge.status-berjalan {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+
+    .activity-badge.status-selesai {
+      background: #ecfdf5;
+      color: #047857;
+    }
+
+
+    .activity-badge.status-ditunda {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+
+    .activity-title {
+
+      margin: 0 0 8px;
+
+      font-size: 18px;
+    }
+
+
+    .activity-note {
+
+      margin: 0;
+
+      color: #4b5563;
+
+      line-height: 1.6;
+
+      white-space: pre-wrap;
+    }
+
+
+    .activity-actions {
+
+      display: flex;
+
+      gap: 8px;
+
+      margin-top: 16px;
+    }
+
+
+    .edit-button,
+    .delete-button {
+
+      border: none;
+
+      border-radius: 8px;
+
+      padding: 9px 14px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+    }
+
+
+    .edit-button {
+
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+
+    .edit-button:hover {
+
+      background: #e5e7eb;
+    }
+
+
+    .delete-button {
+
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+
+    .delete-button:hover {
+
+      background: #fee2e2;
+    }
+
+
+    .empty-message {
+
+      background: white;
+
+      border: 1px dashed #d1d5db;
+
+      border-radius: 12px;
+
+      padding: 24px;
+
+      text-align: center;
+
+      color: #6b7280;
+    }
+
+
+
+    /* ==========================================
+       MOBILE
+    ========================================== */
+
+    @media (max-width: 600px) {
+
+      .page-toolbar {
+
+        flex-direction: column;
+      }
+
+
+      .add-button {
+
+        width: 100%;
+      }
+
+
+      .form-actions {
+
+        flex-direction: column;
+      }
+
+
+      .save-button,
+      .cancel-button {
+
+        width: 100%;
+      }
+
+
+      .header-inner {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+
+      .header-title {
+
+        font-size: 20px;
+      }
+
+
+      .page-content {
+
+        padding: 24px 16px;
+      }
+
+
+      .activity-actions {
+
+        flex-direction: column;
+      }
+
+
+      .edit-button,
+      .delete-button {
+
+        width: 100%;
+      }
+
+    }
+
+  
+    /* ==========================================
+       DETAIL RAPAT
+    ========================================== */
+
+    .meeting-details {
+      margin-top: 20px;
+      padding: 18px;
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 10px;
+    }
+
+    .meeting-details[hidden] {
+      display: none !important;
+    }
+
+    .meeting-details h4 {
+      margin: 0 0 16px;
+      color: #0f766e;
+      font-size: 17px;
+    }
+
+    .meeting-summary {
+      margin-top: 14px;
+      padding: 14px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      line-height: 1.6;
+    }
+
+    .meeting-summary strong {
+      color: #374151;
+    }
+
+  </style>
+</head>
+<body>
+<!-- ==========================================
+       HEADER
+  ========================================== -->
+<header class="page-header">
+<div class="header-inner">
+<div>
+<h1 class="header-title">
+          📚 Semesteran
+        </h1>
+<p class="header-subtitle">
+          Dashboard Kepala RA Al-Amin Al-Ma'arif
+        </p>
+</div>
+<a class="back-button" href="index.html">
+        ← Dashboard
+      </a>
+</div>
+</header>
+<!-- ==========================================
+       ISI HALAMAN
+  ========================================== -->
+<main class="page-content">
+<!-- ========================================
+         INFORMASI + TOMBOL TAMBAH
+    ========================================= -->
+<div class="page-toolbar">
+<div class="page-intro">
+<h2>
+          Kegiatan Semesteran
+        </h2>
+<p>
+          Catat pekerjaan dan kegiatan yang
+          berlangsung dalam satu semester.
+          Daftar kegiatan tidak dikunci sehingga
+          kegiatan baru dapat ditambahkan kapan saja.
+        </p>
+<ul>
+<li>
+            EMIS
+          </li>
+<li>
+            BOP
+          </li>
+<li>
+            LPJ
+          </li>
+<li>
+            Rapat wali murid
+          </li>
+<li>
+            Kegiatan semesteran lainnya
+          </li>
+</ul>
+</div>
+<button class="add-button" id="addButton" type="button">
+        ＋ Tambah
+      </button>
+</div>
+<!-- ========================================
+         FORM TAMBAH / EDIT
+    ========================================= -->
+<section class="form-container" id="formContainer">
+<h3 id="formTitle">
+        Tambah Kegiatan Semesteran
+      </h3>
+<p class="form-description">
+        Isi kegiatan yang ingin dicatat.
+        Kegiatan baru dapat ditambahkan tanpa
+        harus memilih dari daftar yang sudah ada.
+      </p>
+<form id="semesterForm">
+<!-- TANGGAL -->
+<div class="form-group">
+<label for="tanggal">
+            Tanggal
+          </label>
+<input id="tanggal" required="" type="date"/>
+</div>
+<!-- TAHUN AJARAN -->
+<div class="form-group">
+<label for="tahunAjaran">
+            Tahun Ajaran
+          </label>
+<input id="tahunAjaran" placeholder="Contoh: 2026/2027" required="" type="text"/>
+</div>
+<!-- SEMESTER -->
+<div class="form-group">
+<label for="semester">
+            Semester
+          </label>
+<select id="semester" required="">
+<option value="">
+              -- Pilih semester --
+            </option>
+<option value="ganjil">
+              Ganjil
+            </option>
+<option value="genap">
+              Genap
+            </option>
+</select>
+</div>
+<!-- JENIS KEGIATAN -->
+<div class="form-group">
+<label for="jenis">
+            Jenis Kegiatan
+          </label>
+<select id="jenis">
+<option value="">
+              -- Pilih jenis kegiatan --
+            </option>
+<option value="emis">
+              EMIS
+            </option>
+<option value="bop">
+              BOP
+            </option>
+<option value="lpj">
+              LPJ
+            </option>
+<option value="rapat">
+              Rapat
+            </option>
+<option value="lainnya">
+              Kegiatan lainnya
+            </option>
+</select>
+</div>
+<!-- DETAIL RAPAT -->
+<div class="meeting-details" hidden="" id="meetingDetails">
+<h4>Detail Rapat</h4>
+<div class="form-group">
+<label for="jenisRapat">Jenis Rapat</label>
+<select id="jenisRapat">
+<option value="">-- Pilih jenis rapat --</option>
+<option value="internal">Internal</option>
+<option value="eksternal">Eksternal</option>
+</select>
+</div>
+<div class="form-group">
+<label for="peserta">Peserta</label>
+<textarea id="peserta" placeholder="Contoh: Kepala RA, guru, wali murid, pengawas..."></textarea>
+</div>
+<div class="form-group">
+<label for="agendaRapat">Agenda Rapat</label>
+<textarea id="agendaRapat" placeholder="Tuliskan agenda atau pokok pembahasan rapat..."></textarea>
+</div>
+<div class="form-group">
+<label for="hasilRapat">Hasil Pembahasan</label>
+<textarea id="hasilRapat" placeholder="Tuliskan hasil pembahasan rapat..."></textarea>
+</div>
+<div class="form-group">
+<label for="keputusan">Keputusan</label>
+<textarea id="keputusan" placeholder="Tuliskan keputusan yang dihasilkan..."></textarea>
+</div>
+<div class="form-group">
+<label for="pembagianTugas">Pembagian Tugas</label>
+<textarea id="pembagianTugas" placeholder="Tuliskan pembagian tugas jika ada..."></textarea>
+</div>
+<div class="form-group">
+<label for="tindakLanjut">Tindak Lanjut</label>
+<textarea id="tindakLanjut" placeholder="Tuliskan tindak lanjut yang harus dilakukan..."></textarea>
+</div>
+</div>
+<!-- JUDUL -->
+<div class="form-group">
+<label for="judul">
+            Judul / Kegiatan
+          </label>
+<input id="judul" placeholder="Contoh: Pengisian EMIS Semester Ganjil" required="" type="text"/>
+</div>
+<!-- STATUS -->
+<div class="form-group">
+<label for="status">
+            Status
+          </label>
+<select id="status" required="">
+<option value="rencana">
+              ⭕ Rencana
+            </option>
+<option value="berjalan">
+              🔵 Berjalan
+            </option>
+<option value="selesai">
+              ✅ Selesai
+            </option>
+<option value="ditunda">
+              🔴 Ditunda
+            </option>
+</select>
+</div>
+<!-- CATATAN -->
+<div class="form-group">
+<label for="catatan">
+            Catatan
+          </label>
+<textarea id="catatan" placeholder="Keterangan, hasil, atau hal penting lainnya..."></textarea>
+</div>
+<!-- TOMBOL -->
+<div class="form-actions">
+<button class="save-button" id="saveButton" type="submit">
+            Simpan
+          </button>
+<button class="cancel-button" id="cancelButton" type="button">
+            Batal
+          </button>
+</div>
+</form>
+</section>
+<!-- ========================================
+         DAFTAR KEGIATAN
+    ========================================= -->
+<section class="activities-section">
+<h2>
+        Daftar Kegiatan Semesteran
+      </h2>
+<div id="activitiesList">
+<p class="empty-message">
+          Memuat kegiatan semesteran...
+        </p>
+</div>
+</section>
+</main>
+<!-- ==========================================
+       CONFIG
+  ========================================== -->
+<script src="config.js"></script>
+<script>
+
+
+    // ==========================================
+    // CEK LOGIN
+    // ==========================================
+
+    const sessionData =
+      localStorage.getItem(
+        "supabase_session"
+      );
+
+
+    if (!sessionData) {
+
+      window.location.href =
+        "login.html";
+
+    }
+
+
+
+    // ==========================================
+    // ELEMENT
+    // ==========================================
+
+    const addButton =
+      document.getElementById(
+        "addButton"
+      );
+
+
+    const formContainer =
+      document.getElementById(
+        "formContainer"
+      );
+
+
+    const cancelButton =
+      document.getElementById(
+        "cancelButton"
+      );
+
+
+    const semesterForm =
+      document.getElementById(
+        "semesterForm"
+      );
+
+
+    const activitiesList =
+      document.getElementById(
+        "activitiesList"
+      );
+
+
+    const formTitle =
+      document.getElementById(
+        "formTitle"
+      );
+
+
+    const saveButton =
+      document.getElementById(
+        "saveButton"
+      );
+
+
+
+    // ==========================================
+    
+    // ==========================================
+    // DETAIL RAPAT
+    // ==========================================
+
+    const jenisInput =
+      document.getElementById("jenis");
+
+    const meetingDetails =
+      document.getElementById("meetingDetails");
+
+    const jenisRapatInput =
+      document.getElementById("jenisRapat");
+
+    const pesertaInput =
+      document.getElementById("peserta");
+
+    const agendaRapatInput =
+      document.getElementById("agendaRapat");
+
+    const hasilRapatInput =
+      document.getElementById("hasilRapat");
+
+    const keputusanInput =
+      document.getElementById("keputusan");
+
+    const pembagianTugasInput =
+      document.getElementById("pembagianTugas");
+
+    const tindakLanjutInput =
+      document.getElementById("tindakLanjut");
+
+
+    function toggleMeetingDetails() {
+
+      const isMeeting =
+        jenisInput &&
+        jenisInput.value === "rapat";
+
+      if (meetingDetails) {
+        meetingDetails.hidden = !isMeeting;
+      }
+
+      if (!isMeeting) {
+        jenisRapatInput.value = "";
+        pesertaInput.value = "";
+        agendaRapatInput.value = "";
+        hasilRapatInput.value = "";
+        keputusanInput.value = "";
+        pembagianTugasInput.value = "";
+        tindakLanjutInput.value = "";
+      }
+
+    }
+
+
+    function getMeetingData() {
+
+      const isMeeting =
+        jenisInput &&
+        jenisInput.value === "rapat";
+
+      if (!isMeeting) {
+
+        return {
+          jenis_rapat: null,
+          peserta: null,
+          agenda_rapat: null,
+          hasil_rapat: null,
+          keputusan: null,
+          pembagian_tugas: null,
+          tindak_lanjut: null
+        };
+
+      }
+
+      if (!jenisRapatInput.value) {
+
+        throw new Error(
+          "Jenis rapat harus dipilih."
+        );
+
+      }
+
+      return {
+        jenis_rapat:
+          jenisRapatInput.value,
+
+        peserta:
+          pesertaInput.value.trim() || null,
+
+        agenda_rapat:
+          agendaRapatInput.value.trim() || null,
+
+        hasil_rapat:
+          hasilRapatInput.value.trim() || null,
+
+        keputusan:
+          keputusanInput.value.trim() || null,
+
+        pembagian_tugas:
+          pembagianTugasInput.value.trim() || null,
+
+        tindak_lanjut:
+          tindakLanjutInput.value.trim() || null
+      };
+
+    }
+
+
+    function fillMeetingData(activity) {
+
+      jenisRapatInput.value =
+        activity.jenis_rapat || "";
+
+      pesertaInput.value =
+        activity.peserta || "";
+
+      agendaRapatInput.value =
+        activity.agenda_rapat || "";
+
+      hasilRapatInput.value =
+        activity.hasil_rapat || "";
+
+      keputusanInput.value =
+        activity.keputusan || "";
+
+      pembagianTugasInput.value =
+        activity.pembagian_tugas || "";
+
+      tindakLanjutInput.value =
+        activity.tindak_lanjut || "";
+
+      toggleMeetingDetails();
+
+    }
+
+
+    function getJenisRapatLabel(value) {
+
+      if (value === "internal") {
+        return "Internal";
+      }
+
+      if (value === "eksternal") {
+        return "Eksternal";
+      }
+
+      return value || "-";
+
+    }
+
+
+    function renderMeetingDetails(activity) {
+
+      if (activity.jenis !== "rapat") {
+        return "";
+      }
+
+      return `
+        <div class="meeting-summary">
+
+          <strong>Detail Rapat</strong>
+
+          <div>
+            <strong>Jenis:</strong>
+            ${escapeHtml(
+              getJenisRapatLabel(
+                activity.jenis_rapat
+              )
+            )}
+          </div>
+
+          ${
+            activity.peserta
+              ? `
+                <div>
+                  <strong>Peserta:</strong>
+                  ${escapeHtml(activity.peserta)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.agenda_rapat
+              ? `
+                <div>
+                  <strong>Agenda:</strong>
+                  ${escapeHtml(activity.agenda_rapat)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.hasil_rapat
+              ? `
+                <div>
+                  <strong>Hasil:</strong>
+                  ${escapeHtml(activity.hasil_rapat)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.keputusan
+              ? `
+                <div>
+                  <strong>Keputusan:</strong>
+                  ${escapeHtml(activity.keputusan)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.pembagian_tugas
+              ? `
+                <div>
+                  <strong>Pembagian Tugas:</strong>
+                  ${escapeHtml(activity.pembagian_tugas)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.tindak_lanjut
+              ? `
+                <div>
+                  <strong>Tindak Lanjut:</strong>
+                  ${escapeHtml(activity.tindak_lanjut)}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+      `;
+
+    }
+
+
+    jenisInput.addEventListener(
+      "change",
+      toggleMeetingDetails
+    );
+
+
+// MODE EDIT
+    // ==========================================
+
+    let editingActivityId = null;
+
+
+
+    // ==========================================
+    // SESSION
+    // ==========================================
+
+    function getSession() {
+
+      const data =
+        localStorage.getItem(
+          "supabase_session"
+        );
+
+
+      if (!data) {
+
+        window.location.href =
+          "login.html";
+
+        return null;
+
+      }
+
+
+      return JSON.parse(data);
+
+    }
+
+
+
+    // ==========================================
+    // ESCAPE HTML
+    // ==========================================
+
+    function escapeHtml(value) {
+
+      if (
+        value === null ||
+        value === undefined
+      ) {
+
+        return "";
+
+      }
+
+
+      return String(value)
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+
+    // ==========================================
+    // FORMAT TANGGAL
+    // ==========================================
+
+    function formatDate(dateValue) {
+
+      if (!dateValue) {
+
+        return "-";
+
+      }
+
+
+      const date =
+        new Date(
+          dateValue + "T00:00:00"
+        );
+
+
+      return date.toLocaleDateString(
+        "id-ID",
+        {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }
+      );
+
+    }
+
+
+
+    // ==========================================
+    // LABEL SEMESTER
+    // ==========================================
+
+    function getSemesterLabel(semester) {
+
+      if (semester === "ganjil") {
+
+        return "Semester Ganjil";
+
+      }
+
+
+      if (semester === "genap") {
+
+        return "Semester Genap";
+
+      }
+
+
+      return semester || "Semester";
+
+    }
+
+
+
+    // ==========================================
+    // LABEL STATUS
+    // ==========================================
+
+    function getStatusLabel(status) {
+
+      if (status === "rencana") {
+
+        return "⭕ Rencana";
+
+      }
+
+
+      if (status === "berjalan") {
+
+        return "🔵 Berjalan";
+
+      }
+
+
+      if (status === "selesai") {
+
+        return "✅ Selesai";
+
+      }
+
+
+      if (status === "ditunda") {
+
+        return "🔴 Ditunda";
+
+      }
+
+
+      return status || "Status";
+
+    }
+
+
+
+    // ==========================================
+    // BUKA FORM TAMBAH
+    // ==========================================
+
+    addButton.addEventListener(
+      "click",
+      function () {
+
+
+        editingActivityId = null;
+
+
+        semesterForm.reset();
+
+        toggleMeetingDetails();
+
+
+        formTitle.textContent =
+          "Tambah Kegiatan Semesteran";
+
+
+        saveButton.textContent =
+          "Simpan";
+
+
+        formContainer.classList.add(
+          "active"
+        );
+
+
+        addButton.style.display =
+          "none";
+
+
+        document
+          .getElementById("tanggal")
+          .focus();
+
+      }
+    );
+
+
+
+    // ==========================================
+    // BATAL
+    // ==========================================
+
+    cancelButton.addEventListener(
+      "click",
+      function () {
+
+
+        editingActivityId = null;
+
+
+        semesterForm.reset();
+
+        toggleMeetingDetails();
+
+
+        formTitle.textContent =
+          "Tambah Kegiatan Semesteran";
+
+
+        saveButton.textContent =
+          "Simpan";
+
+
+        formContainer.classList.remove(
+          "active"
+        );
+
+
+        addButton.style.display =
+          "inline-flex";
+
+      }
+    );
+
+
+
+    // ==========================================
+    // LOAD KEGIATAN SEMESTERAN
+    // ==========================================
+
+    async function loadSemesterActivities() {
+
+
+      const session =
+        getSession();
+
+
+      if (!session) {
+
+        return;
+
+      }
+
+
+      const accessToken =
+        session.access_token;
+
+
+      try {
+
+
+        const response =
+          await fetch(
+
+            `${SUPABASE_URL}/rest/v1/kegiatan?` +
+            `kategori=eq.semesteran` +
+            `&select=id,tanggal,tahun_ajaran,semester,jenis,status,judul,catatan,jenis_rapat,peserta,agenda_rapat,hasil_rapat,keputusan,pembagian_tugas,tindak_lanjut,created_at` +
+            `&order=tanggal.desc,created_at.desc`,
+
+            {
+
+              method: "GET",
+
+              headers: {
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Authorization":
+                  `Bearer ${accessToken}`
+
+              }
+
+            }
+
+          );
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            JSON.stringify(data)
+          );
+
+        }
+
+
+        if (
+          !Array.isArray(data) ||
+          data.length === 0
+        ) {
+
+          activitiesList.innerHTML = `
+
+            <p class="empty-message">
+              Belum ada kegiatan semesteran.
+            </p>
+
+          `;
+
+          return;
+
+        }
+
+
+        activitiesList.innerHTML =
+          data.map(
+            function (activity) {
+
+
+              const statusClass =
+                activity.status
+                  ? `status-${activity.status}`
+                  : "";
+
+
+              return `
+
+                <article
+                  class="activity-card"
+                >
+
+
+                  <div
+                    class="activity-meta"
+                  >
+
+                    <span
+                      class="activity-date"
+                    >
+                      📅
+                      ${escapeHtml(
+                        formatDate(
+                          activity.tanggal
+                        )
+                      )}
+                    </span>
+
+
+                    <span
+                      class="activity-badge"
+                    >
+                      ${escapeHtml(
+                        getSemesterLabel(
+                          activity.semester
+                        )
+                      )}
+                    </span>
+
+
+                    <span
+                      class="activity-badge ${statusClass}"
+                    >
+                      ${escapeHtml(
+                        getStatusLabel(
+                          activity.status
+                        )
+                      )}
+                    </span>
+
+
+                    <span
+                      class="activity-badge"
+                    >
+                      TA
+                      ${escapeHtml(
+                        activity.tahun_ajaran
+                      )}
+                    </span>
+
+                  </div>
+
+
+                  <h3
+                    class="activity-title"
+                  >
+                    ${escapeHtml(
+                      activity.judul
+                    )}
+                  </h3>
+
+
+                  <p
+                    class="activity-note"
+                  >
+                    ${
+                      activity.catatan
+                        ? escapeHtml(
+                            activity.catatan
+                          )
+                        : "Tidak ada catatan."
+                    }
+                  </p>
+
+
+                  ${renderMeetingDetails(activity)}
+
+
+                  <div
+                    class="activity-actions"
+                  >
+
+                    <button
+                      type="button"
+                      class="edit-button"
+                      data-id="${escapeHtml(
+                        activity.id
+                      )}"
+                    >
+                      ✏️ Edit
+                    </button>
+
+
+                    <button
+                      type="button"
+                      class="delete-button"
+                      data-id="${escapeHtml(
+                        activity.id
+                      )}"
+                    >
+                      🗑️ Hapus
+                    </button>
+
+                  </div>
+
+
+                </article>
+
+              `;
+
+            }
+          ).join("");
+
+
+      } catch (error) {
+
+
+        console.error(
+          "Gagal memuat kegiatan semesteran:",
+          error
+        );
+
+
+        activitiesList.innerHTML = `
+
+          <p class="empty-message">
+            ❌ Gagal memuat kegiatan semesteran.
+          </p>
+
+        `;
+
+      }
+
+    }
+
+
+
+    // ==========================================
+    // EDIT KEGIATAN
+    // ==========================================
+
+    async function editActivity(id) {
+
+
+      const session =
+        getSession();
+
+
+      if (!session) {
+
+        return;
+
+      }
+
+
+      const accessToken =
+        session.access_token;
+
+
+      try {
+
+
+        const response =
+          await fetch(
+
+            `${SUPABASE_URL}/rest/v1/kegiatan?` +
+            `id=eq.${encodeURIComponent(id)}` +
+            `&select=id,tanggal,tahun_ajaran,semester,jenis,status,judul,catatan,jenis_rapat,peserta,agenda_rapat,hasil_rapat,keputusan,pembagian_tugas,tindak_lanjut`,
+
+            {
+
+              method: "GET",
+
+              headers: {
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Authorization":
+                  `Bearer ${accessToken}`
+
+              }
+
+            }
+
+          );
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            JSON.stringify(data)
+          );
+
+        }
+
+
+        if (
+          !Array.isArray(data) ||
+          data.length === 0
+        ) {
+
+          alert(
+            "❌ Data kegiatan tidak ditemukan."
+          );
+
+          return;
+
+        }
+
+
+        const activity =
+          data[0];
+
+
+        editingActivityId =
+          activity.id;
+
+
+        document
+          .getElementById("tanggal")
+          .value =
+            activity.tanggal || "";
+
+
+        document
+          .getElementById("tahunAjaran")
+          .value =
+            activity.tahun_ajaran || "";
+
+
+        document
+          .getElementById("semester")
+          .value =
+            activity.semester || "";
+
+
+        document
+          .getElementById("jenis")
+          .value =
+            activity.jenis || "";
+
+
+        fillMeetingData(activity);
+
+
+        document
+          .getElementById("judul")
+          .value =
+            activity.judul || "";
+
+
+        document
+          .getElementById("status")
+          .value =
+            activity.status || "rencana";
+
+
+        document
+          .getElementById("catatan")
+          .value =
+            activity.catatan || "";
+
+
+        formTitle.textContent =
+          "Edit Kegiatan Semesteran";
+
+
+        saveButton.textContent =
+          "Simpan Perubahan";
+
+
+        formContainer.classList.add(
+          "active"
+        );
+
+
+        addButton.style.display =
+          "none";
+
+
+        formContainer.scrollIntoView({
+
+          behavior: "smooth",
+
+          block: "start"
+
+        });
+
+
+      } catch (error) {
+
+
+        console.error(
+          "Gagal membuka data untuk diedit:",
+          error
+        );
+
+
+        alert(
+          "❌ Gagal mengambil data kegiatan.\n\n" +
+          error.message
+        );
+
+      }
+
+    }
+
+
+
+    // ==========================================
+    // EVENT EDIT
+    // ==========================================
+
+    document.addEventListener(
+      "click",
+      function (event) {
+
+
+        const editButton =
+          event.target.closest(
+            ".edit-button"
+          );
+
+
+        if (!editButton) {
+
+          return;
+
+        }
+
+
+        const id =
+          editButton.dataset.id;
+
+
+        editActivity(id);
+
+      }
+    );
+
+
+
+    // ==========================================
+    // HAPUS KEGIATAN
+    // ==========================================
+
+    async function deleteActivity(id) {
+
+
+      const confirmed =
+        confirm(
+          "Apakah kamu yakin ingin menghapus kegiatan semesteran ini?"
+        );
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+      const session =
+        getSession();
+
+
+      if (!session) {
+
+        return;
+
+      }
+
+
+      const accessToken =
+        session.access_token;
+
+
+      try {
+
+
+        const response =
+          await fetch(
+
+            `${SUPABASE_URL}/rest/v1/kegiatan?` +
+            `id=eq.${encodeURIComponent(id)}`,
+
+            {
+
+              method: "DELETE",
+
+              headers: {
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Authorization":
+                  `Bearer ${accessToken}`,
+
+                "Prefer":
+                  "return=minimal"
+
+              }
+
+            }
+
+          );
+
+
+        if (!response.ok) {
+
+          const errorData =
+            await response.text();
+
+          throw new Error(
+            errorData
+          );
+
+        }
+
+
+        alert(
+          "✅ Kegiatan semesteran berhasil dihapus."
+        );
+
+
+        await loadSemesterActivities();
+
+
+      } catch (error) {
+
+
+        console.error(
+          "Gagal menghapus kegiatan:",
+          error
+        );
+
+
+        alert(
+          "❌ Gagal menghapus kegiatan.\n\n" +
+          error.message
+        );
+
+      }
+
+    }
+
+
+
+    // ==========================================
+    // EVENT HAPUS
+    // ==========================================
+
+    document.addEventListener(
+      "click",
+      function (event) {
+
+
+        const deleteButton =
+          event.target.closest(
+            ".delete-button"
+          );
+
+
+        if (!deleteButton) {
+
+          return;
+
+        }
+
+
+        const id =
+          deleteButton.dataset.id;
+
+
+        deleteActivity(id);
+
+      }
+    );
+
+
+
+    // ==========================================
+    // SIMPAN / UPDATE
+    // ==========================================
+
+    semesterForm.addEventListener(
+      "submit",
+      async function (event) {
+
+
+        event.preventDefault();
+
+
+        const tanggal =
+          document
+            .getElementById("tanggal")
+            .value;
+
+
+        const tahunAjaran =
+          document
+            .getElementById("tahunAjaran")
+            .value
+            .trim();
+
+
+        const semester =
+          document
+            .getElementById("semester")
+            .value;
+
+
+        const jenis =
+          document
+            .getElementById("jenis")
+            .value;
+
+
+        const judul =
+          document
+            .getElementById("judul")
+            .value
+            .trim();
+
+
+        const status =
+          document
+            .getElementById("status")
+            .value;
+
+
+        const catatan =
+          document
+            .getElementById("catatan")
+            .value
+            .trim();
+
+
+        let meetingData;
+
+        try {
+
+          meetingData = getMeetingData();
+
+        } catch (error) {
+
+          alert(
+            error.message
+          );
+
+          return;
+
+        }
+
+
+        const session =
+          getSession();
+
+
+        if (!session) {
+
+          return;
+
+        }
+
+
+        const accessToken =
+          session.access_token;
+
+
+
+        // ======================================
+        // EDIT
+        // ======================================
+
+        if (editingActivityId) {
+
+
+          try {
+
+
+            const response =
+              await fetch(
+
+                `${SUPABASE_URL}/rest/v1/kegiatan?` +
+                `id=eq.${encodeURIComponent(
+                  editingActivityId
+                )}`,
+
+                {
+
+                  method: "PATCH",
+
+                  headers: {
+
+                    "apikey":
+                      SUPABASE_KEY,
+
+                    "Authorization":
+                      `Bearer ${accessToken}`,
+
+                    "Content-Type":
+                      "application/json",
+
+                    "Prefer":
+                      "return=representation"
+
+                  },
+
+
+                  body:
+                    JSON.stringify({
+
+                      tanggal:
+                        tanggal,
+
+                      tahun_ajaran:
+                        tahunAjaran,
+
+                      semester:
+                        semester,
+
+                      jenis:
+                        jenis,
+
+                      ...meetingData,
+
+                      judul:
+                        judul,
+
+                      status:
+                        status,
+
+                      catatan:
+                        catatan
+
+                    })
+
+                }
+
+              );
+
+
+            const data =
+              await response.json();
+
+
+            if (!response.ok) {
+
+              throw new Error(
+                JSON.stringify(data)
+              );
+
+            }
+
+
+            alert(
+              "✅ Kegiatan semesteran berhasil diperbarui."
+            );
+
+
+            editingActivityId =
+              null;
+
+
+            semesterForm.reset();
+
+        toggleMeetingDetails();
+
+
+            formTitle.textContent =
+              "Tambah Kegiatan Semesteran";
+
+
+            saveButton.textContent =
+              "Simpan";
+
+
+            formContainer.classList.remove(
+              "active"
+            );
+
+
+            addButton.style.display =
+              "inline-flex";
+
+
+            await loadSemesterActivities();
+
+
+          } catch (error) {
+
+
+            console.error(
+              "Gagal memperbarui kegiatan:",
+              error
+            );
+
+
+            alert(
+              "❌ Gagal memperbarui kegiatan.\n\n" +
+              error.message
+            );
+
+          }
+
+
+          return;
+
+        }
+
+
+
+        // ======================================
+        // TAMBAH
+        // ======================================
+
+        try {
+
+
+          const response =
+            await fetch(
+
+              `${SUPABASE_URL}/rest/v1/kegiatan`,
+
+              {
+
+                method: "POST",
+
+                headers: {
+
+                  "apikey":
+                    SUPABASE_KEY,
+
+                  "Authorization":
+                    `Bearer ${accessToken}`,
+
+                  "Content-Type":
+                    "application/json",
+
+                  "Prefer":
+                    "return=representation"
+
+                },
+
+
+                body:
+                  JSON.stringify({
+
+                    kategori:
+                      "semesteran",
+
+                    tanggal:
+                      tanggal,
+
+                    tahun_ajaran:
+                      tahunAjaran,
+
+                    semester:
+                      semester,
+
+                    jenis:
+                      jenis,
+
+                    ...meetingData,
+
+                    judul:
+                      judul,
+
+                    status:
+                      status,
+
+                    catatan:
+                      catatan
+
+                  })
+
+              }
+
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              JSON.stringify(data)
+            );
+
+          }
+
+
+          alert(
+            "✅ Kegiatan semesteran berhasil disimpan."
+          );
+
+
+          semesterForm.reset();
+
+        toggleMeetingDetails();
+
+
+          formContainer.classList.remove(
+            "active"
+          );
+
+
+          addButton.style.display =
+            "inline-flex";
+
+
+          console.log(
+            "Data semesteran berhasil disimpan:",
+            data
+          );
+
+
+          await loadSemesterActivities();
+
+
+        } catch (error) {
+
+
+          console.error(
+            "Gagal menyimpan kegiatan:",
+            error
+          );
+
+
+          alert(
+            "❌ Gagal menyimpan kegiatan.\n\n" +
+            error.message
+          );
+
+        }
+
+      }
+    );
+
+
+
+    // ==========================================
+    // LOAD AWAL
+    // ==========================================
+
+    loadSemesterActivities();
+
+
+  </script>
+</body>
+</html>

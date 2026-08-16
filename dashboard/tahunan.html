@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tahunan | Dashboard Kepala</title>
+<style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    .page-header {
+      background: #0f766e;
+      color: white;
+      padding: 20px 24px;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .header-subtitle {
+      margin: 6px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: white;
+      color: #0f766e;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-button:hover {
+      opacity: 0.9;
+    }
+
+    .page-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 24px 50px;
+    }
+
+    .intro-card,
+    .form-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .intro-card {
+      margin-bottom: 20px;
+    }
+
+    .intro-card h2 {
+      margin: 0 0 8px;
+      font-size: 21px;
+    }
+
+    .intro-card p {
+      margin: 0;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .form-card h2 {
+      margin: 0 0 22px;
+      font-size: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 11px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #1f2937;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #0f766e;
+      box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.12);
+    }
+
+    textarea {
+      min-height: 115px;
+      resize: vertical;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 17px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .save-button {
+      background: #0f766e;
+      color: white;
+    }
+
+    .save-button:hover {
+      background: #0d6b64;
+    }
+
+    .cancel-button {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .cancel-button:hover {
+      background: #d1d5db;
+    }
+
+    .add-button {
+      background: #0f766e;
+      color: white;
+      padding: 11px 18px;
+    }
+
+    .add-button:hover {
+      background: #0d6b64;
+    }
+
+    .list-section {
+      margin-top: 30px;
+    }
+
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .list-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .activity-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .activity-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .activity-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .activity-title {
+      margin: 0 0 6px;
+      font-size: 17px;
+    }
+
+    .activity-meta {
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .activity-type {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #ecfdf5;
+      color: #047857;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-rencana {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-berjalan {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .status-selesai {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-ditunda {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .activity-note {
+      margin: 14px 0 0;
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+      color: #4b5563;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .activity-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .edit-button {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .delete-button {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .edit-button:hover {
+      background: #bae6fd;
+    }
+
+    .delete-button:hover {
+      background: #fecaca;
+    }
+
+    .empty-state {
+      background: white;
+      border: 1px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 30px 20px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loading {
+      color: #6b7280;
+      text-align: center;
+      padding: 25px;
+    }
+
+    @media (max-width: 600px) {
+      .page-header {
+        padding: 18px 16px;
+      }
+
+      .header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .header-title {
+        font-size: 21px;
+      }
+
+      .page-content {
+        padding: 24px 16px 40px;
+      }
+
+      .intro-card,
+      .form-card {
+        padding: 20px;
+      }
+
+      .activity-top {
+        flex-direction: column;
+      }
+
+      .list-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .button-row {
+        flex-wrap: wrap;
+      }
+    }
+  
+    /* ==========================================
+       DETAIL RAPAT
+    ========================================== */
+
+    .meeting-details {
+      margin-top: 20px;
+      padding: 18px;
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 10px;
+    }
+
+    .meeting-details[hidden] {
+      display: none !important;
+    }
+
+    .meeting-details h4 {
+      margin: 0 0 16px;
+      color: #0f766e;
+      font-size: 17px;
+    }
+
+    .meeting-summary {
+      margin-top: 14px;
+      padding: 14px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      line-height: 1.6;
+    }
+
+    .meeting-summary strong {
+      color: #374151;
+    }
+
+  </style>
+</head>
+<body>
+<!-- ==========================================
+       HEADER
+       ========================================== -->
+<header class="page-header">
+<div class="header-inner">
+<div>
+<h1 class="header-title">
+          Tahunan
+        </h1>
+<p class="header-subtitle">
+          Dashboard Kepala RA Al-Amin Al-Ma'arif
+        </p>
+</div>
+<a class="back-button" href="index.html">
+        ← Dashboard
+      </a>
+</div>
+</header>
+<!-- ==========================================
+       CONTENT
+       ========================================== -->
+<main class="page-content">
+<!-- ==========================================
+         INTRO
+         ========================================== -->
+<section class="intro-card">
+<h2>
+        Kegiatan Tahunan
+      </h2>
+<p>
+        Tempat mencatat program dan kegiatan tahunan seperti
+        PPDB, Maulid, Agustusan, karyawisata, manasik haji,
+        renang, lomba, serta kegiatan tahunan lain yang muncul
+        kemudian.
+      </p>
+</section>
+<!-- ==========================================
+         FORM
+         ========================================== -->
+<section class="form-card hidden" id="formCard">
+<h2 id="formTitle">
+        Tambah Kegiatan Tahunan
+      </h2>
+<!-- ID EDIT -->
+<input id="editId" type="hidden"/>
+<!-- TANGGAL -->
+<div class="form-group">
+<label for="tanggal">
+          Tanggal
+        </label>
+<input id="tanggal" type="date"/>
+</div>
+<!-- JENIS -->
+<div class="form-group">
+<label for="jenis">
+          Jenis Kegiatan
+        </label>
+<select id="jenis">
+<option value="">
+            -- Pilih jenis kegiatan --
+          </option>
+<option value="PPDB">
+            PPDB
+          </option>
+<option value="Maulid">
+            Maulid
+          </option>
+<option value="Agustusan">
+            Agustusan
+          </option>
+<option value="Karyawisata">
+            Karyawisata
+          </option>
+<option value="Manasik Haji">
+            Manasik Haji
+          </option>
+<option value="Renang">
+            Renang
+          </option>
+<option value="Lomba">
+            Lomba
+          </option>
+<option value="Kegiatan Lain">
+            Kegiatan Lain
+          </option>
+</select>
+</div>
+<!-- DETAIL RAPAT -->
+<div class="meeting-details" hidden="" id="meetingDetails">
+<h4>Detail Rapat</h4>
+<div class="form-group">
+<label for="jenisRapat">Jenis Rapat</label>
+<select id="jenisRapat">
+<option value="">-- Pilih jenis rapat --</option>
+<option value="internal">Internal</option>
+<option value="eksternal">Eksternal</option>
+</select>
+</div>
+<div class="form-group">
+<label for="peserta">Peserta</label>
+<textarea id="peserta" placeholder="Contoh: Kepala RA, guru, wali murid, pengawas..."></textarea>
+</div>
+<div class="form-group">
+<label for="agendaRapat">Agenda Rapat</label>
+<textarea id="agendaRapat" placeholder="Tuliskan agenda atau pokok pembahasan rapat..."></textarea>
+</div>
+<div class="form-group">
+<label for="hasilRapat">Hasil Pembahasan</label>
+<textarea id="hasilRapat" placeholder="Tuliskan hasil pembahasan rapat..."></textarea>
+</div>
+<div class="form-group">
+<label for="keputusan">Keputusan</label>
+<textarea id="keputusan" placeholder="Tuliskan keputusan yang dihasilkan..."></textarea>
+</div>
+<div class="form-group">
+<label for="pembagianTugas">Pembagian Tugas</label>
+<textarea id="pembagianTugas" placeholder="Tuliskan pembagian tugas jika ada..."></textarea>
+</div>
+<div class="form-group">
+<label for="tindakLanjut">Tindak Lanjut</label>
+<textarea id="tindakLanjut" placeholder="Tuliskan tindak lanjut yang harus dilakukan..."></textarea>
+</div>
+</div>
+<!-- JUDUL -->
+<div class="form-group">
+<label for="judul">
+          Judul / Kegiatan
+        </label>
+<input id="judul" placeholder="Contoh: Persiapan PPDB Tahun Ajaran 2027/2028" type="text"/>
+</div>
+<!-- STATUS -->
+<div class="form-group">
+<label for="status">
+          Status
+        </label>
+<select id="status">
+<option value="rencana">
+            Rencana
+          </option>
+<option value="berjalan">
+            Berjalan
+          </option>
+<option value="selesai">
+            Selesai
+          </option>
+<option value="ditunda">
+            Ditunda
+          </option>
+</select>
+</div>
+<!-- CATATAN -->
+<div class="form-group">
+<label for="catatan">
+          Catatan
+        </label>
+<textarea id="catatan" placeholder="Tuliskan keterangan, hasil kegiatan, persiapan, evaluasi, atau hal penting lainnya..."></textarea>
+</div>
+<!-- BUTTON -->
+<div class="button-row">
+<button class="save-button" id="saveButton" type="button">
+          Simpan
+        </button>
+<button class="cancel-button" id="cancelButton" type="button">
+          Batal
+        </button>
+</div>
+</section>
+<!-- ==========================================
+         LIST
+         ========================================== -->
+<section class="list-section">
+<div class="list-header">
+<h2>
+          Daftar Kegiatan Tahunan
+        </h2>
+<button class="add-button" id="addButton" type="button">
+          ＋ Tambah
+        </button>
+</div>
+<div class="activity-list" id="activityList">
+<div class="loading">
+          Memuat kegiatan...
+        </div>
+</div>
+</section>
+</main>
+<!-- ==========================================
+       CONFIG
+       ========================================== -->
+<script src="config.js"></script>
+<script>
+
+    // ==========================================
+    // CEK LOGIN
+    // ==========================================
+
+    const sessionData =
+      localStorage.getItem("supabase_session");
+
+    if (!sessionData) {
+
+      window.location.href = "login.html";
+
+    }
+
+
+    // ==========================================
+    // ELEMENT
+    // ==========================================
+
+    const formCard =
+      document.getElementById("formCard");
+
+    const formTitle =
+      document.getElementById("formTitle");
+
+    const editId =
+      document.getElementById("editId");
+
+    const tanggal =
+      document.getElementById("tanggal");
+
+    const jenis =
+      document.getElementById("jenis");
+
+    const judul =
+      document.getElementById("judul");
+
+    const status =
+      document.getElementById("status");
+
+    const catatan =
+      document.getElementById("catatan");
+
+    const saveButton =
+      document.getElementById("saveButton");
+
+    
+
+    // ==========================================
+    // DETAIL RAPAT
+    // ==========================================
+
+    const jenisInput =
+      document.getElementById("jenis");
+
+    const meetingDetails =
+      document.getElementById("meetingDetails");
+
+    const jenisRapatInput =
+      document.getElementById("jenisRapat");
+
+    const pesertaInput =
+      document.getElementById("peserta");
+
+    const agendaRapatInput =
+      document.getElementById("agendaRapat");
+
+    const hasilRapatInput =
+      document.getElementById("hasilRapat");
+
+    const keputusanInput =
+      document.getElementById("keputusan");
+
+    const pembagianTugasInput =
+      document.getElementById("pembagianTugas");
+
+    const tindakLanjutInput =
+      document.getElementById("tindakLanjut");
+
+
+    function toggleMeetingDetails() {
+
+      const isMeeting =
+        jenisInput &&
+        jenisInput.value === "rapat";
+
+      if (meetingDetails) {
+        meetingDetails.hidden = !isMeeting;
+      }
+
+      if (!isMeeting) {
+        jenisRapatInput.value = "";
+        pesertaInput.value = "";
+        agendaRapatInput.value = "";
+        hasilRapatInput.value = "";
+        keputusanInput.value = "";
+        pembagianTugasInput.value = "";
+        tindakLanjutInput.value = "";
+      }
+
+    }
+
+
+    function getMeetingData() {
+
+      const isMeeting =
+        jenisInput &&
+        jenisInput.value === "rapat";
+
+      if (!isMeeting) {
+
+        return {
+          jenis_rapat: null,
+          peserta: null,
+          agenda_rapat: null,
+          hasil_rapat: null,
+          keputusan: null,
+          pembagian_tugas: null,
+          tindak_lanjut: null
+        };
+
+      }
+
+      if (!jenisRapatInput.value) {
+
+        throw new Error(
+          "Jenis rapat harus dipilih."
+        );
+
+      }
+
+      return {
+        jenis_rapat:
+          jenisRapatInput.value,
+
+        peserta:
+          pesertaInput.value.trim() || null,
+
+        agenda_rapat:
+          agendaRapatInput.value.trim() || null,
+
+        hasil_rapat:
+          hasilRapatInput.value.trim() || null,
+
+        keputusan:
+          keputusanInput.value.trim() || null,
+
+        pembagian_tugas:
+          pembagianTugasInput.value.trim() || null,
+
+        tindak_lanjut:
+          tindakLanjutInput.value.trim() || null
+      };
+
+    }
+
+
+    function fillMeetingData(activity) {
+
+      jenisRapatInput.value =
+        activity.jenis_rapat || "";
+
+      pesertaInput.value =
+        activity.peserta || "";
+
+      agendaRapatInput.value =
+        activity.agenda_rapat || "";
+
+      hasilRapatInput.value =
+        activity.hasil_rapat || "";
+
+      keputusanInput.value =
+        activity.keputusan || "";
+
+      pembagianTugasInput.value =
+        activity.pembagian_tugas || "";
+
+      tindakLanjutInput.value =
+        activity.tindak_lanjut || "";
+
+      toggleMeetingDetails();
+
+    }
+
+
+    function getJenisRapatLabel(value) {
+
+      if (value === "internal") {
+        return "Internal";
+      }
+
+      if (value === "eksternal") {
+        return "Eksternal";
+      }
+
+      return value || "-";
+
+    }
+
+
+    function renderMeetingDetails(activity) {
+
+      if (activity.jenis !== "rapat") {
+        return "";
+      }
+
+      return `
+        <div class="meeting-summary">
+
+          <strong>Detail Rapat</strong>
+
+          <div>
+            <strong>Jenis:</strong>
+            ${escapeHtml(
+              getJenisRapatLabel(
+                activity.jenis_rapat
+              )
+            )}
+          </div>
+
+          ${
+            activity.peserta
+              ? `
+                <div>
+                  <strong>Peserta:</strong>
+                  ${escapeHtml(activity.peserta)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.agenda_rapat
+              ? `
+                <div>
+                  <strong>Agenda:</strong>
+                  ${escapeHtml(activity.agenda_rapat)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.hasil_rapat
+              ? `
+                <div>
+                  <strong>Hasil:</strong>
+                  ${escapeHtml(activity.hasil_rapat)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.keputusan
+              ? `
+                <div>
+                  <strong>Keputusan:</strong>
+                  ${escapeHtml(activity.keputusan)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.pembagian_tugas
+              ? `
+                <div>
+                  <strong>Pembagian Tugas:</strong>
+                  ${escapeHtml(activity.pembagian_tugas)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            activity.tindak_lanjut
+              ? `
+                <div>
+                  <strong>Tindak Lanjut:</strong>
+                  ${escapeHtml(activity.tindak_lanjut)}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+      `;
+
+    }
+
+
+    jenisInput.addEventListener(
+      "change",
+      toggleMeetingDetails
+    );
+
+const cancelButton =
+      document.getElementById("cancelButton");
+
+    const addButton =
+      document.getElementById("addButton");
+
+    const activityList =
+      document.getElementById("activityList");
+
+
+    // ==========================================
+    // AMBIL TOKEN
+    // ==========================================
+
+    function getAccessToken() {
+
+      const session =
+        JSON.parse(
+          localStorage.getItem("supabase_session")
+        );
+
+      if (!session || !session.access_token) {
+
+        window.location.href = "login.html";
+
+        return null;
+
+      }
+
+      return session.access_token;
+
+    }
+
+
+    // ==========================================
+    // HEADER SUPABASE
+    // ==========================================
+
+    function getHeaders() {
+
+      const accessToken =
+        getAccessToken();
+
+      return {
+
+        "apikey": SUPABASE_KEY,
+
+        "Authorization":
+          `Bearer ${accessToken}`,
+
+        "Content-Type":
+          "application/json",
+
+        "Prefer":
+          "return=representation"
+
+      };
+
+    }
+
+
+    // ==========================================
+    // BUKA FORM TAMBAH
+    // ==========================================
+
+    addButton.addEventListener(
+      "click",
+      function () {
+
+        editId.value = "";
+
+        formTitle.textContent =
+          "Tambah Kegiatan Tahunan";
+
+        saveButton.textContent =
+          "Simpan";
+
+        tanggal.value = "";
+
+        jenis.value = "";
+
+        judul.value = "";
+
+        status.value = "rencana";
+
+        catatan.value = "";
+
+        toggleMeetingDetails();
+
+        formCard.classList.remove("hidden");
+
+        formCard.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+      }
+    );
+
+
+    // ==========================================
+    // BATAL
+    // ==========================================
+
+    cancelButton.addEventListener(
+      "click",
+      function () {
+
+        resetForm();
+
+      }
+    );
+
+
+    function resetForm() {
+
+      editId.value = "";
+
+      tanggal.value = "";
+
+      jenis.value = "";
+
+      judul.value = "";
+
+      status.value = "rencana";
+
+      catatan.value = "";
+
+      toggleMeetingDetails();
+
+      formTitle.textContent =
+        "Tambah Kegiatan Tahunan";
+
+      saveButton.textContent =
+        "Simpan";
+
+      formCard.classList.add("hidden");
+
+    }
+
+
+    // ==========================================
+    // SIMPAN
+    // ==========================================
+
+    saveButton.addEventListener(
+      "click",
+      async function () {
+
+        const tanggalValue =
+          tanggal.value;
+
+        const jenisValue =
+          jenis.value;
+
+        const judulValue =
+          judul.value.trim();
+
+        const statusValue =
+          status.value;
+
+        const catatanValue =
+          catatan.value.trim();
+
+
+        let meetingData;
+
+        try {
+
+          meetingData = getMeetingData();
+
+        } catch (error) {
+
+          alert(
+            error.message
+          );
+
+          return;
+
+        }
+
+
+        if (!judulValue) {
+
+          alert(
+            "Judul / Kegiatan wajib diisi."
+          );
+
+          return;
+
+        }
+
+
+        saveButton.disabled = true;
+
+        saveButton.textContent =
+          "Menyimpan...";
+
+
+        try {
+
+          const data = {
+
+            kategori:
+              "tahunan",
+
+            judul:
+              judulValue,
+
+            tanggal:
+              tanggalValue || null,
+
+            jenis:
+              jenisValue || null,
+
+            ...meetingData,
+
+            status:
+              statusValue,
+
+            catatan:
+              catatanValue || null
+
+          };
+
+
+          // ======================================
+          // EDIT
+          // ======================================
+
+          if (editId.value) {
+
+            const response =
+              await fetch(
+                `${SUPABASE_URL}/rest/v1/kegiatan?id=eq.${encodeURIComponent(editId.value)}`,
+                {
+                  method: "PATCH",
+                  headers: getHeaders(),
+                  body: JSON.stringify(data)
+                }
+              );
+
+
+            if (!response.ok) {
+
+              const errorText =
+                await response.text();
+
+              throw new Error(
+                errorText ||
+                "Gagal mengubah kegiatan."
+              );
+
+            }
+
+
+            alert(
+              "Kegiatan tahunan berhasil diubah."
+            );
+
+          }
+
+
+          // ======================================
+          // TAMBAH
+          // ======================================
+
+          else {
+
+            const response =
+              await fetch(
+                `${SUPABASE_URL}/rest/v1/kegiatan`,
+                {
+                  method: "POST",
+                  headers: getHeaders(),
+                  body: JSON.stringify(data)
+                }
+              );
+
+
+            if (!response.ok) {
+
+              const errorText =
+                await response.text();
+
+              throw new Error(
+                errorText ||
+                "Gagal menyimpan kegiatan."
+              );
+
+            }
+
+
+            alert(
+              "Kegiatan tahunan berhasil disimpan."
+            );
+
+          }
+
+
+          resetForm();
+
+          loadActivities();
+
+        }
+
+
+        catch (error) {
+
+          console.error(
+            "Gagal menyimpan kegiatan:",
+            error
+          );
+
+          alert(
+            "Gagal menyimpan kegiatan.\n\n" +
+            error.message
+          );
+
+        }
+
+
+        finally {
+
+          saveButton.disabled = false;
+
+          saveButton.textContent =
+            editId.value
+              ? "Simpan Perubahan"
+              : "Simpan";
+
+        }
+
+      }
+    );
+
+
+    // ==========================================
+    // LOAD DATA
+    // ==========================================
+
+    async function loadActivities() {
+
+      activityList.innerHTML =
+        `
+          <div class="loading">
+            Memuat kegiatan...
+          </div>
+        `;
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/kegiatan?select=*&kategori=eq.tahunan&order=tanggal.asc,created_at.asc`,
+            {
+              method: "GET",
+              headers: getHeaders()
+            }
+          );
+
+
+        if (!response.ok) {
+
+          const errorText =
+            await response.text();
+
+          throw new Error(
+            errorText ||
+            "Gagal mengambil data kegiatan."
+          );
+
+        }
+
+
+        const activities =
+          await response.json();
+
+
+        renderActivities(
+          activities
+        );
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Gagal memuat kegiatan:",
+          error
+        );
+
+        activityList.innerHTML =
+          `
+            <div class="empty-state">
+              Gagal memuat data kegiatan.
+            </div>
+          `;
+
+      }
+
+    }
+
+
+    // ==========================================
+    // TAMPILKAN DATA
+    // ==========================================
+
+    function renderActivities(
+      activities
+    ) {
+
+      if (!activities.length) {
+
+        activityList.innerHTML =
+          `
+            <div class="empty-state">
+              Belum ada kegiatan tahunan.
+              <br><br>
+              Klik <strong>＋ Tambah</strong>
+              untuk mencatat kegiatan.
+            </div>
+          `;
+
+        return;
+
+      }
+
+
+      activityList.innerHTML =
+        activities
+          .map(activity => {
+
+            const tanggalText =
+              formatDate(
+                activity.tanggal
+              );
+
+
+            const statusText =
+              getStatusText(
+                activity.status
+              );
+
+
+            const statusClass =
+              getStatusClass(
+                activity.status
+              );
+
+
+            const jenisText =
+              activity.jenis ||
+              "Kegiatan tahunan";
+
+
+            return `
+
+              <article
+                class="activity-card"
+              >
+
+                <div class="activity-top">
+
+                  <div>
+
+                    <h3
+                      class="activity-title"
+                    >
+                      ${escapeHtml(
+                        activity.judul
+                      )}
+                    </h3>
+
+
+                    <div
+                      class="activity-meta"
+                    >
+
+                      ${tanggalText}
+
+                    </div>
+
+
+                    <span
+                      class="activity-type"
+                    >
+                      ${escapeHtml(
+                        jenisText
+                      )}
+                    </span>
+
+                  </div>
+
+
+                  <span
+                    class="status-badge ${statusClass}"
+                  >
+                    ${statusText}
+                  </span>
+
+                </div>
+
+
+                ${
+                  activity.catatan
+                    ? `
+                      <div
+                        class="activity-note"
+                      >
+                        ${escapeHtml(
+                          activity.catatan
+                        )}
+                      </div>
+                    `
+                    : ""
+                }
+
+
+                ${renderMeetingDetails(activity)}
+
+
+                <div
+                  class="activity-actions"
+                >
+
+                  <button
+                    type="button"
+                    class="edit-button"
+                    onclick="editActivity('${activity.id}')"
+                  >
+                    Edit
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="delete-button"
+                    onclick="deleteActivity('${activity.id}')"
+                  >
+                    Hapus
+                  </button>
+
+                </div>
+
+              </article>
+
+            `;
+
+          })
+          .join("");
+
+    }
+
+
+    // ==========================================
+    // EDIT
+    // ==========================================
+
+    async function editActivity(id) {
+
+      try {
+
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/kegiatan?id=eq.${encodeURIComponent(id)}&select=*`,
+            {
+              method: "GET",
+              headers: getHeaders()
+            }
+          );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Gagal mengambil data kegiatan."
+          );
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!data.length) {
+
+          alert(
+            "Data kegiatan tidak ditemukan."
+          );
+
+          return;
+
+        }
+
+
+        const activity =
+          data[0];
+
+
+        editId.value =
+          activity.id || "";
+
+        tanggal.value =
+          activity.tanggal || "";
+
+        jenis.value =
+          activity.jenis || "";
+
+        fillMeetingData(activity);
+
+        judul.value =
+          activity.judul || "";
+
+        status.value =
+          activity.status || "rencana";
+
+        catatan.value =
+          activity.catatan || "";
+
+
+        formTitle.textContent =
+          "Edit Kegiatan Tahunan";
+
+        saveButton.textContent =
+          "Simpan Perubahan";
+
+
+        formCard.classList.remove(
+          "hidden"
+        );
+
+
+        formCard.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Gagal membuka edit:",
+          error
+        );
+
+        alert(
+          "Gagal membuka data untuk diedit."
+        );
+
+      }
+
+    }
+
+
+    // ==========================================
+    // HAPUS
+    // ==========================================
+
+    async function deleteActivity(id) {
+
+      const yakin =
+        confirm(
+          "Apakah Anda yakin ingin menghapus kegiatan tahunan ini?"
+        );
+
+
+      if (!yakin) {
+
+        return;
+
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/kegiatan?id=eq.${encodeURIComponent(id)}`,
+            {
+              method: "DELETE",
+              headers: getHeaders()
+            }
+          );
+
+
+        if (!response.ok) {
+
+          const errorText =
+            await response.text();
+
+          throw new Error(
+            errorText ||
+            "Gagal menghapus kegiatan."
+          );
+
+        }
+
+
+        alert(
+          "Kegiatan tahunan berhasil dihapus."
+        );
+
+
+        loadActivities();
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Gagal menghapus kegiatan:",
+          error
+        );
+
+        alert(
+          "Gagal menghapus kegiatan.\n\n" +
+          error.message
+        );
+
+      }
+
+    }
+
+
+    // ==========================================
+    // FORMAT TANGGAL
+    // ==========================================
+
+    function formatDate(
+      dateString
+    ) {
+
+      if (!dateString) {
+
+        return "Tanggal belum ditentukan";
+
+      }
+
+
+      const parts =
+        dateString.split("-");
+
+
+      if (parts.length !== 3) {
+
+        return dateString;
+
+      }
+
+
+      return (
+        parts[2] +
+        "/" +
+        parts[1] +
+        "/" +
+        parts[0]
+      );
+
+    }
+
+
+    // ==========================================
+    // STATUS
+    // ==========================================
+
+    function getStatusText(
+      value
+    ) {
+
+      const map = {
+
+        rencana: "Rencana",
+
+        berjalan: "Berjalan",
+
+        selesai: "Selesai",
+
+        ditunda: "Ditunda"
+
+      };
+
+
+      return (
+        map[value] ||
+        value ||
+        "Rencana"
+      );
+
+    }
+
+
+    function getStatusClass(
+      value
+    ) {
+
+      const map = {
+
+        rencana:
+          "status-rencana",
+
+        berjalan:
+          "status-berjalan",
+
+        selesai:
+          "status-selesai",
+
+        ditunda:
+          "status-ditunda"
+
+      };
+
+
+      return (
+        map[value] ||
+        "status-rencana"
+      );
+
+    }
+
+
+    // ==========================================
+    // ESCAPE HTML
+    // ==========================================
+
+    function escapeHtml(
+      value
+    ) {
+
+      if (value === null ||
+          value === undefined) {
+
+        return "";
+
+      }
+
+
+      return String(value)
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+    // ==========================================
+    // LOAD AWAL
+    // ==========================================
+
+    loadActivities();
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,2605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dashboard Kepala | RA Al-Amin Al-Ma'arif</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    /* ==========================================
+       HEADER
+    ========================================== */
+
+    .dashboard-header {
+      background: #0f766e;
+      color: white;
+      padding: 20px 24px;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .header-subtitle {
+      margin: 6px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .logout-button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      background: white;
+      color: #0f766e;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .logout-button:hover {
+      opacity: 0.9;
+    }
+
+
+    /* ==========================================
+       CONTENT
+    ========================================== */
+
+    .dashboard-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 24px;
+    }
+
+
+    /* ==========================================
+       TAHUN AJARAN
+    ========================================== */
+
+    .academic-year {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 30px;
+      padding: 14px 18px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .academic-year span {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .academic-year strong {
+      font-size: 20px;
+      color: #0f766e;
+    }
+
+
+    /* ==========================================
+       MENU UTAMA
+    ========================================== */
+
+    .dashboard-menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .menu-card {
+      display: block;
+      padding: 24px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #1f2937;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .menu-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .menu-card h2 {
+      margin: 0 0 6px;
+      font-size: 19px;
+    }
+
+    .menu-card p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+
+    /* ==========================================
+       PENCARIAN DAN FILTER
+    ========================================== */
+
+    .filter-section {
+      margin-top: 30px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .filter-section h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+    }
+
+    .filter-description {
+      margin: 0 0 20px;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .filter-input,
+    .filter-select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: white;
+      color: #1f2937;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+      border-color: #0f766e;
+      box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.12);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .search-button,
+    .reset-button {
+      border: none;
+      border-radius: 8px;
+      padding: 11px 18px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .search-button {
+      background: #0f766e;
+      color: white;
+    }
+
+    .search-button:hover {
+      background: #0d665f;
+    }
+
+    .reset-button {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .reset-button:hover {
+      background: #d1d5db;
+    }
+
+
+    /* ==========================================
+       HASIL PENCARIAN
+    ========================================== */
+
+    .search-results {
+      margin-top: 24px;
+    }
+
+    .search-result-info {
+      margin-bottom: 12px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .search-result-card {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+
+    .search-result-category {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #e6fffb;
+      color: #0f766e;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .search-result-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .search-result-detail {
+      margin: 4px 0;
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .search-empty {
+      padding: 20px;
+      text-align: center;
+      color: #6b7280;
+      background: #f9fafb;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+
+    /* ==========================================
+       RINGKASAN
+    ========================================== */
+
+    .summary-section {
+      margin-top: 30px;
+    }
+
+    .summary-section h2 {
+      margin: 0 0 16px;
+      font-size: 20px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .summary-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .summary-label {
+      display: block;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .summary-number {
+      display: block;
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f766e;
+    }
+
+    .summary-status {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+
+    /* ==========================================
+       EDIT MODAL
+    ========================================== */
+
+    .edit-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .edit-modal.hidden {
+      display: none;
+    }
+
+    .edit-modal-box {
+      width: min(900px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    .edit-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .edit-modal-header h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .close-modal-button {
+      background: #e5e7eb;
+      color: #374151;
+      font-size: 20px;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+    }
+
+    .edit-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .edit-form-group {
+      margin-bottom: 2px;
+    }
+
+    .edit-form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .edit-form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .edit-form-group input,
+    .edit-form-group select,
+    .edit-form-group textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #1f2937;
+      background: white;
+    }
+
+    .edit-form-group textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .edit-modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .modal-save-button {
+      background: #0f766e;
+      color: white;
+    }
+
+    .modal-cancel-button {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .search-result-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .search-edit-button,
+    .search-delete-button {
+      border: none;
+      border-radius: 7px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .search-edit-button {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .search-delete-button {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* ==========================================
+       RESPONSIVE
+    ========================================== */
+
+    @media (max-width: 1000px) {
+
+      .filter-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-menu {
+        grid-template-columns: 1fr;
+      }
+
+      .header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .header-title {
+        font-size: 20px;
+      }
+
+      .dashboard-content {
+        padding: 24px 16px;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-actions {
+        flex-direction: column;
+      }
+
+      .edit-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .edit-form-group.full {
+        grid-column: auto;
+      }
+
+      .search-button,
+      .reset-button {
+        width: 100%;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+
+  <!-- ==========================================
+       HEADER DASHBOARD
+  ========================================== -->
+
+  <header class="dashboard-header">
+
+    <div class="header-inner">
+
+      <div>
+
+        <h1 class="header-title">
+          Dashboard Kepala
+        </h1>
+
+        <p class="header-subtitle">
+          RA Al-Amin Al-Ma'arif
+        </p>
+
+      </div>
+
+
+      <button
+        id="logoutButton"
+        class="logout-button"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- ==========================================
+       ISI DASHBOARD
+  ========================================== -->
+
+  <main class="dashboard-content">
+
+
+    <!-- ========================================
+         TAHUN AJARAN
+    ========================================= -->
+
+    <div class="academic-year">
+
+      <span>
+        Tahun Ajaran
+      </span>
+
+      <strong>
+        2026/2027
+      </strong>
+
+    </div>
+
+
+
+    <!-- ========================================
+         5 LINI UTAMA
+    ========================================= -->
+
+    <div class="dashboard-menu">
+
+
+      <a
+        href="mingguan.html"
+        class="menu-card"
+      >
+
+        <div class="menu-icon">
+          📅
+        </div>
+
+        <h2>
+          Mingguan
+        </h2>
+
+        <p>
+          Rapat, koordinasi, monitoring,
+          dan pekerjaan mingguan.
+        </p>
+
+      </a>
+
+
+
+      <a
+        href="semesteran.html"
+        class="menu-card"
+      >
+
+        <div class="menu-icon">
+          📋
+        </div>
+
+        <h2>
+          Semesteran
+        </h2>
+
+        <p>
+          EMIS, BOP, LPJ, dan rapat wali murid.
+        </p>
+
+      </a>
+
+
+
+      <a
+        href="tahunan.html"
+        class="menu-card"
+      >
+
+        <div class="menu-icon">
+          🗓️
+        </div>
+
+        <h2>
+          Tahunan
+        </h2>
+
+        <p>
+          Program kerja, PPDB, kegiatan tahunan,
+          dan agenda lainnya.
+        </p>
+
+      </a>
+
+
+
+      <a
+        href="kondisional.html"
+        class="menu-card"
+      >
+
+        <div class="menu-icon">
+          ⚠️
+        </div>
+
+        <h2>
+          Kondisional
+        </h2>
+
+        <p>
+          Permasalahan, sarpras mendadak,
+          rapat, dan ide pengembangan.
+        </p>
+
+      </a>
+
+
+
+      <a
+        href="pengadaan.html"
+        class="menu-card"
+      >
+
+        <div class="menu-icon">
+          🛒
+        </div>
+
+        <h2>
+          Pengadaan
+        </h2>
+
+        <p>
+          Target pengadaan rutin dan
+          non-rutin lintas tahun.
+        </p>
+
+      </a>
+
+
+    </div>
+
+
+
+    <!-- ==========================================
+         PENCARIAN DAN FILTER
+    ========================================== -->
+
+    <section class="filter-section">
+
+      <h2>
+        🔎 Cari & Filter Data
+      </h2>
+
+      <p class="filter-description">
+        Cari kegiatan berdasarkan kata, lini, status,
+        atau tahun ajaran. Beberapa filter dapat digunakan
+        sekaligus.
+      </p>
+
+
+      <div class="filter-grid">
+
+
+        <!-- KATA KUNCI -->
+
+        <div class="filter-group">
+
+          <label for="searchInput">
+            Kata kunci
+          </label>
+
+          <input
+            type="text"
+            id="searchInput"
+            class="filter-input"
+            placeholder="Contoh: rapat, BOP, PPDB..."
+            autocomplete="off"
+          >
+
+        </div>
+
+
+
+        <!-- LINI -->
+
+        <div class="filter-group">
+
+          <label for="filterLini">
+            Lini
+          </label>
+
+          <select
+            id="filterLini"
+            class="filter-select"
+          >
+
+            <option value="">
+              Semua lini
+            </option>
+
+            <option value="mingguan">
+              Mingguan
+            </option>
+
+            <option value="semesteran">
+              Semesteran
+            </option>
+
+            <option value="tahunan">
+              Tahunan
+            </option>
+
+            <option value="kondisional">
+              Kondisional
+            </option>
+
+            <option value="pengadaan">
+              Pengadaan
+            </option>
+
+          </select>
+
+        </div>
+
+
+
+        <!-- STATUS -->
+
+        <div class="filter-group">
+
+          <label for="filterStatus">
+            Status
+          </label>
+
+          <select
+            id="filterStatus"
+            class="filter-select"
+          >
+
+            <option value="">
+              Semua status
+            </option>
+
+            <option value="rencana">
+              Rencana
+            </option>
+
+            <option value="berjalan">
+              Berjalan
+            </option>
+
+            <option value="selesai">
+              Selesai
+            </option>
+
+            <option value="ditunda">
+              Ditunda
+            </option>
+
+            <option value="belum">
+              Belum
+            </option>
+
+            <option value="proses">
+              Proses
+            </option>
+
+          </select>
+
+        </div>
+
+
+
+        <!-- TAHUN AJARAN -->
+
+        <div class="filter-group">
+
+          <label for="filterTahunAjaran">
+            Tahun Ajaran
+          </label>
+
+          <select
+            id="filterTahunAjaran"
+            class="filter-select"
+          >
+
+            <option value="">
+              Semua tahun ajaran
+            </option>
+
+          </select>
+
+        </div>
+
+
+      </div>
+
+
+
+      <!-- TOMBOL -->
+
+      <div class="filter-actions">
+
+        <button
+          type="button"
+          id="searchButton"
+          class="search-button"
+        >
+          🔎 Cari
+        </button>
+
+
+        <button
+          type="button"
+          id="resetButton"
+          class="reset-button"
+        >
+          Reset Filter
+        </button>
+
+      </div>
+
+
+
+      <!-- HASIL -->
+
+      <div
+        id="searchResults"
+        class="search-results"
+      ></div>
+
+
+    </section>
+
+
+
+    <!-- ==========================================
+         RINGKASAN
+    ========================================== -->
+
+    <section class="summary-section">
+
+      <h2>
+        Ringkasan
+      </h2>
+
+
+      <div class="summary-grid">
+
+
+        <div class="summary-card">
+
+          <span class="summary-label">
+            Mingguan
+          </span>
+
+          <span
+            class="summary-number"
+            id="jumlahMingguan"
+          >
+            0
+          </span>
+
+          <span class="summary-status">
+            kegiatan
+          </span>
+
+        </div>
+
+
+
+        <div class="summary-card">
+
+          <span class="summary-label">
+            Semesteran
+          </span>
+
+          <span
+            class="summary-number"
+            id="jumlahSemesteran"
+          >
+            0
+          </span>
+
+          <span class="summary-status">
+            kegiatan
+          </span>
+
+        </div>
+
+
+
+        <div class="summary-card">
+
+          <span class="summary-label">
+            Tahunan
+          </span>
+
+          <span
+            class="summary-number"
+            id="jumlahTahunan"
+          >
+            0
+          </span>
+
+          <span class="summary-status">
+            kegiatan
+          </span>
+
+        </div>
+
+
+
+        <div class="summary-card">
+
+          <span class="summary-label">
+            Kondisional
+          </span>
+
+          <span
+            class="summary-number"
+            id="jumlahKondisional"
+          >
+            0
+          </span>
+
+          <span class="summary-status">
+            kegiatan
+          </span>
+
+        </div>
+
+
+
+        <div class="summary-card">
+
+          <span class="summary-label">
+            Pengadaan
+          </span>
+
+          <span
+            class="summary-number"
+            id="jumlahPengadaan"
+          >
+            0
+          </span>
+
+          <span class="summary-status">
+            target
+          </span>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+
+  <!-- ==========================================
+       MODAL EDIT DATA DARI HASIL PENCARIAN
+  ========================================== -->
+
+  <div id="editModal" class="edit-modal hidden">
+    <div class="edit-modal-box">
+      <div class="edit-modal-header">
+        <h2 id="editModalTitle">Edit Data</h2>
+        <button type="button" id="closeEditModal" class="close-modal-button">×</button>
+      </div>
+
+      <input type="hidden" id="modalEditId">
+      <input type="hidden" id="modalEditType">
+
+      <div id="modalKegiatanFields" class="edit-form-grid hidden">
+        <div class="edit-form-group">
+          <label for="modalKegiatanKategori">Lini</label>
+          <select id="modalKegiatanKategori">
+            <option value="mingguan">Mingguan</option>
+            <option value="semesteran">Semesteran</option>
+            <option value="tahunan">Tahunan</option>
+            <option value="kondisional">Kondisional</option>
+          </select>
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalKegiatanStatus">Status</label>
+          <select id="modalKegiatanStatus">
+            <option value="rencana">Rencana</option>
+            <option value="berjalan">Berjalan</option>
+            <option value="selesai">Selesai</option>
+            <option value="ditunda">Ditunda</option>
+          </select>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanJudul">Judul / Kegiatan</label>
+          <input id="modalKegiatanJudul" type="text">
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalKegiatanTanggal">Tanggal</label>
+          <input id="modalKegiatanTanggal" type="date">
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalKegiatanTahun">Tahun Ajaran</label>
+          <input id="modalKegiatanTahun" type="text" placeholder="Contoh: 2026/2027">
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalKegiatanSemester">Semester</label>
+          <select id="modalKegiatanSemester">
+            <option value="">-- Tidak diisi --</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalKegiatanJenis">Jenis</label>
+          <input id="modalKegiatanJenis" type="text">
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanDeskripsi">Deskripsi</label>
+          <textarea id="modalKegiatanDeskripsi"></textarea>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanPeserta">Peserta</label>
+          <textarea id="modalKegiatanPeserta"></textarea>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanAgenda">Agenda Rapat</label>
+          <textarea id="modalKegiatanAgenda"></textarea>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanHasil">Hasil Rapat</label>
+          <textarea id="modalKegiatanHasil"></textarea>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanKeputusan">Keputusan</label>
+          <textarea id="modalKegiatanKeputusan"></textarea>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanPembagian">Pembagian Tugas</label>
+          <textarea id="modalKegiatanPembagian"></textarea>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanTindak">Tindak Lanjut</label>
+          <textarea id="modalKegiatanTindak"></textarea>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalKegiatanCatatan">Catatan</label>
+          <textarea id="modalKegiatanCatatan"></textarea>
+        </div>
+      </div>
+
+      <div id="modalPengadaanFields" class="edit-form-grid hidden">
+        <div class="edit-form-group full">
+          <label for="modalPengadaanNama">Nama / Kebutuhan Pengadaan</label>
+          <input id="modalPengadaanNama" type="text">
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalPengadaanKategori">Kategori</label>
+          <select id="modalPengadaanKategori">
+            <option value="rutin">Rutin</option>
+            <option value="non-rutin">Non-rutin</option>
+          </select>
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalPengadaanTanggal">Tanggal Dicatat</label>
+          <input id="modalPengadaanTanggal" type="date">
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalPengadaanPrioritas">Prioritas</label>
+          <select id="modalPengadaanPrioritas">
+            <option value="tinggi">Tinggi</option>
+            <option value="sedang">Sedang</option>
+            <option value="rendah">Rendah</option>
+          </select>
+        </div>
+
+        <div class="edit-form-group">
+          <label for="modalPengadaanStatus">Status</label>
+          <select id="modalPengadaanStatus">
+            <option value="belum">Belum</option>
+            <option value="proses">Proses</option>
+            <option value="selesai">Selesai</option>
+          </select>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalPengadaanTarget">Target</label>
+          <input id="modalPengadaanTarget" type="text">
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalPengadaanKegiatan">Kegiatan Terkait</label>
+          <select id="modalPengadaanKegiatan">
+            <option value="">-- Tidak terkait kegiatan --</option>
+          </select>
+        </div>
+
+        <div class="edit-form-group full">
+          <label for="modalPengadaanCatatan">Catatan</label>
+          <textarea id="modalPengadaanCatatan"></textarea>
+        </div>
+      </div>
+
+      <div class="edit-modal-actions">
+        <button type="button" id="modalSaveButton" class="modal-save-button">Simpan Perubahan</button>
+        <button type="button" id="modalCancelButton" class="modal-cancel-button">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONFIG
+  ========================================== -->
+
+  <script src="config.js"></script>
+
+
+  <script>
+
+    // ==========================================
+    // CEK LOGIN
+    // ==========================================
+
+    const sessionData =
+      localStorage.getItem(
+        "supabase_session"
+      );
+
+
+    if (!sessionData) {
+
+      window.location.href =
+        "login.html";
+
+    }
+
+
+
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+
+    document
+      .getElementById("logoutButton")
+      .addEventListener(
+        "click",
+        function () {
+
+          localStorage.removeItem(
+            "supabase_session"
+          );
+
+          window.location.href =
+            "login.html";
+
+        }
+      );
+
+
+
+    // ==========================================
+    // VARIABEL DATA
+    // ==========================================
+
+    let semuaKegiatan = [];
+
+    let semuaPengadaan = [];
+
+
+
+    // ==========================================
+    // HELPER
+    // ==========================================
+
+    function getHeaders() {
+
+      const session = JSON.parse(
+        localStorage.getItem("supabase_session") || "null"
+      );
+
+      if (!session || !session.access_token) {
+        window.location.href = "login.html";
+        throw new Error("Sesi login tidak ditemukan.");
+      }
+
+      return {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      };
+
+    }
+
+    function escapeHTML(value) {
+
+      return String(value ?? "")
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+
+    function textSemuaField(item) {
+
+      return Object.values(item)
+
+        .map(
+          value =>
+            String(value ?? "")
+        )
+
+        .join(" ")
+
+        .toLowerCase();
+
+    }
+
+
+
+    function namaLini(kategori) {
+
+      if (
+        kategori ===
+        "mingguan"
+      ) {
+
+        return "Mingguan";
+
+      }
+
+
+      if (
+        kategori ===
+        "semesteran"
+      ) {
+
+        return "Semesteran";
+
+      }
+
+
+      if (
+        kategori ===
+        "tahunan"
+      ) {
+
+        return "Tahunan";
+
+      }
+
+
+      if (
+        kategori ===
+        "kondisional"
+      ) {
+
+        return "Kondisional";
+
+      }
+
+
+      if (
+        kategori ===
+        "pengadaan"
+      ) {
+
+        return "Pengadaan";
+
+      }
+
+
+      return kategori ||
+        "Kegiatan";
+
+    }
+
+
+
+    // ==========================================
+    // EDIT / HAPUS DARI HASIL PENCARIAN
+    // ==========================================
+
+    const editModal = document.getElementById("editModal");
+    const modalEditId = document.getElementById("modalEditId");
+    const modalEditType = document.getElementById("modalEditType");
+    const modalKegiatanFields = document.getElementById("modalKegiatanFields");
+    const modalPengadaanFields = document.getElementById("modalPengadaanFields");
+    const modalPengadaanKegiatan = document.getElementById("modalPengadaanKegiatan");
+
+    function nilaiModal(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function setModalValue(id, value) {
+      document.getElementById(id).value = value ?? "";
+    }
+
+    function isiPilihanKegiatanModal() {
+      modalPengadaanKegiatan.innerHTML =
+        `<option value="">-- Tidak terkait kegiatan --</option>` +
+        semuaKegiatan.map(item =>
+          `<option value="${escapeHTML(item.id)}">${escapeHTML(getKegiatanLabel(item))}</option>`
+        ).join("");
+    }
+
+    function getKegiatanLabel(item) {
+      const map = {
+        mingguan: "Mingguan",
+        semesteran: "Semesteran",
+        tahunan: "Tahunan",
+        kondisional: "Kondisional"
+      };
+      const lini = map[item.kategori] || item.kategori || "Kegiatan";
+      return `${lini} — ${item.judul || "Tanpa judul"}${item.tanggal ? ` — ${item.tanggal}` : ""}`;
+    }
+
+    async function openEditModal(type, id) {
+      const source = type === "kegiatan" ? semuaKegiatan : semuaPengadaan;
+      const item = source.find(row => String(row.id) === String(id));
+
+      if (!item) {
+        alert("Data tidak ditemukan.");
+        return;
+      }
+
+      modalEditId.value = item.id;
+      modalEditType.value = type;
+      modalKegiatanFields.classList.toggle("hidden", type !== "kegiatan");
+      modalPengadaanFields.classList.toggle("hidden", type !== "pengadaan");
+      document.getElementById("editModalTitle").textContent =
+        type === "kegiatan" ? `Edit ${namaLini(item.kategori)}` : "Edit Pengadaan";
+
+      if (type === "kegiatan") {
+        setModalValue("modalKegiatanKategori", item.kategori);
+        setModalValue("modalKegiatanStatus", item.status || "rencana");
+        setModalValue("modalKegiatanJudul", item.judul);
+        setModalValue("modalKegiatanTanggal", item.tanggal);
+        setModalValue("modalKegiatanTahun", item.tahun_ajaran);
+        setModalValue("modalKegiatanSemester", item.semester);
+        setModalValue("modalKegiatanJenis", item.jenis);
+        setModalValue("modalKegiatanDeskripsi", item.deskripsi);
+        setModalValue("modalKegiatanPeserta", item.peserta);
+        setModalValue("modalKegiatanAgenda", item.agenda_rapat);
+        setModalValue("modalKegiatanHasil", item.hasil_rapat);
+        setModalValue("modalKegiatanKeputusan", item.keputusan);
+        setModalValue("modalKegiatanPembagian", item.pembagian_tugas);
+        setModalValue("modalKegiatanTindak", item.tindak_lanjut);
+        setModalValue("modalKegiatanCatatan", item.catatan);
+      } else {
+        isiPilihanKegiatanModal();
+        setModalValue("modalPengadaanNama", item.nama);
+        setModalValue("modalPengadaanKategori", item.kategori || "rutin");
+        setModalValue("modalPengadaanTanggal", item.tanggal);
+        setModalValue("modalPengadaanPrioritas", item.prioritas || "tinggi");
+        setModalValue("modalPengadaanStatus", item.status || "belum");
+        setModalValue("modalPengadaanTarget", item.target);
+        setModalValue("modalPengadaanKegiatan", item.kegiatan_id);
+        setModalValue("modalPengadaanCatatan", item.catatan);
+      }
+
+      editModal.classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      editModal.classList.add("hidden");
+    }
+
+    async function saveFromSearch() {
+      const type = modalEditType.value;
+      const id = modalEditId.value;
+      if (!type || !id) return;
+
+      let table;
+      let payload;
+
+      if (type === "kegiatan") {
+        const judul = nilaiModal("modalKegiatanJudul");
+        if (!judul) {
+          alert("Judul / kegiatan wajib diisi.");
+          return;
+        }
+
+        table = "kegiatan";
+        payload = {
+          kategori: nilaiModal("modalKegiatanKategori") || "kondisional",
+          judul,
+          deskripsi: nilaiModal("modalKegiatanDeskripsi") || null,
+          tanggal: nilaiModal("modalKegiatanTanggal") || null,
+          tahun_ajaran: nilaiModal("modalKegiatanTahun") || null,
+          semester: nilaiModal("modalKegiatanSemester") || null,
+          status: nilaiModal("modalKegiatanStatus") || "rencana",
+          jenis: nilaiModal("modalKegiatanJenis") || null,
+          peserta: nilaiModal("modalKegiatanPeserta") || null,
+          agenda_rapat: nilaiModal("modalKegiatanAgenda") || null,
+          hasil_rapat: nilaiModal("modalKegiatanHasil") || null,
+          keputusan: nilaiModal("modalKegiatanKeputusan") || null,
+          pembagian_tugas: nilaiModal("modalKegiatanPembagian") || null,
+          tindak_lanjut: nilaiModal("modalKegiatanTindak") || null,
+          catatan: nilaiModal("modalKegiatanCatatan") || null
+        };
+      } else {
+        const nama = nilaiModal("modalPengadaanNama");
+        if (!nama) {
+          alert("Nama / kebutuhan pengadaan wajib diisi.");
+          return;
+        }
+
+        table = "pengadaan";
+        payload = {
+          nama,
+          kategori: nilaiModal("modalPengadaanKategori") || "rutin",
+          tanggal: nilaiModal("modalPengadaanTanggal") || null,
+          prioritas: nilaiModal("modalPengadaanPrioritas") || "tinggi",
+          target: nilaiModal("modalPengadaanTarget") || null,
+          status: nilaiModal("modalPengadaanStatus") || "belum",
+          kegiatan_id: nilaiModal("modalPengadaanKegiatan") || null,
+          catatan: nilaiModal("modalPengadaanCatatan") || null
+        };
+      }
+
+      const button = document.getElementById("modalSaveButton");
+      button.disabled = true;
+      button.textContent = "Menyimpan...";
+
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`,
+          {
+            method: "PATCH",
+            headers: {
+              ...getHeaders(),
+              "Prefer": "return=minimal"
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(await response.text() || "Gagal mengubah data.");
+        }
+
+        closeEditModal();
+        await loadSummary();
+        jalankanPencarian();
+        alert("Data berhasil diubah.");
+      } catch (error) {
+        console.error(error);
+        alert("❌ Gagal mengubah data.\n\n" + error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "Simpan Perubahan";
+      }
+    }
+
+    async function deleteFromSearch(type, id) {
+      const source = type === "kegiatan" ? semuaKegiatan : semuaPengadaan;
+      const item = source.find(row => String(row.id) === String(id));
+      if (!item) {
+        alert("Data tidak ditemukan.");
+        return;
+      }
+
+      const nama = type === "kegiatan"
+        ? (item.judul || "kegiatan ini")
+        : (item.nama || "pengadaan ini");
+
+      if (!confirm(`Yakin ingin menghapus "${nama}"?\n\nData yang dihapus tidak dapat dikembalikan.`)) {
+        return;
+      }
+
+      const table = type === "kegiatan" ? "kegiatan" : "pengadaan";
+
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`,
+          {
+            method: "DELETE",
+            headers: {
+              ...getHeaders(),
+              "Prefer": "return=minimal"
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(await response.text() || "Gagal menghapus data.");
+        }
+
+        await loadSummary();
+        jalankanPencarian();
+        alert("Data berhasil dihapus.");
+      } catch (error) {
+        console.error(error);
+        alert("❌ Gagal menghapus data.\n\n" + error.message);
+      }
+    }
+
+    // ==========================================
+    // MEMUAT RINGKASAN + DATA
+    // ==========================================
+
+    async function loadSummary() {
+
+      try {
+
+        const session =
+          JSON.parse(
+            localStorage.getItem(
+              "supabase_session"
+            )
+          );
+
+
+        if (
+          !session ||
+          !session.access_token
+        ) {
+
+          window.location.href =
+            "login.html";
+
+          return;
+
+        }
+
+
+        const accessToken =
+          session.access_token;
+
+
+        const headers = {
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            `Bearer ${accessToken}`
+
+        };
+
+
+
+        // ======================================
+        // AMBIL KEGIATAN
+        // ======================================
+
+        const kegiatanResponse =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/kegiatan?select=*`,
+            {
+              method: "GET",
+              headers: headers
+            }
+          );
+
+
+        if (
+          !kegiatanResponse.ok
+        ) {
+
+          throw new Error(
+            "Gagal mengambil data kegiatan."
+          );
+
+        }
+
+
+        semuaKegiatan =
+          await kegiatanResponse.json();
+
+
+
+        // ======================================
+        // AMBIL PENGADAAN
+        // ======================================
+
+        const pengadaanResponse =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/pengadaan?select=*`,
+            {
+              method: "GET",
+              headers: headers
+            }
+          );
+
+
+        if (
+          !pengadaanResponse.ok
+        ) {
+
+          throw new Error(
+            "Gagal mengambil data pengadaan."
+          );
+
+        }
+
+
+        semuaPengadaan =
+          await pengadaanResponse.json();
+
+
+
+        // ======================================
+        // RINGKASAN
+        // ======================================
+
+        updateSummary();
+
+
+
+        // ======================================
+        // ISI PILIHAN TAHUN AJARAN
+        // ======================================
+
+        isiTahunAjaran();
+
+
+
+      } catch (error) {
+
+        console.error(
+          "Gagal memuat ringkasan:",
+          error
+        );
+
+      }
+
+    }
+
+
+
+    // ==========================================
+    // UPDATE RINGKASAN
+    // ==========================================
+
+    function updateSummary() {
+
+      let mingguan = 0;
+
+      let semesteran = 0;
+
+      let tahunan = 0;
+
+      let kondisional = 0;
+
+
+
+      semuaKegiatan.forEach(
+        item => {
+
+          if (
+            item.kategori ===
+            "mingguan"
+          ) {
+
+            mingguan++;
+
+          }
+
+
+          if (
+            item.kategori ===
+            "semesteran"
+          ) {
+
+            semesteran++;
+
+          }
+
+
+          if (
+            item.kategori ===
+            "tahunan"
+          ) {
+
+            tahunan++;
+
+          }
+
+
+          if (
+            item.kategori ===
+            "kondisional"
+          ) {
+
+            kondisional++;
+
+          }
+
+        }
+      );
+
+
+
+      document
+        .getElementById(
+          "jumlahMingguan"
+        )
+        .textContent =
+        mingguan;
+
+
+
+      document
+        .getElementById(
+          "jumlahSemesteran"
+        )
+        .textContent =
+        semesteran;
+
+
+
+      document
+        .getElementById(
+          "jumlahTahunan"
+        )
+        .textContent =
+        tahunan;
+
+
+
+      document
+        .getElementById(
+          "jumlahKondisional"
+        )
+        .textContent =
+        kondisional;
+
+
+
+      document
+        .getElementById(
+          "jumlahPengadaan"
+        )
+        .textContent =
+        semuaPengadaan.length;
+
+    }
+
+
+
+    // ==========================================
+    // MEMBUAT DAFTAR TAHUN AJARAN
+    // ==========================================
+
+    function isiTahunAjaran() {
+
+      const select =
+        document.getElementById(
+          "filterTahunAjaran"
+        );
+
+
+      const tahunSet =
+        new Set();
+
+
+      semuaKegiatan.forEach(
+        item => {
+
+          if (
+            item.tahun_ajaran
+          ) {
+
+            tahunSet.add(
+              item.tahun_ajaran
+            );
+
+          }
+
+        }
+      );
+
+
+      select.innerHTML = `
+
+        <option value="">
+          Semua tahun ajaran
+        </option>
+
+      `;
+
+
+      Array.from(tahunSet)
+
+        .sort()
+
+        .forEach(
+          tahun => {
+
+            const option =
+              document.createElement(
+                "option"
+              );
+
+
+            option.value =
+              tahun;
+
+
+            option.textContent =
+              tahun;
+
+
+            select.appendChild(
+              option
+            );
+
+          }
+        );
+
+    }
+
+
+
+    // ==========================================
+    // MENJALANKAN PENCARIAN + FILTER
+    // ==========================================
+
+    function jalankanPencarian() {
+
+      const keyword =
+        document
+          .getElementById(
+            "searchInput"
+          )
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const lini =
+        document
+          .getElementById(
+            "filterLini"
+          )
+          .value;
+
+
+      const status =
+        document
+          .getElementById(
+            "filterStatus"
+          )
+          .value;
+
+
+      const tahunAjaran =
+        document
+          .getElementById(
+            "filterTahunAjaran"
+          )
+          .value;
+
+
+
+      // ======================================
+      // KEGIATAN
+      // ======================================
+
+      const hasilKegiatan =
+        semuaKegiatan.filter(
+          item => {
+
+            const cocokKeyword =
+              !keyword ||
+              textSemuaField(
+                item
+              ).includes(
+                keyword
+              );
+
+
+            const cocokLini =
+              !lini ||
+              lini ===
+              item.kategori;
+
+
+            const cocokStatus =
+              !status ||
+              String(
+                item.status ?? ""
+              ).toLowerCase() ===
+              status.toLowerCase();
+
+
+            const cocokTahun =
+              !tahunAjaran ||
+              String(
+                item.tahun_ajaran ?? ""
+              ) ===
+              tahunAjaran;
+
+
+            return (
+              cocokKeyword &&
+              cocokLini &&
+              cocokStatus &&
+              cocokTahun
+            );
+
+          }
+        );
+
+
+
+      // ======================================
+      // PENGADAAN
+      // ======================================
+
+      const hasilPengadaan =
+        semuaPengadaan.filter(
+          item => {
+
+            const cocokKeyword =
+              !keyword ||
+              textSemuaField(
+                item
+              ).includes(
+                keyword
+              );
+
+
+            /*
+              Pengadaan tidak memakai
+              kategori kegiatan.
+              Karena itu filter lini
+              hanya menampilkan pengadaan
+              ketika lini = pengadaan.
+            */
+
+            const cocokLini =
+              !lini ||
+              lini ===
+              "pengadaan";
+
+
+            const cocokStatus =
+              !status ||
+              String(
+                item.status ?? ""
+              ).toLowerCase() ===
+              status.toLowerCase();
+
+
+            /*
+              Pengadaan tidak dipaksa
+              memiliki tahun_ajaran.
+              Jika suatu saat tabel
+              pengadaan memiliki kolom
+              tahun_ajaran, filter akan
+              bekerja otomatis.
+            */
+
+            const cocokTahun =
+              !tahunAjaran ||
+              String(
+                item.tahun_ajaran ?? ""
+              ) ===
+              tahunAjaran;
+
+
+            return (
+              cocokKeyword &&
+              cocokLini &&
+              cocokStatus &&
+              cocokTahun
+            );
+
+          }
+        );
+
+
+
+      tampilkanHasil(
+        hasilKegiatan,
+        hasilPengadaan
+      );
+
+    }
+
+
+
+    // ==========================================
+    // MENAMPILKAN HASIL
+    // ==========================================
+
+    function tampilkanHasil(
+      hasilKegiatan,
+      hasilPengadaan
+    ) {
+
+      const container =
+        document.getElementById(
+          "searchResults"
+        );
+
+
+      container.innerHTML =
+        "";
+
+
+
+      const total =
+        hasilKegiatan.length +
+        hasilPengadaan.length;
+
+
+
+      // ======================================
+      // TIDAK ADA FILTER / HASIL
+      // ======================================
+
+      if (
+        total === 0
+      ) {
+
+        container.innerHTML = `
+
+          <div class="search-empty">
+
+            Tidak ditemukan data
+            yang sesuai dengan pencarian
+            atau filter.
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+
+      // ======================================
+      // INFO
+      // ======================================
+
+      const info =
+        document.createElement(
+          "div"
+        );
+
+
+      info.className =
+        "search-result-info";
+
+
+      info.textContent =
+        `Ditemukan ${total} data.`;
+
+
+      container.appendChild(
+        info
+      );
+
+
+
+      // ======================================
+      // KEGIATAN
+      // ======================================
+
+      hasilKegiatan.forEach(
+        item => {
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "search-result-card";
+
+
+          const judul =
+            item.judul ||
+            "Tanpa judul";
+
+
+          const tanggal =
+            item.tanggal ||
+            "";
+
+
+          const status =
+            item.status ||
+            "";
+
+
+          const tahunAjaran =
+            item.tahun_ajaran ||
+            "";
+
+
+          const deskripsi =
+            item.deskripsi ||
+            item.catatan ||
+            "";
+
+
+
+          card.innerHTML = `
+
+            <div class="search-result-category">
+
+              ${escapeHTML(
+                namaLini(
+                  item.kategori
+                )
+              )}
+
+            </div>
+
+
+            <h3 class="search-result-title">
+
+              ${escapeHTML(
+                judul
+              )}
+
+            </h3>
+
+
+            ${
+              tanggal
+                ? `
+                  <p class="search-result-detail">
+                    📅 Tanggal:
+                    ${escapeHTML(
+                      tanggal
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+
+            ${
+              tahunAjaran
+                ? `
+                  <p class="search-result-detail">
+                    📚 Tahun Ajaran:
+                    ${escapeHTML(
+                      tahunAjaran
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+
+            ${
+              status
+                ? `
+                  <p class="search-result-detail">
+                    Status:
+                    ${escapeHTML(
+                      status
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+
+            ${
+              deskripsi
+                ? `
+                  <p class="search-result-detail">
+                    ${escapeHTML(
+                      deskripsi
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+            <div class="search-result-actions">
+              <button type="button" class="search-edit-button" onclick="openEditModal('kegiatan', '${escapeHTML(item.id)}')">✏️ Edit</button>
+              <button type="button" class="search-delete-button" onclick="deleteFromSearch('kegiatan', '${escapeHTML(item.id)}')">🗑️ Hapus</button>
+            </div>
+
+          `;
+
+
+          container.appendChild(
+            card
+          );
+
+        }
+      );
+
+
+
+      // ======================================
+      // PENGADAAN
+      // ======================================
+
+      hasilPengadaan.forEach(
+        item => {
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "search-result-card";
+
+
+          /*
+            Karena struktur kolom pengadaan
+            dapat berbeda dari kegiatan,
+            kita mencoba beberapa nama kolom
+            yang umum digunakan.
+          */
+
+          const judul =
+            item.nama_pengadaan ||
+            item.nama ||
+            item.kebutuhan ||
+            item.judul ||
+            item.nama_barang ||
+            "Pengadaan";
+
+
+          const kategori =
+            item.kategori ||
+            "";
+
+
+          const status =
+            item.status ||
+            "";
+
+
+          const prioritas =
+            item.prioritas ||
+            "";
+
+
+          const target =
+            item.target ||
+            "";
+
+
+          const catatan =
+            item.catatan ||
+            item.keterangan ||
+            item.deskripsi ||
+            "";
+
+
+
+          card.innerHTML = `
+
+            <div class="search-result-category">
+
+              🛒 Pengadaan
+
+            </div>
+
+
+            <h3 class="search-result-title">
+
+              ${escapeHTML(
+                judul
+              )}
+
+            </h3>
+
+
+            ${
+              kategori
+                ? `
+                  <p class="search-result-detail">
+                    Kategori:
+                    ${escapeHTML(
+                      kategori
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+
+            ${
+              prioritas
+                ? `
+                  <p class="search-result-detail">
+                    Prioritas:
+                    ${escapeHTML(
+                      prioritas
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+
+            ${
+              target
+                ? `
+                  <p class="search-result-detail">
+                    Target:
+                    ${escapeHTML(
+                      target
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+
+            ${
+              status
+                ? `
+                  <p class="search-result-detail">
+                    Status:
+                    ${escapeHTML(
+                      status
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+
+            ${
+              catatan
+                ? `
+                  <p class="search-result-detail">
+                    ${escapeHTML(
+                      catatan
+                    )}
+                  </p>
+                `
+                : ""
+            }
+
+            <div class="search-result-actions">
+              <button type="button" class="search-edit-button" onclick="openEditModal('pengadaan', '${escapeHTML(item.id)}')">✏️ Edit</button>
+              <button type="button" class="search-delete-button" onclick="deleteFromSearch('pengadaan', '${escapeHTML(item.id)}')">🗑️ Hapus</button>
+            </div>
+
+          `;
+
+
+          container.appendChild(
+            card
+          );
+
+        }
+      );
+
+    }
+
+
+
+    // ==========================================
+    // TOMBOL CARI
+    // ==========================================
+
+    document
+      .getElementById(
+        "searchButton"
+      )
+      .addEventListener(
+        "click",
+        function () {
+
+          jalankanPencarian();
+
+        }
+      );
+
+
+
+    // ==========================================
+    // ENTER = CARI
+    // ==========================================
+
+    document
+      .getElementById(
+        "searchInput"
+      )
+      .addEventListener(
+        "keydown",
+        function (event) {
+
+          if (
+            event.key ===
+            "Enter"
+          ) {
+
+            event.preventDefault();
+
+            jalankanPencarian();
+
+          }
+
+        }
+      );
+
+
+
+    // ==========================================
+    // RESET FILTER
+    // ==========================================
+
+    document
+      .getElementById(
+        "resetButton"
+      )
+      .addEventListener(
+        "click",
+        function () {
+
+          document
+            .getElementById(
+              "searchInput"
+            )
+            .value = "";
+
+
+          document
+            .getElementById(
+              "filterLini"
+            )
+            .value = "";
+
+
+          document
+            .getElementById(
+              "filterStatus"
+            )
+            .value = "";
+
+
+          document
+            .getElementById(
+              "filterTahunAjaran"
+            )
+            .value = "";
+
+
+          document
+            .getElementById(
+              "searchResults"
+            )
+            .innerHTML = "";
+
+        }
+      );
+
+
+
+    document.getElementById("closeEditModal").addEventListener("click", closeEditModal);
+    document.getElementById("modalCancelButton").addEventListener("click", closeEditModal);
+    document.getElementById("modalSaveButton").addEventListener("click", saveFromSearch);
+
+    editModal.addEventListener("click", function(event) {
+      if (event.target === editModal) {
+        closeEditModal();
+      }
+    });
+
+    // ==========================================
+    // JALANKAN SAAT DASHBOARD DIBUKA
+    // ==========================================
+
+    loadSummary();
+
+  </script>
+
+
+</body>
+</html>
