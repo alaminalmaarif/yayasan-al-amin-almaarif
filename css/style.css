@@ -1009,3 +1009,116 @@ footer p + p {
     padding: 10px;
   }
 }
+
+
+/* Prestasi */
+.prestasi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 28px;
+}
+
+.prestasi-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e0e7e3;
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.prestasi-image-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #111;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.prestasi-image-button img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.prestasi-image-button:hover img,
+.prestasi-image-button:focus-visible img {
+  transform: scale(1.05);
+}
+
+.prestasi-content {
+  padding: 18px 18px 20px;
+}
+
+.prestasi-juara {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--primary);
+  background: #eef7f2;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.prestasi-juara i {
+  color: var(--accent);
+}
+
+.prestasi-title {
+  margin-bottom: 10px;
+  color: var(--primary);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.prestasi-meta {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.prestasi-meta-line {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.prestasi-date {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.prestasi-date i {
+  color: var(--primary);
+}
+
+.prestasi-lightbox-caption {
+  margin-top: 12px;
+}
+
+.prestasi-lightbox-caption .prestasi-content {
+  padding: 8px 4px 2px;
+  color: #fff;
+}
+
+.prestasi-lightbox-caption .prestasi-title {
+  color: #fff;
+}
+
+.prestasi-lightbox-caption .prestasi-meta {
+  color: #d9dedb;
+}
+
+.prestasi-lightbox-caption .prestasi-juara {
+  color: #164c35;
+  background: #eaf5ee;
+}

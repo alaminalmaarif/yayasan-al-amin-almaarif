@@ -1,0 +1,79 @@
+PANDUAN INSTALASI FITUR PRESTASI
+=================================
+
+1. TIMPA FILE
+-------------
+Salin file/folder dari paket update ke folder website lama.
+File yang ditambahkan/diubah:
+- index.html
+- css/style.css
+- js/config.js
+- js/script.js
+- js/prestasi.js (baru)
+- upload-prestasi.html (baru)
+
+upload.html Galeri tidak diubah.
+Dashboard, data JSON, assets, dan file lain tidak diubah.
+
+2. CLOUDINARY
+-------------
+TIDAK perlu membuat atau mengaktifkan tag "yayasan-prestasi" secara manual.
+Tag dibuat/diterapkan otomatis saat upload melalui:
+  tags = yayasan-prestasi
+
+Sistem memakai upload preset Cloudinary yang sama dengan Galeri:
+  yayasan_gallery
+
+Karena upload preset lama sudah dipakai oleh Galeri, tidak perlu membuat preset baru.
+Cloudinary mendukung parameter tags dan context pada unsigned upload.
+
+3. RESOURCE LIST / IMAGE LIST
+-----------------------------
+Website membaca data Prestasi melalui:
+  /image/list/yayasan-prestasi.json
+
+Galeri kamu saat ini sudah memakai mekanisme /image/list/yayasan-gallery.json.
+Artinya fitur Resource List sudah harus aktif pada Cloudinary agar Galeri berjalan.
+Kalau Galeri sedang berjalan normal, biasanya TIDAK perlu mengubah apa pun lagi.
+
+Jika suatu saat URL list mengembalikan 401/403/404 karena Resource List dibatasi:
+Cloudinary Console > Settings > Security > Restricted image types
+lalu pastikan Resource list tidak dibatasi untuk kebutuhan client-side list.
+
+4. CARA UPLOAD PRESTASI
+-----------------------
+Buka:
+  https://domain-kamu/upload-prestasi.html
+
+Isi:
+- Juara
+- Nama Kegiatan/Lomba
+- Unit
+- Tingkat
+- Tanggal Lomba
+- Foto
+
+Untuk Nama Kegiatan, Unit, atau Tingkat yang belum tersedia, pilih "Ketik manual...".
+
+5. DATA YANG DISIMPAN
+----------------------
+Setiap foto prestasi akan mendapat:
+Tag:
+  yayasan-prestasi
+
+Context:
+  juara
+  nama_kegiatan
+  unit
+  tingkat
+  tanggal
+
+6. CACHE
+--------
+Cloudinary menyatakan client-side asset list memiliki cache sekitar 60 detik.
+Jadi setelah upload berhasil, tunggu sekitar 1 menit lalu refresh halaman.
+
+7. CATATAN KEAMANAN
+--------------------
+Upload Galeri dan Prestasi memakai unsigned upload. Nama upload preset dapat terlihat di browser.
+Untuk penggunaan admin yang lebih aman di masa depan, pertimbangkan signed upload/backend atau perlindungan akses pada halaman upload.

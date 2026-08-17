@@ -28,6 +28,8 @@ const CONFIG = Object.freeze({
   cloudinary: Object.freeze({
     cloudName: "k8jsv9np",
     galleryTag: "yayasan-gallery",
+    achievementTag: "yayasan-prestasi",
+    uploadPreset: "yayasan_gallery",
     pageSize: 12
   }),
 

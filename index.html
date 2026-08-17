@@ -102,6 +102,7 @@
         <li><a href="#visiMisi">Visi &amp; Misi</a></li>
         <li><a href="#unit">Unit Pendidikan</a></li>
         <li><a href="#galeri">Galeri</a></li>
+        <li><a href="#prestasi">Prestasi</a></li>
         <li><a href="#video">Video</a></li>
         <li><a href="#ppdb">PPDB</a></li>
         <li><a href="#donasi">Donasi</a></li>
@@ -213,6 +214,27 @@
       <p id="galleryLightboxCaption"></p>
     </dialog>
 
+    <section id="prestasi" class="section" aria-labelledby="prestasiTitle">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2 id="prestasiTitle">Prestasi</h2>
+          <p>Dokumentasi prestasi dan penghargaan peserta didik serta unit pendidikan di bawah naungan yayasan.</p>
+        </div>
+        <div id="prestasiContainer" class="prestasi-grid" aria-live="polite"></div>
+        <div class="center">
+          <button id="loadMorePrestasi" type="button" class="btn-primary" hidden>Lihat Lebih Banyak</button>
+        </div>
+      </div>
+    </section>
+
+    <dialog id="prestasiLightbox" class="gallery-lightbox prestasi-lightbox" aria-labelledby="prestasiLightboxCaption">
+      <button id="closePrestasiLightbox" type="button" class="gallery-lightbox-close" aria-label="Tutup gambar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+      <img id="prestasiLightboxImage" src="" alt="">
+      <div id="prestasiLightboxCaption" class="prestasi-lightbox-caption"></div>
+    </dialog>
+
     <section id="video" class="section" aria-labelledby="videoTitle">
       <div class="container">
         <div class="section-title" data-aos="fade-up">
@@ -306,6 +328,7 @@
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="js/config.js"></script>
   <script src="js/gallery.js"></script>
+  <script src="js/prestasi.js"></script>
   <script src="js/youtube.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/script.js"></script>

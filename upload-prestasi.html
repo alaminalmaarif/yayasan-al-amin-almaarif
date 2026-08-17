@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Prestasi - Yayasan Al-Amin</title>
+  <style>
+    *{box-sizing:border-box}
+    :root{--primary:#0B5D3B;--primary-dark:#08452B;--gold:#D4AF37;--muted:#65736d;--line:#dfe7e3}
+    body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#f5f7f6;color:#18352a;display:flex;justify-content:center;padding:28px 16px}
+    .card{width:100%;max-width:680px;background:#fff;border-radius:18px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+    h1{margin:0 0 8px;font-size:25px;color:var(--primary)}
+    .sub{margin:0 0 24px;color:var(--muted);line-height:1.5}
+    .form-grid{display:grid;gap:16px}
+    .field{display:grid;gap:7px}
+    label{font-size:14px;font-weight:700;color:#25473a}
+    select,input[type=date],input[type=text]{width:100%;min-height:46px;padding:11px 13px;border:1px solid #cbd7d1;border-radius:10px;background:#fff;color:#18352a;font:inherit;outline:none}
+    select:focus,input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(11,93,59,.1)}
+    .custom-input{display:none}.custom-input.show{display:block}
+    .picker{display:block;width:100%;border:2px dashed #b8c8c0;border-radius:14px;padding:26px 18px;text-align:center;cursor:pointer;background:#fafcfb}
+    input[type=file]{display:none}
+    .count{margin:12px 0;color:#53635c;font-size:14px}
+    .preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:9px;margin-top:12px}
+    .preview img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;border:1px solid var(--line)}
+    .actions{margin-top:20px;display:grid;gap:10px}
+    button{width:100%;border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer;background:var(--primary);color:#fff}
+    button:hover:not(:disabled){background:var(--primary-dark)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .secondary{background:#eef5f1;color:var(--primary)}
+    .secondary:hover:not(:disabled){background:#e0ece6}
+    .progress{margin-top:18px;display:none}.bar-wrap{height:10px;background:#e7ece9;border-radius:99px;overflow:hidden}.bar{width:0;height:100%;background:var(--primary);transition:width .2s}
+    .status{margin-top:10px;font-size:14px;line-height:1.5;white-space:pre-line}.success{color:#17633f}.error{color:#a12828}
+    .note{margin-top:20px;padding:13px 14px;border-radius:10px;background:#f4f7f5;color:#5d6963;font-size:13px;line-height:1.55}
+    .note strong{color:#25473a}.back{display:inline-block;margin-top:16px;color:var(--primary);font-size:14px;text-decoration:none}.back:hover{text-decoration:underline}
+    @media(max-width:520px){.card{padding:22px}.preview{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<main class="card">
+  <h1>Upload Prestasi</h1>
+  <p class="sub">Yayasan Pendidikan Islam Al-Amin Al-Ma'arif</p>
+
+  <form id="prestasiForm">
+    <div class="form-grid">
+      <div class="field">
+        <label for="juara">Juara</label>
+        <select id="juara" required>
+          <option value="">Pilih juara...</option>
+          <option>Juara 1</option>
+          <option>Juara 2</option>
+          <option>Juara 3</option>
+          <option>Harapan 1</option>
+          <option>Harapan 2</option>
+          <option>Harapan 3</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="namaKegiatan">Nama Kegiatan / Lomba</label>
+        <select id="namaKegiatan" required>
+          <option value="">Pilih nama kegiatan...</option>
+          <option value="custom">Ketik manual...</option>
+        </select>
+        <input id="namaKegiatanCustom" class="custom-input" type="text" maxlength="255" placeholder="Contoh: Lomba Mewarnai Islami">
+      </div>
+
+      <div class="field">
+        <label for="unit">Unit</label>
+        <select id="unit" required>
+          <option value="">Pilih unit...</option>
+          <option>RA</option>
+          <option>MDT</option>
+          <option>TPQ</option>
+          <option>Pesantren</option>
+          <option>Majelis Taklim</option>
+          <option value="custom">Ketik manual...</option>
+        </select>
+        <input id="unitCustom" class="custom-input" type="text" maxlength="100" placeholder="Contoh: MTs atau MA">
+      </div>
+
+      <div class="field">
+        <label for="tingkat">Tingkat</label>
+        <select id="tingkat" required>
+          <option value="">Pilih tingkat...</option>
+          <option>Desa Parung</option>
+          <option>Kecamatan Parung</option>
+          <option>Kabupaten Bogor</option>
+          <option>Provinsi Jawa Barat</option>
+          <option>Negara Indonesia</option>
+          <option>Internasional</option>
+          <option value="custom">Ketik manual...</option>
+        </select>
+        <input id="tingkatCustom" class="custom-input" type="text" maxlength="150" placeholder="Contoh: Se-3 Kecamatan">
+      </div>
+
+      <div class="field">
+        <label for="tanggal">Tanggal Lomba</label>
+        <input id="tanggal" type="date" required>
+      </div>
+
+      <div class="field">
+        <label for="photos">Foto Prestasi</label>
+        <label class="picker" for="photos"><strong>📷 Pilih foto prestasi</strong><br><span style="font-size:13px;color:#69756f">Bisa memilih banyak foto sekaligus. Semua foto memakai data prestasi yang sama.</span></label>
+        <input id="photos" type="file" accept="image/*" multiple required>
+        <div id="count" class="count">Belum ada foto dipilih.</div>
+        <div id="preview" class="preview" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="uploadBtn" type="submit" disabled>UPLOAD PRESTASI</button>
+      <button id="resetBtn" class="secondary" type="button">Reset Form</button>
+    </div>
+  </form>
+
+  <div id="progress" class="progress">
+    <div class="bar-wrap"><div id="bar" class="bar"></div></div>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="note">
+    <strong>Catatan:</strong> foto akan disimpan di Cloudinary dengan tag <strong>yayasan-prestasi</strong> dan metadata prestasi. Setelah upload berhasil, data biasanya muncul di website setelah cache daftar Cloudinary diperbarui.
+  </div>
+
+  <a class="back" href="index.html#prestasi">← Kembali ke halaman Prestasi</a>
+</main>
+
+<script>
+const CLOUD_NAME = "k8jsv9np";
+const UPLOAD_PRESET = "yayasan_gallery";
+const ACHIEVEMENT_TAG = "yayasan-prestasi";
+
+const form = document.getElementById("prestasiForm");
+const juara = document.getElementById("juara");
+const namaKegiatan = document.getElementById("namaKegiatan");
+const namaKegiatanCustom = document.getElementById("namaKegiatanCustom");
+const unit = document.getElementById("unit");
+const unitCustom = document.getElementById("unitCustom");
+const tingkat = document.getElementById("tingkat");
+const tingkatCustom = document.getElementById("tingkatCustom");
+const tanggal = document.getElementById("tanggal");
+const photos = document.getElementById("photos");
+const count = document.getElementById("count");
+const preview = document.getElementById("preview");
+const uploadBtn = document.getElementById("uploadBtn");
+const resetBtn = document.getElementById("resetBtn");
+const progress = document.getElementById("progress");
+const bar = document.getElementById("bar");
+const status = document.getElementById("status");
+
+function toggleCustom(select, input) {
+  const show = select.value === "custom";
+  input.classList.toggle("show", show);
+  input.required = show;
+  if (!show) input.value = "";
+}
+
+namaKegiatan.addEventListener("change", () => toggleCustom(namaKegiatan, namaKegiatanCustom));
+unit.addEventListener("change", () => toggleCustom(unit, unitCustom));
+tingkat.addEventListener("change", () => toggleCustom(tingkat, tingkatCustom));
+
+function getSelectedValue(select, customInput) {
+  return select.value === "custom" ? customInput.value.trim() : select.value.trim();
+}
+
+function updateUploadButton() {
+  uploadBtn.disabled = !form.checkValidity() || photos.files.length === 0;
+}
+
+[juara, namaKegiatan, namaKegiatanCustom, unit, unitCustom, tingkat, tingkatCustom, tanggal].forEach(element => {
+  element.addEventListener("input", updateUploadButton);
+  element.addEventListener("change", updateUploadButton);
+});
+
+photos.addEventListener("change", () => {
+  const files = Array.from(photos.files);
+  count.textContent = files.length ? `${files.length} foto dipilih.` : "Belum ada foto dipilih.";
+  preview.replaceChildren();
+
+  files.slice(0, 20).forEach(file => {
+    const img = document.createElement("img");
+    img.alt = file.name;
+    const url = URL.createObjectURL(file);
+    img.src = url;
+    img.addEventListener("load", () => URL.revokeObjectURL(url), { once: true });
+    preview.append(img);
+  });
+
+  if (files.length > 20) {
+    const more = document.createElement("div");
+    more.textContent = `+${files.length - 20} foto lainnya`;
+    more.style.gridColumn = "1 / -1";
+    more.style.fontSize = "13px";
+    more.style.color = "#69756f";
+    preview.append(more);
+  }
+  updateUploadButton();
+});
+
+function escapeContextValue(value) {
+  return String(value || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/\|/g, "\\|")
+    .replace(/=/g, "\\=")
+    .replace(/[\r\n]+/g, " ")
+    .trim();
+}
+
+function buildContext(data) {
+  return [
+    ["juara", data.juara],
+    ["nama_kegiatan", data.namaKegiatan],
+    ["unit", data.unit],
+    ["tingkat", data.tingkat],
+    ["tanggal", data.tanggal]
+  ].map(([key, value]) => `${key}=${escapeContextValue(value)}`).join("|");
+}
+
+function uploadOne(file, context) {
+  return new Promise((resolve, reject) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", UPLOAD_PRESET);
+    data.append("tags", ACHIEVEMENT_TAG);
+    data.append("context", context);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try { resolve(JSON.parse(xhr.responseText)); }
+        catch { reject(new Error("Respons Cloudinary tidak dapat dibaca.")); }
+      } else {
+        let message = `HTTP ${xhr.status}`;
+        try {
+          const payload = JSON.parse(xhr.responseText);
+          message = payload.error?.message || message;
+        } catch {}
+        reject(new Error(message));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Koneksi ke Cloudinary gagal."));
+    xhr.send(data);
+  });
+}
+
+function setFormDisabled(disabled) {
+  form.querySelectorAll("input, select, button").forEach(element => {
+    if (element.id !== "resetBtn") element.disabled = disabled;
+  });
+}
+
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!form.checkValidity() || !photos.files.length) {
+    form.reportValidity();
+    return;
+  }
+
+  const data = {
+    juara: juara.value,
+    namaKegiatan: getSelectedValue(namaKegiatan, namaKegiatanCustom),
+    unit: getSelectedValue(unit, unitCustom),
+    tingkat: getSelectedValue(tingkat, tingkatCustom),
+    tanggal: tanggal.value
+  };
+
+  if (!data.namaKegiatan || !data.unit || !data.tingkat) {
+    alert("Mohon lengkapi data prestasi.");
+    return;
+  }
+
+  const files = Array.from(photos.files);
+  const context = buildContext(data);
+  setFormDisabled(true);
+  progress.style.display = "block";
+  status.className = "status";
+  bar.style.width = "0%";
+
+  let success = 0;
+  let failed = 0;
+  const failures = [];
+
+  for (let i = 0; i < files.length; i++) {
+    try {
+      await uploadOne(files[i], context);
+      success++;
+    } catch (error) {
+      failed++;
+      failures.push(`${files[i].name}: ${error.message}`);
+      console.error("Upload prestasi gagal:", files[i].name, error);
+    }
+
+    bar.style.width = `${Math.round(((i + 1) / files.length) * 100)}%`;
+    status.textContent = `Proses: ${i + 1} / ${files.length}\nBerhasil: ${success} | Gagal: ${failed}`;
+  }
+
+  if (failed === 0) {
+    status.className = "status success";
+    status.textContent = `✅ Selesai! ${success} foto berhasil diupload.\nFoto diberi tag ${ACHIEVEMENT_TAG} dan metadata prestasi sudah disimpan.`;
+    photos.value = "";
+    count.textContent = "Belum ada foto dipilih.";
+    preview.replaceChildren();
+  } else {
+    status.className = "status error";
+    status.textContent = `Selesai dengan catatan.\nBerhasil: ${success} | Gagal: ${failed}\n${failures.join("\n")}`;
+  }
+
+  setFormDisabled(false);
+  updateUploadButton();
+});
+
+resetBtn.addEventListener("click", () => {
+  form.reset();
+  namaKegiatanCustom.classList.remove("show");
+  unitCustom.classList.remove("show");
+  tingkatCustom.classList.remove("show");
+  namaKegiatanCustom.required = false;
+  unitCustom.required = false;
+  tingkatCustom.required = false;
+  preview.replaceChildren();
+  count.textContent = "Belum ada foto dipilih.";
+  progress.style.display = "none";
+  bar.style.width = "0%";
+  status.textContent = "";
+  uploadBtn.disabled = true;
+});
+
+updateUploadButton();
+</script>
+</body>
+</html>

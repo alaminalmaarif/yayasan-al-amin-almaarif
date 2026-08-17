@@ -455,6 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPPDB(),
     loadDonation(),
     loadSocialAndContact(),
-    loadGallery()
+    loadGallery(),
+    loadPrestasi()
   ]);
 });
