@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Dashboard Kepala | RA Al-Amin Al-Ma'arif</title>
+  <title>Dashboard Yayasan Pendidikan Islam Al-Amin Al-Ma'arif</title>
 
   <style>
     * {
@@ -170,7 +170,7 @@
 
     .filter-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
+      grid-template-columns: 1.3fr 1.2fr 1fr 1fr 1fr;
       gap: 12px;
     }
 
@@ -553,11 +553,11 @@
       <div>
 
         <h1 class="header-title">
-          Dashboard Kepala
+          Dashboard Yayasan Pendidikan Islam Al-Amin Al-Ma'arif
         </h1>
 
         <p class="header-subtitle">
-          RA Al-Amin Al-Ma'arif
+          Pusat Administrasi Yayasan
         </p>
 
       </div>
@@ -590,12 +590,26 @@
     <div class="academic-year">
 
       <span>
-        Tahun Ajaran
+        Unit Yayasan
       </span>
 
-      <strong>
-        2026/2027
-      </strong>
+      <select id="dashboardUnit" class="filter-select" aria-label="Unit Yayasan"></select>
+
+      <input id="dashboardUnitCustom" class="filter-input" type="text" placeholder="Contoh: MTs Al-Amin" hidden>
+
+      <button id="dashboardUnitApply" type="button" class="search-button" hidden>Gunakan Unit</button>
+
+      <span style="margin-top:10px;">
+        Tahun Ajaran Dashboard
+      </span>
+
+      <select id="dashboardTahunAjaran" class="filter-select" aria-label="Tahun Ajaran Dashboard"></select>
+
+      <input id="dashboardTahunCustom" class="filter-input" type="text" placeholder="Contoh: 2035/2036" hidden>
+
+      <button id="dashboardTahunApply" type="button" class="search-button" hidden>Gunakan Tahun Ajaran</button>
+
+      <small id="dashboardTahunInfo">Data ditampilkan sesuai unit dan tahun ajaran yang dipilih.</small>
 
     </div>
 
@@ -758,6 +772,28 @@
 
         </div>
 
+
+
+        <!-- UNIT -->
+
+        <div class="filter-group">
+
+          <label for="filterUnit">
+            Unit
+          </label>
+
+          <select
+            id="filterUnit"
+            class="filter-select"
+          >
+
+            <option value="">
+              Semua unit
+            </option>
+
+          </select>
+
+        </div>
 
 
         <!-- LINI -->
@@ -1086,8 +1122,10 @@
         </div>
 
         <div class="edit-form-group">
-          <label for="modalKegiatanTahun">Tahun Ajaran</label>
-          <input id="modalKegiatanTahun" type="text" placeholder="Contoh: 2026/2027">
+          <label for="modalKegiatanTahunSelect">Tahun Ajaran</label>
+          <select id="modalKegiatanTahunSelect" class="filter-select"></select>
+          <input id="modalKegiatanTahunCustom" class="filter-input" type="text" placeholder="Contoh: 2035/2036" hidden>
+          <button id="modalKegiatanTahunApply" type="button" class="reset-button" hidden>Gunakan Tahun Ajaran</button>
         </div>
 
         <div class="edit-form-group">
@@ -1212,6 +1250,7 @@
   ========================================== -->
 
   <script src="config.js"></script>
+  <script src="tahun-ajaran.js"></script>
 
 
   <script>
@@ -1458,7 +1497,7 @@
         setModalValue("modalKegiatanStatus", item.status || "rencana");
         setModalValue("modalKegiatanJudul", item.judul);
         setModalValue("modalKegiatanTanggal", item.tanggal);
-        setModalValue("modalKegiatanTahun", item.tahun_ajaran);
+        setYearPickerValue("modalKegiatanTahunSelect", "modalKegiatanTahunCustom", item.tahun_ajaran || getDashboardYear());
         setModalValue("modalKegiatanSemester", item.semester);
         setModalValue("modalKegiatanJenis", item.jenis);
         setModalValue("modalKegiatanDeskripsi", item.deskripsi);
@@ -1506,10 +1545,11 @@
         table = "kegiatan";
         payload = {
           kategori: nilaiModal("modalKegiatanKategori") || "kondisional",
+          unit: getDashboardUnit(),
           judul,
           deskripsi: nilaiModal("modalKegiatanDeskripsi") || null,
           tanggal: nilaiModal("modalKegiatanTanggal") || null,
-          tahun_ajaran: nilaiModal("modalKegiatanTahun") || null,
+          tahun_ajaran: getYearPickerValue("modalKegiatanTahunSelect", "modalKegiatanTahunCustom") || null,
           semester: nilaiModal("modalKegiatanSemester") || null,
           status: nilaiModal("modalKegiatanStatus") || "rencana",
           jenis: nilaiModal("modalKegiatanJenis") || null,
@@ -1529,12 +1569,15 @@
         }
 
         table = "pengadaan";
+        const kegiatanTerkait = semuaKegiatan.find(k => String(k.id) === String(nilaiModal("modalPengadaanKegiatan")));
         payload = {
           nama,
+          unit: getDashboardUnit(),
           kategori: nilaiModal("modalPengadaanKategori") || "rutin",
           tanggal: nilaiModal("modalPengadaanTanggal") || null,
           prioritas: nilaiModal("modalPengadaanPrioritas") || "tinggi",
           target: nilaiModal("modalPengadaanTarget") || null,
+          tahun_target: kegiatanTerkait?.tahun_ajaran || null,
           status: nilaiModal("modalPengadaanStatus") || "belum",
           kegiatan_id: nilaiModal("modalPengadaanKegiatan") || null,
           catatan: nilaiModal("modalPengadaanCatatan") || null
@@ -1721,7 +1764,7 @@
         semuaPengadaan =
           await pengadaanResponse.json();
 
-
+        await loadRelatedProcurement();
 
         // ======================================
         // RINGKASAN
@@ -1756,111 +1799,64 @@
     // UPDATE RINGKASAN
     // ==========================================
 
+    function normalizeUnit(value) {
+      return String(value ?? "").trim().toLowerCase();
+    }
+
+    function getActiveUnit() {
+      return typeof getDashboardUnit === "function"
+        ? String(getDashboardUnit() ?? "").trim()
+        : "";
+    }
+
+    function matchesDashboardUnit(item) {
+      const activeUnit = getActiveUnit();
+      if (!activeUnit) return true;
+
+      const itemUnit = String(item?.unit ?? "").trim();
+
+      // Data lama yang belum memiliki kolom/nilai unit tetap dianggap RA,
+      // mengikuti kompatibilitas yang sudah dipakai pada versi unit.
+      if (!itemUnit) {
+        return normalizeUnit(activeUnit) === "ra";
+      }
+
+      return normalizeUnit(itemUnit) === normalizeUnit(activeUnit);
+    }
+
+    function matchesDashboardContext(item) {
+      return matchesDashboardUnit(item) &&
+             matchesDashboardYear(item);
+    }
+
+    // ==========================================
+    // UPDATE RINGKASAN
+    // ==========================================
+
     function updateSummary() {
 
       let mingguan = 0;
-
       let semesteran = 0;
-
       let tahunan = 0;
-
       let kondisional = 0;
 
+      semuaKegiatan
+        .filter(item => matchesDashboardContext(item))
+        .forEach(item => {
+          if (item.kategori === "mingguan") mingguan++;
+          if (item.kategori === "semesteran") semesteran++;
+          if (item.kategori === "tahunan") tahunan++;
+          if (item.kategori === "kondisional") kondisional++;
+        });
 
+      document.getElementById("jumlahMingguan").textContent = mingguan;
+      document.getElementById("jumlahSemesteran").textContent = semesteran;
+      document.getElementById("jumlahTahunan").textContent = tahunan;
+      document.getElementById("jumlahKondisional").textContent = kondisional;
 
-      semuaKegiatan.forEach(
-        item => {
-
-          if (
-            item.kategori ===
-            "mingguan"
-          ) {
-
-            mingguan++;
-
-          }
-
-
-          if (
-            item.kategori ===
-            "semesteran"
-          ) {
-
-            semesteran++;
-
-          }
-
-
-          if (
-            item.kategori ===
-            "tahunan"
-          ) {
-
-            tahunan++;
-
-          }
-
-
-          if (
-            item.kategori ===
-            "kondisional"
-          ) {
-
-            kondisional++;
-
-          }
-
-        }
-      );
-
-
-
-      document
-        .getElementById(
-          "jumlahMingguan"
-        )
-        .textContent =
-        mingguan;
-
-
-
-      document
-        .getElementById(
-          "jumlahSemesteran"
-        )
-        .textContent =
-        semesteran;
-
-
-
-      document
-        .getElementById(
-          "jumlahTahunan"
-        )
-        .textContent =
-        tahunan;
-
-
-
-      document
-        .getElementById(
-          "jumlahKondisional"
-        )
-        .textContent =
-        kondisional;
-
-
-
-      document
-        .getElementById(
-          "jumlahPengadaan"
-        )
-        .textContent =
-        semuaPengadaan.length;
-
+      document.getElementById("jumlahPengadaan").textContent =
+        semuaPengadaan.filter(item => matchesDashboardUnit(item)).length;
     }
-
-
 
     // ==========================================
     // MEMBUAT DAFTAR TAHUN AJARAN
@@ -1868,246 +1864,207 @@
 
     function isiTahunAjaran() {
 
-      const select =
-        document.getElementById(
-          "filterTahunAjaran"
-        );
+      const select = document.getElementById("filterTahunAjaran");
+      if (!select) return;
 
+      const tahunSet = new Set();
 
-      const tahunSet =
-        new Set();
+      semuaKegiatan
+        .filter(item => matchesDashboardUnit(item))
+        .forEach(item => {
+          if (item.tahun_ajaran) tahunSet.add(item.tahun_ajaran);
+        });
 
+      semuaPengadaan
+        .filter(item => matchesDashboardUnit(item))
+        .forEach(item => {
+          if (item.tahun_target) tahunSet.add(item.tahun_target);
+          if (item.tahun_ajaran) tahunSet.add(item.tahun_ajaran);
+        });
 
-      semuaKegiatan.forEach(
-        item => {
+      const active = getDashboardYear();
+      if (active) tahunSet.add(active);
 
-          if (
-            item.tahun_ajaran
-          ) {
-
-            tahunSet.add(
-              item.tahun_ajaran
-            );
-
-          }
-
-        }
-      );
-
-
-      select.innerHTML = `
-
-        <option value="">
-          Semua tahun ajaran
-        </option>
-
-      `;
-
+      select.innerHTML = `<option value="">Semua tahun ajaran</option>`;
 
       Array.from(tahunSet)
-
         .sort()
+        .forEach(tahun => {
+          const option = document.createElement("option");
+          option.value = tahun;
+          option.textContent = tahun;
+          select.appendChild(option);
+        });
 
-        .forEach(
-          tahun => {
-
-            const option =
-              document.createElement(
-                "option"
-              );
-
-
-            option.value =
-              tahun;
-
-
-            option.textContent =
-              tahun;
-
-
-            select.appendChild(
-              option
-            );
-
-          }
-        );
-
+      select.value = active || "";
     }
-
-
 
     // ==========================================
     // MENJALANKAN PENCARIAN + FILTER
     // ==========================================
 
+    function normalizeSearchText(value) {
+      return String(value ?? "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function getRelatedActivity(item) {
+      if (!item || !item.kegiatan_id) return null;
+
+      return semuaKegiatan.find(
+        kegiatan => String(kegiatan.id) === String(item.kegiatan_id)
+      ) || null;
+    }
+
     function jalankanPencarian() {
 
-      const keyword =
-        document
-          .getElementById(
-            "searchInput"
-          )
-          .value
-          .trim()
-          .toLowerCase();
+      if (!Array.isArray(semuaKegiatan) || !Array.isArray(semuaPengadaan)) {
+        return;
+      }
 
+      const keyword = normalizeSearchText(
+        document.getElementById("searchInput")?.value
+      );
+
+      const unit = String(
+        document.getElementById("filterUnit")?.value || ""
+      ).trim();
 
       const lini =
-        document
-          .getElementById(
-            "filterLini"
-          )
-          .value;
+        document.getElementById("filterLini")?.value || "";
 
-
-      const status =
-        document
-          .getElementById(
-            "filterStatus"
-          )
-          .value;
-
+      const status = normalizeSearchText(
+        document.getElementById("filterStatus")?.value
+      );
 
       const tahunAjaran =
-        document
-          .getElementById(
-            "filterTahunAjaran"
-          )
-          .value;
-
-
+        document.getElementById("filterTahunAjaran")?.value || "";
 
       // ======================================
       // KEGIATAN
       // ======================================
 
-      const hasilKegiatan =
-        semuaKegiatan.filter(
-          item => {
+      const hasilKegiatan = semuaKegiatan.filter(item => {
 
-            const cocokKeyword =
-              !keyword ||
-              textSemuaField(
-                item
-              ).includes(
-                keyword
-              );
+        const cocokKeyword =
+          !keyword ||
+          normalizeSearchText(textSemuaField(item)).includes(keyword);
 
+        const itemUnit = String(item?.unit ?? "").trim();
 
-            const cocokLini =
-              !lini ||
-              lini ===
-              item.kategori;
+        const cocokUnit =
+          !unit ||
+          normalizeUnit(itemUnit) === normalizeUnit(unit) ||
+          (!itemUnit && normalizeUnit(unit) === "ra");
 
+        const cocokLini =
+          !lini ||
+          (lini !== "pengadaan" && item.kategori === lini);
 
-            const cocokStatus =
-              !status ||
-              String(
-                item.status ?? ""
-              ).toLowerCase() ===
-              status.toLowerCase();
+        const cocokStatus =
+          !status ||
+          normalizeSearchText(item.status) === status;
 
+        const cocokTahun =
+          !tahunAjaran ||
+          normalizeSearchText(item.tahun_ajaran) ===
+          normalizeSearchText(tahunAjaran);
 
-            const cocokTahun =
-              !tahunAjaran ||
-              String(
-                item.tahun_ajaran ?? ""
-              ) ===
-              tahunAjaran;
-
-
-            return (
-              cocokKeyword &&
-              cocokLini &&
-              cocokStatus &&
-              cocokTahun
-            );
-
-          }
+        return (
+          cocokKeyword &&
+          cocokUnit &&
+          cocokLini &&
+          cocokStatus &&
+          cocokTahun
         );
-
-
+      });
 
       // ======================================
       // PENGADAAN
       // ======================================
 
-      const hasilPengadaan =
-        semuaPengadaan.filter(
-          item => {
+      const hasilPengadaan = semuaPengadaan.filter(item => {
 
-            const cocokKeyword =
-              !keyword ||
-              textSemuaField(
-                item
-              ).includes(
-                keyword
-              );
+        const kegiatanTerkait = getRelatedActivity(item);
 
+        const searchableText = [
+          textSemuaField(item),
+          kegiatanTerkait ? textSemuaField(kegiatanTerkait) : ""
+        ].join(" ");
 
-            /*
-              Pengadaan tidak memakai
-              kategori kegiatan.
-              Karena itu filter lini
-              hanya menampilkan pengadaan
-              ketika lini = pengadaan.
-            */
+        const cocokKeyword =
+          !keyword ||
+          normalizeSearchText(searchableText).includes(keyword);
 
-            const cocokLini =
-              !lini ||
-              lini ===
-              "pengadaan";
+        const itemUnit = String(item?.unit ?? "").trim();
 
+        const cocokUnit =
+          !unit ||
+          normalizeUnit(itemUnit) === normalizeUnit(unit) ||
+          (!itemUnit && normalizeUnit(unit) === "ra");
 
-            const cocokStatus =
-              !status ||
-              String(
-                item.status ?? ""
-              ).toLowerCase() ===
-              status.toLowerCase();
+        // Pengadaan tampil jika lini kosong/pengadaan,
+        // atau jika terhubung dengan kegiatan pada lini yang dipilih.
+        const cocokLini =
+          !lini ||
+          lini === "pengadaan" ||
+          kegiatanTerkait?.kategori === lini;
 
+        const cocokStatus =
+          !status ||
+          normalizeSearchText(item.status) === status;
 
-            /*
-              Pengadaan tidak dipaksa
-              memiliki tahun_ajaran.
-              Jika suatu saat tabel
-              pengadaan memiliki kolom
-              tahun_ajaran, filter akan
-              bekerja otomatis.
-            */
+        const cocokTahun =
+          !tahunAjaran ||
+          normalizeSearchText(item.tahun_ajaran) === normalizeSearchText(tahunAjaran) ||
+          normalizeSearchText(item.tahun_target) === normalizeSearchText(tahunAjaran) ||
+          normalizeSearchText(kegiatanTerkait?.tahun_ajaran) === normalizeSearchText(tahunAjaran);
 
-            const cocokTahun =
-              !tahunAjaran ||
-              String(
-                item.tahun_ajaran ?? ""
-              ) ===
-              tahunAjaran;
-
-
-            return (
-              cocokKeyword &&
-              cocokLini &&
-              cocokStatus &&
-              cocokTahun
-            );
-
-          }
+        return (
+          cocokKeyword &&
+          cocokUnit &&
+          cocokLini &&
+          cocokStatus &&
+          cocokTahun
         );
+      });
 
-
-
-      tampilkanHasil(
-        hasilKegiatan,
-        hasilPengadaan
-      );
-
+      tampilkanHasil(hasilKegiatan, hasilPengadaan);
     }
-
-
 
     // ==========================================
     // MENAMPILKAN HASIL
     // ==========================================
+
+    function loadRelatedProcurement() {
+      // Data pengadaan sudah dimuat bersama data utama.
+      // Fungsi ini dipertahankan agar alur versi sebelumnya tetap kompatibel.
+      return Promise.resolve();
+    }
+
+    function renderRelatedProcurement(kegiatanId) {
+      const related = semuaPengadaan.filter(
+        item => String(item.kegiatan_id ?? "") === String(kegiatanId)
+      );
+
+      if (!related.length) return "";
+
+      return `
+        <div class="search-result-detail">
+          🛒 Pengadaan terkait:
+          ${related.map(item => escapeHTML(
+            item.nama_pengadaan ||
+            item.nama ||
+            item.kebutuhan ||
+            item.judul ||
+            item.nama_barang ||
+            "Pengadaan"
+          )).join(", ")}
+        </div>
+      `;
+    }
 
     function tampilkanHasil(
       hasilKegiatan,
@@ -2301,6 +2258,8 @@
                 : ""
             }
 
+            ${renderRelatedProcurement(item.id)}
+
             <div class="search-result-actions">
               <button type="button" class="search-edit-button" onclick="openEditModal('kegiatan', '${escapeHTML(item.id)}')">✏️ Edit</button>
               <button type="button" class="search-delete-button" onclick="deleteFromSearch('kegiatan', '${escapeHTML(item.id)}')">🗑️ Hapus</button>
@@ -2465,6 +2424,13 @@
                 : ""
             }
 
+            ${(() => {
+              const kegiatan = semuaKegiatan.find(k => String(k.id) === String(item.kegiatan_id));
+              return kegiatan
+                ? `<p class="search-result-detail">🔗 Kegiatan terkait: ${escapeHTML(namaLini(kegiatan.kategori))} — ${escapeHTML(kegiatan.judul || "Tanpa judul")} (${escapeHTML(kegiatan.tahun_ajaran || "TA belum diatur")})</p>`
+                : "";
+            })()}
+
             <div class="search-result-actions">
               <button type="button" class="search-edit-button" onclick="openEditModal('pengadaan', '${escapeHTML(item.id)}')">✏️ Edit</button>
               <button type="button" class="search-delete-button" onclick="deleteFromSearch('pengadaan', '${escapeHTML(item.id)}')">🗑️ Hapus</button>
@@ -2531,6 +2497,19 @@
 
 
 
+    ["filterLini", "filterStatus", "filterTahunAjaran"].forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener("change", jalankanPencarian);
+      }
+    });
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+      if (this.value.trim() === "") return;
+      jalankanPencarian();
+    });
+
+
     // ==========================================
     // RESET FILTER
     // ==========================================
@@ -2549,6 +2528,10 @@
             )
             .value = "";
 
+          const filterUnit = document.getElementById("filterUnit");
+          if (filterUnit) {
+            filterUnit.value = getDashboardUnit();
+          }
 
           document
             .getElementById(
@@ -2568,7 +2551,7 @@
             .getElementById(
               "filterTahunAjaran"
             )
-            .value = "";
+            .value = getDashboardYear();
 
 
           document
@@ -2593,10 +2576,108 @@
     });
 
     // ==========================================
+    // UNIT DASHBOARD
+    // ==========================================
+
+    setupUnitPicker(
+      "dashboardUnit",
+      "dashboardUnitCustom",
+      "dashboardUnitApply",
+      {
+        value: getDashboardUnit(),
+        onChange: function(unit) {
+          setDashboardUnit(unit, true);
+          updateSummary();
+          isiTahunAjaran();
+
+          const filterUnit = document.getElementById("filterUnit");
+          if (filterUnit) filterUnit.value = unit;
+
+          jalankanPencarian();
+        }
+      }
+    );
+
+    // Isi filter unit dari daftar unit yang disediakan tahun-ajaran.js.
+    const filterUnitSelect = document.getElementById("filterUnit");
+    if (filterUnitSelect) {
+      const activeUnit = getDashboardUnit();
+
+      const fixedUnits = Array.isArray(window.DASHBOARD_FIXED_UNITS)
+        ? window.DASHBOARD_FIXED_UNITS
+        : (typeof DASHBOARD_FIXED_UNITS !== "undefined" ? DASHBOARD_FIXED_UNITS : []);
+
+      filterUnitSelect.innerHTML =
+        `<option value="">Semua unit</option>` +
+        fixedUnits.map(unit =>
+          `<option value="${escapeHTML(unit)}">${escapeHTML(unit)}</option>`
+        ).join("");
+
+      if (activeUnit && !fixedUnits.some(
+        unit => normalizeUnit(unit) === normalizeUnit(activeUnit)
+      )) {
+        filterUnitSelect.insertAdjacentHTML(
+          "beforeend",
+          `<option value="${escapeHTML(activeUnit)}">${escapeHTML(activeUnit)}</option>`
+        );
+      }
+
+      filterUnitSelect.value = activeUnit || "";
+    }
+
+    // Filter langsung bekerja saat pilihan berubah.
+    ["filterUnit", "filterLini", "filterStatus", "filterTahunAjaran"].forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener("change", jalankanPencarian);
+      }
+    });
+
+    document.getElementById("searchInput").addEventListener("input", function() {
+      jalankanPencarian();
+    });
+
+    // ==========================================
+    // TAHUN AJARAN DASHBOARD
+    // ==========================================
+
+    setupYearPicker(
+      "dashboardTahunAjaran",
+      "dashboardTahunCustom",
+      "dashboardTahunApply",
+      {
+        value: getDashboardYear(),
+        onChange: function(year) {
+          setDashboardYear(year, true);
+          updateSummary();
+          isiTahunAjaran();
+          jalankanPencarian();
+        }
+      }
+    );
+
+    updateDashboardLinks();
+
+    setupYearPicker(
+      "modalKegiatanTahunSelect",
+      "modalKegiatanTahunCustom",
+      "modalKegiatanTahunApply",
+      { value: getDashboardYear() }
+    );
+
+    // ==========================================
     // JALANKAN SAAT DASHBOARD DIBUKA
     // ==========================================
 
-    loadSummary();
+    loadSummary().then(() => {
+      const filterUnit = document.getElementById("filterUnit");
+      if (filterUnit) filterUnit.value = getDashboardUnit();
+
+      const filterTahun = document.getElementById("filterTahunAjaran");
+      if (filterTahun) filterTahun.value = getDashboardYear();
+
+      // Tidak menampilkan hasil otomatis sampai pengguna melakukan pencarian.
+    });
 
   </script>
 
