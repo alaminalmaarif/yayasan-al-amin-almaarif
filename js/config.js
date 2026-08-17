@@ -30,6 +30,7 @@ const CONFIG = Object.freeze({
     galleryTag: "yayasan-gallery",
     achievementTag: "yayasan-prestasi",
     uploadPreset: "yayasan_gallery",
+    achievementUploadPreset: "yayasan_prestasi",
     pageSize: 12
   }),
 

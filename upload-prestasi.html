@@ -119,7 +119,7 @@
   </div>
 
   <div class="note">
-    <strong>Catatan:</strong> foto akan disimpan di Cloudinary dengan tag <strong>yayasan-prestasi</strong> dan metadata prestasi. Setelah upload berhasil, data biasanya muncul di website setelah cache daftar Cloudinary diperbarui.
+    <strong>Catatan:</strong> foto akan disimpan di Cloudinary dengan tag <strong>yayasan-prestasi</strong> dan metadata prestasi. Upload Prestasi menggunakan upload preset Cloudinary <strong>yayasan_prestasi</strong> yang terpisah dari preset Galeri. Setelah upload berhasil, data biasanya muncul di website setelah cache daftar Cloudinary diperbarui.
   </div>
 
   <a class="back" href="index.html#prestasi">← Kembali ke halaman Prestasi</a>
@@ -127,7 +127,7 @@
 
 <script>
 const CLOUD_NAME = "k8jsv9np";
-const UPLOAD_PRESET = "yayasan_gallery";
+const UPLOAD_PRESET = "yayasan_prestasi";
 const ACHIEVEMENT_TAG = "yayasan-prestasi";
 
 const form = document.getElementById("prestasiForm");

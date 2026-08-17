@@ -15,17 +15,30 @@ File yang ditambahkan/diubah:
 upload.html Galeri tidak diubah.
 Dashboard, data JSON, assets, dan file lain tidak diubah.
 
-2. CLOUDINARY
--------------
-TIDAK perlu membuat atau mengaktifkan tag "yayasan-prestasi" secara manual.
-Tag dibuat/diterapkan otomatis saat upload melalui:
+2. CLOUDINARY - WAJIB BUAT PRESET BARU
+-------------------------------------
+JANGAN memakai upload preset Galeri "yayasan_gallery" untuk Prestasi.
+Preset Galeri sudah memiliki tag "yayasan-gallery". Pada unsigned upload,
+parameter multi-value seperti tags dapat digabung dengan nilai dari preset,
+sehingga foto Prestasi bisa ikut masuk Galeri.
+
+Buat satu upload preset baru di Cloudinary:
+  Nama: yayasan_prestasi
+  Signing Mode: Unsigned
+
+Pada preset baru, JANGAN isi/default-kan tag "yayasan-gallery" maupun
+"yayasan-prestasi". Tag Prestasi akan dikirim oleh halaman upload:
   tags = yayasan-prestasi
 
-Sistem memakai upload preset Cloudinary yang sama dengan Galeri:
-  yayasan_gallery
+Context Prestasi juga dikirim oleh halaman upload:
+  juara
+  nama_kegiatan
+  unit
+  tingkat
+  tanggal
 
-Karena upload preset lama sudah dipakai oleh Galeri, tidak perlu membuat preset baru.
-Cloudinary mendukung parameter tags dan context pada unsigned upload.
+Preset Galeri "yayasan_gallery" JANGAN diubah karena masih dipakai oleh
+upload.html Galeri Kegiatan.
 
 3. RESOURCE LIST / IMAGE LIST
 -----------------------------
@@ -43,7 +56,7 @@ lalu pastikan Resource list tidak dibatasi untuk kebutuhan client-side list.
 4. CARA UPLOAD PRESTASI
 -----------------------
 Buka:
-  https://domain-kamu/upload-prestasi.html
+  https://yayasan-alamin-almaarif.netlify.app/upload-prestasi.html
 
 Isi:
 - Juara
