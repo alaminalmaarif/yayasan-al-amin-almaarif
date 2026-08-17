@@ -396,7 +396,7 @@
           Tahunan
         </h1>
 <p class="header-subtitle">
-          Dashboard Kepala RA Al-Amin Al-Ma'arif
+          Dashboard Kepala Yayasan Pendidikan Islam Al-Amin Al-Ma'arif
         </p>
 </div>
 <a class="back-button" href="index.html">
@@ -437,6 +437,14 @@
           Tanggal
         </label>
 <input id="tanggal" type="date"/>
+</div>
+
+<div class="form-group">
+<label for="tahunAjaranSelect">Tahun Ajaran</label>
+<select id="tahunAjaranSelect" class="filter-select" required></select>
+<input id="tahunAjaranCustom" class="filter-input" type="text" placeholder="Contoh: 2035/2036" hidden>
+<button id="tahunAjaranApply" type="button" class="cancel-button" hidden>Gunakan Tahun Ajaran</button>
+<div style="font-size:13px;color:#6b7280;margin-top:6px;">Unit aktif: <strong id="unitAktif"></strong></div>
 </div>
 <!-- JENIS -->
 <div class="form-group">
@@ -576,6 +584,7 @@
        CONFIG
        ========================================== -->
 <script src="config.js"></script>
+<script src="tahun-ajaran.js"></script>
 <script>
 
     // ==========================================
@@ -622,6 +631,12 @@
 
     const saveButton =
       document.getElementById("saveButton");
+
+    document.getElementById("unitAktif") && (document.getElementById("unitAktif").textContent = getDashboardUnit());
+
+    setupYearPicker("tahunAjaranSelect", "tahunAjaranCustom", "tahunAjaranApply", {
+      value: getDashboardYear()
+    });
 
     
 
@@ -952,6 +967,7 @@ const cancelButton =
           "Simpan";
 
         tanggal.value = "";
+        setYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom", getDashboardYear());
 
         jenis.value = "";
 
@@ -993,6 +1009,7 @@ const cancelButton =
       editId.value = "";
 
       tanggal.value = "";
+      setYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom", getDashboardYear());
 
       jenis.value = "";
 
@@ -1025,6 +1042,9 @@ const cancelButton =
 
         const tanggalValue =
           tanggal.value;
+
+        const tahunAjaranValue =
+          getYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom") || getDashboardYear();
 
         const jenisValue =
           jenis.value;
@@ -1080,11 +1100,17 @@ const cancelButton =
             kategori:
               "tahunan",
 
+            unit:
+              getDashboardUnit(),
+
             judul:
               judulValue,
 
             tanggal:
               tanggalValue || null,
+
+            tahun_ajaran:
+              tahunAjaranValue,
 
             jenis:
               jenisValue || null,
@@ -1253,9 +1279,11 @@ const cancelButton =
         const activities =
           await response.json();
 
+        const filteredActivities = activities.filter(item => matchesDashboardContext(item));
+        await loadRelatedProcurement();
 
         renderActivities(
-          activities
+          filteredActivities
         );
 
       }
@@ -1359,6 +1387,10 @@ const cancelButton =
 
                     </div>
 
+                    <div class="activity-meta">
+                      📚 Tahun Ajaran: ${escapeHtml(activity.tahun_ajaran || "Belum diatur")}
+                    </div>
+
 
                     <span
                       class="activity-type"
@@ -1397,6 +1429,7 @@ const cancelButton =
 
                 ${renderMeetingDetails(activity)}
 
+                ${renderRelatedProcurement(activity.id)}
 
                 <div
                   class="activity-actions"
@@ -1461,7 +1494,6 @@ const cancelButton =
         const data =
           await response.json();
 
-
         if (!data.length) {
 
           alert(
@@ -1482,6 +1514,8 @@ const cancelButton =
 
         tanggal.value =
           activity.tanggal || "";
+
+        setYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom", activity.tahun_ajaran || getDashboardYear());
 
         jenis.value =
           activity.jenis || "";

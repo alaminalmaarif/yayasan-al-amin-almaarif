@@ -582,7 +582,7 @@
         </h1>
 
         <p class="header-subtitle">
-          Dashboard Kepala RA Al-Amin Al-Ma'arif
+          Dashboard Kepala Yayasan Pendidikan Islam Al-Amin Al-Ma'arif
         </p>
 
       </div>
@@ -624,6 +624,12 @@
         tahun ajaran sehingga target yang belum selesai
         tetap dapat dilanjutkan pada tahun berikutnya.
       </p>
+
+      <div class="procurement-year-info" style="margin-top:14px;padding:12px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:9px;">
+        <strong>Unit:</strong> <span id="pengadaanUnitAktif"></span><br>
+        <strong>Tahun Ajaran Dashboard:</strong> <span id="pengadaanTahunAktif"></span>
+        <div style="font-size:13px;color:#6b7280;margin-top:4px;">Pengadaan tetap lintas tahun. Kegiatan terkait mengikuti tahun ajaran yang sedang dipilih.</div>
+      </div>
 
     </section>
 
@@ -889,6 +895,7 @@
        ========================================== -->
 
   <script src="config.js"></script>
+  <script src="tahun-ajaran.js"></script>
 
 
 
@@ -993,7 +1000,16 @@
       );
 
     let kegiatanData = [];
+    let allKegiatanData = [];
 
+    const pengadaanTahunAktif = document.getElementById("pengadaanTahunAktif");
+    if (pengadaanTahunAktif) {
+      pengadaanTahunAktif.textContent = getDashboardYear();
+    }
+    const pengadaanUnitAktif = document.getElementById("pengadaanUnitAktif");
+    if (pengadaanUnitAktif) {
+      pengadaanUnitAktif.textContent = getDashboardUnit();
+    }
 
 
     // ==========================================
@@ -1218,6 +1234,9 @@
             nama:
               namaValue,
 
+            unit:
+              getDashboardUnit(),
+
             kategori:
               kategoriValue,
 
@@ -1235,6 +1254,9 @@
             kegiatan_id:
               kegiatanId.value ||
               null,
+
+            tahun_target:
+              (getKegiatanById(kegiatanId.value)?.tahun_ajaran) || null,
 
             status:
               statusValue,
@@ -1383,7 +1405,7 @@
 
       try {
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/kegiatan?select=id,kategori,judul,tanggal&order=tanggal.desc,created_at.desc`,
+          `${SUPABASE_URL}/rest/v1/kegiatan?select=id,unit,kategori,judul,tanggal,tahun_ajaran&order=tanggal.desc,created_at.desc`,
           { method: "GET", headers: getHeaders() }
         );
 
@@ -1391,7 +1413,9 @@
           throw new Error("Gagal mengambil daftar kegiatan.");
         }
 
-        kegiatanData = await response.json();
+        const allKegiatan = await response.json();
+        allKegiatanData = allKegiatan;
+        kegiatanData = allKegiatan.filter(item => matchesDashboardContext(item));
 
         kegiatanId.innerHTML =
           `<option value="">-- Tidak terkait kegiatan --</option>` +
@@ -1417,12 +1441,13 @@
 
       const kategori = kategoriMap[item.kategori] || item.kategori || "Kegiatan";
       const tanggal = item.tanggal ? ` — ${formatDate(item.tanggal)}` : "";
-      return `${kategori} — ${item.judul || "Tanpa judul"}${tanggal}`;
+      const tahun = item.tahun_ajaran ? ` — TA ${item.tahun_ajaran}` : "";
+      return `${kategori} — ${item.judul || "Tanpa judul"}${tanggal}${tahun}`;
     }
 
 
     function getKegiatanById(id) {
-      return kegiatanData.find(item => item.id === id) || null;
+      return allKegiatanData.find(item => String(item.id) === String(id)) || null;
     }
 
 
@@ -1466,9 +1491,10 @@
         const data =
           await response.json();
 
+        const filteredData = data.filter(item => matchesDashboardUnit(item));
 
         renderProcurement(
-          data
+          filteredData
         );
 
       }

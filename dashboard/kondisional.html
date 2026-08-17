@@ -354,7 +354,7 @@
           Kondisional
         </h1>
 <p class="header-subtitle">
-          Dashboard Kepala RA Al-Amin Al-Ma'arif
+          Dashboard Kepala Yayasan Pendidikan Islam Al-Amin Al-Ma'arif
         </p>
 </div>
 <a class="back-button" href="index.html">
@@ -393,6 +393,14 @@
           Tanggal
         </label>
 <input id="tanggal" type="date"/>
+</div>
+
+<div class="form-group">
+<label for="tahunAjaranSelect">Tahun Ajaran</label>
+<select id="tahunAjaranSelect" class="filter-select" required></select>
+<input id="tahunAjaranCustom" class="filter-input" type="text" placeholder="Contoh: 2035/2036" hidden>
+<button id="tahunAjaranApply" type="button" class="cancel-button" hidden>Gunakan Tahun Ajaran</button>
+<div style="font-size:13px;color:#6b7280;margin-top:6px;">Unit aktif: <strong id="unitAktif"></strong></div>
 </div>
 <!-- JENIS KEGIATAN -->
 <div class="form-group">
@@ -518,6 +526,7 @@
        CONFIG
        ========================================== -->
 <script src="config.js"></script>
+<script src="tahun-ajaran.js"></script>
 <script>
 
     // ==========================================
@@ -555,6 +564,12 @@
 
     const saveButton =
       document.getElementById("saveButton");
+
+    document.getElementById("unitAktif") && (document.getElementById("unitAktif").textContent = getDashboardUnit());
+
+    setupYearPicker("tahunAjaranSelect", "tahunAjaranCustom", "tahunAjaranApply", {
+      value: getDashboardYear()
+    });
 
     
 
@@ -947,8 +962,10 @@ const cancelButton =
         const data =
           await response.json();
 
+        const filteredData = data.filter(item => matchesDashboardContext(item));
+        await loadRelatedProcurement();
 
-        renderActivities(data);
+        renderActivities(filteredData);
 
 
       } catch (error) {
@@ -1016,6 +1033,10 @@ const cancelButton =
                     ${formatTanggal(
                       item.tanggal
                     )}
+                  </div>
+
+                  <div class="activity-date">
+                    📚 Tahun Ajaran: ${escapeHtml(item.tahun_ajaran || "Belum diatur")}
                   </div>
 
                 </div>
@@ -1168,11 +1189,15 @@ const cancelButton =
 
           kategori: "kondisional",
 
+          unit: getDashboardUnit(),
+
           judul: judul,
 
           deskripsi: null,
 
           tanggal: tanggal,
+
+          tahun_ajaran: getYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom") || getDashboardYear(),
 
           status: status,
 
@@ -1326,6 +1351,8 @@ const cancelButton =
 
         tanggalInput.value =
           item.tanggal || "";
+
+        setYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom", item.tahun_ajaran || getDashboardYear());
 
         jenisInput.value =
           item.jenis || "";

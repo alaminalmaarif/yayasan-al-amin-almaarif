@@ -527,7 +527,7 @@
           Mingguan
         </h1>
 <p class="header-subtitle">
-          Dashboard Kepala RA Al-Amin Al-Ma'arif
+          Dashboard Kepala Yayasan Pendidikan Islam Al-Amin Al-Ma'arif
         </p>
 </div>
 <a class="back-button" href="index.html">
@@ -571,6 +571,14 @@
             Tanggal
           </label>
 <input id="tanggal" required="" type="date"/>
+</div>
+
+<div class="form-group">
+<label for="tahunAjaranSelect">Tahun Ajaran</label>
+<select id="tahunAjaranSelect" class="filter-select" required></select>
+<input id="tahunAjaranCustom" class="filter-input" type="text" placeholder="Contoh: 2035/2036" hidden>
+<button id="tahunAjaranApply" type="button" class="cancel-button" hidden>Gunakan Tahun Ajaran</button>
+<div style="font-size:13px;color:#6b7280;margin-top:6px;">Unit aktif: <strong id="unitAktif"></strong></div>
 </div>
 <!-- JENIS -->
 <div class="form-group">
@@ -677,6 +685,7 @@
        CONFIG
   ========================================== -->
 <script src="config.js"></script>
+<script src="tahun-ajaran.js"></script>
 <script>
 
 
@@ -743,6 +752,12 @@
       document.getElementById(
         "saveButton"
       );
+
+    document.getElementById("unitAktif") && (document.getElementById("unitAktif").textContent = getDashboardUnit());
+
+    setupYearPicker("tahunAjaranSelect", "tahunAjaranCustom", "tahunAjaranApply", {
+      value: getDashboardYear()
+    });
 
 
 
@@ -1237,7 +1252,7 @@
 
             `${SUPABASE_URL}/rest/v1/kegiatan?` +
             `kategori=eq.mingguan` +
-            `&select=id,tanggal,jenis,judul,catatan,jenis_rapat,peserta,agenda_rapat,hasil_rapat,keputusan,pembagian_tugas,tindak_lanjut,created_at` +
+            `&select=id,unit,tanggal,tahun_ajaran,jenis,judul,catatan,jenis_rapat,peserta,agenda_rapat,hasil_rapat,keputusan,pembagian_tugas,tindak_lanjut,created_at` +
             `&order=tanggal.desc,created_at.desc`,
 
             {
@@ -1273,11 +1288,12 @@
 
         }
 
-
+        const filteredData = data.filter(item => matchesDashboardContext(item));
+        await loadRelatedProcurement();
 
         if (
-          !Array.isArray(data) ||
-          data.length === 0
+          !Array.isArray(filteredData) ||
+          filteredData.length === 0
         ) {
 
 
@@ -1297,7 +1313,7 @@
 
 
         activitiesList.innerHTML =
-          data.map(
+          filteredData.map(
 
             function (activity) {
 
@@ -1317,6 +1333,10 @@
                         activity.tanggal
                       )
                     )}
+                  </div>
+
+                  <div class="activity-date">
+                    📚 Tahun Ajaran: ${escapeHtml(activity.tahun_ajaran || "Belum diatur")}
                   </div>
 
 
@@ -1355,6 +1375,7 @@
 
                   ${renderMeetingDetails(activity)}
 
+                  ${renderRelatedProcurement(activity.id)}
 
                   <div
                     class="activity-actions"
@@ -1447,7 +1468,7 @@
 
             `${SUPABASE_URL}/rest/v1/kegiatan?` +
             `id=eq.${encodeURIComponent(id)}` +
-            `&select=id,tanggal,jenis,judul,catatan,jenis_rapat,peserta,agenda_rapat,hasil_rapat,keputusan,pembagian_tugas,tindak_lanjut`,
+            `&select=id,tanggal,tahun_ajaran,jenis,judul,catatan,jenis_rapat,peserta,agenda_rapat,hasil_rapat,keputusan,pembagian_tugas,tindak_lanjut`,
 
             {
 
@@ -1517,6 +1538,8 @@
           .getElementById("tanggal")
           .value =
             activity.tanggal || "";
+
+        setYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom", activity.tahun_ajaran || getDashboardYear());
 
 
         document
@@ -1766,6 +1789,9 @@
             .getElementById("tanggal")
             .value;
 
+        const tahunAjaran =
+          getYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom") || getDashboardYear();
+
 
         const jenis =
           document
@@ -1863,8 +1889,14 @@
                   body:
                     JSON.stringify({
 
+                      unit:
+                        getDashboardUnit(),
+
                       tanggal:
                         tanggal,
+
+                      tahun_ajaran:
+                        tahunAjaran,
 
                       jenis:
                         jenis,
@@ -1911,6 +1943,7 @@
 
 
             weeklyForm.reset();
+          setYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom", getDashboardYear());
 
         toggleMeetingDetails();
 
@@ -2000,8 +2033,14 @@
                     kategori:
                       "mingguan",
 
+                    unit:
+                      getDashboardUnit(),
+
                     tanggal:
                       tanggal,
+
+                    tahun_ajaran:
+                      tahunAjaran,
 
                     jenis:
                       jenis,
@@ -2025,8 +2064,6 @@
           const data =
             await response.json();
 
-
-
           if (!response.ok) {
 
             throw new Error(
@@ -2044,6 +2081,7 @@
 
 
           weeklyForm.reset();
+          setYearPickerValue("tahunAjaranSelect", "tahunAjaranCustom", getDashboardYear());
 
         toggleMeetingDetails();
 
