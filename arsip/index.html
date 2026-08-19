@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arsip & Administrasi | YPI Al-Amin Al-Ma'arif</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div><h1 class="title">Arsip & Administrasi Yayasan</h1><p class="subtitle">Pusat data, dokumen, dan persuratan YPI Al-Amin Al-Ma'arif</p></div>
+    <div class="top-actions"><a class="btn light" href="../dashboard/index.html">Dashboard</a><button id="googleBtn" class="btn light">Hubungkan Google</button><button id="logoutBtn" class="btn gray">Keluar</button></div>
+  </div>
+</header>
+<main class="page">
+  <section id="authCard" class="card">
+    <h2>Google Drive & Google Sheets</h2>
+    <p class="muted">Data arsip disimpan di Google Sheets dan file scan disimpan di Google Drive. Hubungkan akun Google yang menjadi pemilik arsip.</p>
+    <div class="field" style="max-width:700px;margin-top:12px"><label>Google OAuth Client ID</label><input id="clientIdInput" class="input" placeholder="935049165096-8066cpddqeld3sog2v7ji4v1e3htpkmb.apps.googleusercontent.com"></div>
+    <div id="googleStatus" class="status warn">Belum terhubung.</div>
+    <div style="margin-top:12px"><button id="setupBtn" class="btn" disabled>Siapkan Struktur Arsip Google</button></div>
+    <p class="google-note">Pertama kali, struktur folder dan spreadsheet per unit akan dibuat otomatis. Pastikan konfigurasi Google Client ID sudah diisi di <code>config.js</code>.</p>
+  </section>
+
+  <section id="appCard" class="hidden">
+    <div class="card">
+      <div class="tabs" id="categoryTabs"></div>
+      <div class="toolbar">
+        <div class="field"><label>Unit</label><select id="searchUnit" class="select"></select></div>
+        <div class="field"><label>Kata kunci</label><input id="searchText" class="input" placeholder="Nama, NIK, nomor surat, perihal, dll."></div>
+        <div class="field" id="searchTypeWrap"><label>Jenis Surat</label><select id="searchType" class="select"><option value="">Semua</option></select></div>
+        <div class="field"><label>Tahun</label><input id="searchYear" class="input" type="number" min="2000" max="2100" placeholder="Semua"></div>
+        <button id="searchBtn" class="btn">Cari</button>
+      </div>
+    </div>
+
+    <section class="card" id="formCard">
+      <h2 id="formTitle">Tambah Arsip</h2>
+      <p class="muted" id="formHint">Pilih jenis arsip untuk menampilkan formulir.</p>
+      <div id="formBody"></div>
+    </section>
+
+    <section class="card">
+      <h2>Hasil Arsip</h2>
+      <p class="muted" id="resultInfo">Belum ada pencarian.</p>
+      <div id="results"></div>
+    </section>
+  </section>
+</main>
+<div id="modal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h3 id="modalTitle">Edit Arsip</h3><button class="close" id="modalClose">Tutup</button></div><div id="modalBody" style="margin-top:16px"></div></div></div>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
