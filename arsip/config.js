@@ -22,6 +22,9 @@ const ARSIP_UNITS = {
     spreadsheetName: "ARSIP - YAYASAN - YPI-AA",
     categories: ["Yayasan", "Persuratan"]
   },
+  kb: {
+    label: "KB Al-Amin", shortCode: "KB-AA", code: "421.0", spreadsheetName: "ARSIP - KB - KB-AA", categories: ["Siswa", "Pegawai", "Lembaga", "Persuratan"]
+  },
   ra: {
     label: "RA Al-Amin",
     shortCode: "RA-AA",

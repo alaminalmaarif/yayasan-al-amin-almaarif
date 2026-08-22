@@ -1,23 +1,19 @@
 {
   "tahun_ajaran": "2027/2028",
-
   "status": {
     "buka": true,
     "keterangan": "Pendaftaran Peserta Didik Baru telah dibuka."
   },
-
   "brosur": {
     "judul": "Brosur PPDB Yayasan Pendidikan Islam Al-Amin Al-Ma'arif",
     "file": "assets/brosur/brosur-ppdb.pdf",
     "thumbnail": "assets/brosur/brosur.jpg"
   },
-
   "kontak": {
     "nama": "Muhammad Irham Muthi'illah",
     "jabatan": "Sekretaris Yayasan",
     "whatsapp": "6285717797429"
   },
-
   "unit": [
     {
       "id": "ra",
@@ -42,6 +38,27 @@
       "nama": "Pesantren Salafiyah Khusus Putri Al-Amin",
       "formulir": "https://docs.google.com/forms/d/e/1FAIpQLSe88BSu7LNfeIvqOVpvgeoEMLb1vMcugfeHCTjwl6BZOk1eIw/viewform",
       "aktif": true
+    },
+    {
+      "id": "kb",
+      "nama": "KB Al-Amin",
+      "formulir": "https://docs.google.com/forms/d/e/1FAIpQLSflDLqJyfFROOIfBfoYXOzqb1XyBO5KhLhZfQTU_CnQJ3MC6A/viewform?usp=publish-editor",
+      "aktif": true,
+      "catatan": "Formulir PPDB belum tersedia. Aktifkan setelah Google Form unit dibuat."
+    },
+    {
+      "id": "mts",
+      "nama": "MTs Al-Amin",
+      "formulir": "https://docs.google.com/forms/d/e/1FAIpQLSc5fOq7_l6bC9cdlkqZxTa7RIVmcsLChFw0kQlLIJKq89VozA/viewform?usp=publish-editor",
+      "aktif": true,
+      "catatan": "Formulir PPDB belum tersedia. Aktifkan setelah Google Form unit dibuat."
+    },
+    {
+      "id": "ma",
+      "nama": "MA Al-Amin",
+      "formulir": "https://docs.google.com/forms/d/e/1FAIpQLSevo08pRky-nJWk4CKKDygPmpeK5nWX-D55tm0JVyut1zE0uw/viewform?usp=dialog",
+      "aktif": true,
+      "catatan": "Formulir PPDB belum tersedia. Aktifkan setelah Google Form unit dibuat."
     }
   ]
 }

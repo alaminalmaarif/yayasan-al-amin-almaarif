@@ -25,7 +25,7 @@
 
   const BASE_COLUMNS = ["ID", "Dibuat", "Diubah"];
   const SCHEMAS = {
-    Siswa: BASE_COLUMNS.concat(["Nama Lengkap", "NIK", "NIS/NISN", "Tempat Lahir", "Tanggal Lahir", "Alamat", "Nama Ayah", "Nama Ibu", "Tanggal Masuk", "Status", "Tahun Lulus", "Pindah Ke", "Lanjut Ke", "Keterangan", "Akta", "KK", "KTP Orang Tua", "Dokumen Lain", "Ijazah", "e-Rapor"]),
+    Siswa: BASE_COLUMNS.concat(["Nama Lengkap", "NIK", "NIS/NISN", "Nomor KK", "Tempat Lahir", "Tanggal Lahir", "Alamat", "Nama Ayah", "NIK Ayah", "Nomor WhatsApp Ayah", "Pekerjaan Ayah", "Pendidikan Terakhir Ayah", "Nama Ibu", "NIK Ibu", "Nomor WhatsApp Ibu", "Pekerjaan Ibu", "Pendidikan Terakhir Ibu", "Tanggal Masuk", "Status", "Tahun Lulus", "Pindah Ke", "Lanjut Ke", "Keterangan", "Akta", "KK", "KTP Orang Tua", "Pas Foto Terbaru", "Dokumen Lain", "Ijazah", "e-Rapor", "Data PPDB Lengkap"]),
     Pegawai: BASE_COLUMNS.concat(["Nama Lengkap", "NIK", "NUPTK/NPK", "Tempat Lahir", "Tanggal Lahir", "Alamat", "Pendidikan", "Jabatan", "Tanggal Mulai", "Status", "Unit", "Keterangan", "KK", "KTP", "NPWP", "Rekening", "Ijazah", "Sertifikat", "Dokumen Lain"]),
     Lembaga: BASE_COLUMNS.concat(["Nama Lembaga", "Nomor Identitas", "Alamat", "Kepala/Pimpinan", "Tanggal Berdiri", "Status", "Keterangan", "Akta", "SK/Legalitas", "NPWP", "Dokumen Lain"]),
     Yayasan: BASE_COLUMNS.concat(["Nama Yayasan", "Nomor Identitas", "Alamat", "Ketua", "Tanggal Berdiri", "Status", "Keterangan", "Akta Notaris", "SK Kemenkumham", "NPWP", "Dokumen Lain"]),
@@ -33,7 +33,7 @@
   };
 
   const FILE_FIELDS = {
-    Siswa: [["akta","Akta"],["kk","KK"],["ktp_ortu","KTP Orang Tua"],["ijazah","Ijazah"],["e_rapor","e-Rapor"],["dokumen_lain","Dokumen Lain"]],
+    Siswa: [["akta","Akta"],["kk","KK"],["ktp_ortu","KTP Orang Tua"],["pas_foto","Pas Foto Terbaru"],["ijazah","Ijazah"],["e_rapor","e-Rapor"],["dokumen_lain","Dokumen Lain"]],
     Pegawai: [["kk","KK"],["ktp","KTP"],["npwp","NPWP"],["rekening","Rekening"],["ijazah","Ijazah"],["sertifikat","Sertifikat"],["dokumen_lain","Dokumen Lain"]],
     Lembaga: [["akta","Akta"],["sk_legalitas","SK/Legalitas"],["npwp","NPWP"],["dokumen_lain","Dokumen Lain"]],
     Yayasan: [["akta_notaris","Akta Notaris"],["sk_kemenkumham","SK Kemenkumham"],["npwp","NPWP"],["dokumen_lain","Dokumen Lain"]],
@@ -160,7 +160,9 @@
   }
 
   async function googleFetch(url, options = {}) {
-    const timeoutMs = Number(options.timeoutMs || 20000);
+    // Reading several unit spreadsheets can occasionally be slow on Google.
+    // Give ordinary requests a realistic window instead of failing after 20s.
+    const timeoutMs = Number(options.timeoutMs || 60000);
     const fetchOptions = {...options};
     delete fetchOptions.timeoutMs;
 
@@ -332,45 +334,51 @@
       setStatus("Memeriksa struktur Google yang sudah ada...", "warn");
       $("setupBtn").disabled = true;
 
-      const existing = await findExistingGoogleStructure();
-      if (existing?.rootFolderId && existing?.units) {
-        setStatus("Struktur Google sudah ada dan digunakan kembali. Tidak membuat folder/Spreadsheet baru.", "ok");
-        $("setupBtn").disabled = false;
-        renderAppReady();
-        return;
-      }
-
-      // No matching root exists, so this is the first setup for this Google account/app.
-      const root = await createFolder(ARSIP_APP_NAME);
-      await markDriveFile(root.id);
-      const setup = {version:4, rootFolderId:root.id, createdAt:nowIso(), units:{}};
+      // Preserve the existing archive root. If a newly added unit is missing,
+      // only that unit is appended to the existing root; a second archive root
+      // is never created merely because the schema grew.
+      let roots = await findDriveFiles(`mimeType='application/vnd.google-apps.folder' and trashed=false and appProperties has { key='arsipApp' and value='${DRIVE_APP_MARKER}' }`);
+      if (!roots.length) roots = await findDriveFiles(`name='${ARSIP_APP_NAME.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+      roots.sort((a,b)=>String(a.createdTime||"").localeCompare(String(b.createdTime||"")));
+      let root = roots[0];
+      if (!root) { root = await createFolder(ARSIP_APP_NAME); await markDriveFile(root.id); }
+      const setup = {version:5, rootFolderId:root.id, createdAt:nowIso(), units:{}};
+      const children = await findDriveFiles(`'${root.id}' in parents and trashed=false`);
 
       for (const key of UNIT_KEYS) {
         const unit = ARSIP_UNITS[key];
-        const unitFolder = await createFolder(`${unit.label} - ${unit.shortCode}`, root.id);
-        await markDriveFile(unitFolder.id);
-        const docsFolder = await createFolder("Dokumen", unitFolder.id);
-        await markDriveFile(docsFolder.id);
-        const spreadsheet = await createSpreadsheet(unit.spreadsheetName, unit.categories);
-        await moveFile(spreadsheet.spreadsheetId, unitFolder.id);
-        await markDriveFile(spreadsheet.spreadsheetId);
+        let unitFolder = children.find(f => f.mimeType === 'application/vnd.google-apps.folder' && f.name === `${unit.label} - ${unit.shortCode}`);
+        if (!unitFolder) unitFolder = children.find(f => f.mimeType === 'application/vnd.google-apps.folder' && f.name === unit.label);
+        if (!unitFolder) {
+          unitFolder = await createFolder(`${unit.label} - ${unit.shortCode}`, root.id);
+          await markDriveFile(unitFolder.id);
+        }
+        const unitChildren = await findDriveFiles(`'${unitFolder.id}' in parents and trashed=false`);
+        let docsFolder = unitChildren.find(f => f.mimeType === 'application/vnd.google-apps.folder' && f.name === 'Dokumen');
+        if (!docsFolder) { docsFolder = await createFolder('Dokumen', unitFolder.id); await markDriveFile(docsFolder.id); }
+        let spreadsheet = unitChildren.find(f => f.mimeType === 'application/vnd.google-apps.spreadsheet' && f.name === unit.spreadsheetName);
+        if (!spreadsheet) {
+          spreadsheet = await createSpreadsheet(unit.spreadsheetName, unit.categories);
+          await moveFile(spreadsheet.spreadsheetId, unitFolder.id);
+          await markDriveFile(spreadsheet.spreadsheetId);
+          spreadsheet = {id:spreadsheet.spreadsheetId};
+        }
+        const docChildren = await findDriveFiles(`'${docsFolder.id}' in parents and trashed=false`);
         const categoryFolders = {};
         for (const cat of unit.categories) {
-          categoryFolders[cat] = (await createFolder(cat, docsFolder.id)).id;
+          let folder = docChildren.find(f => f.mimeType === 'application/vnd.google-apps.folder' && f.name === cat);
+          if (!folder) folder = await createFolder(cat, docsFolder.id);
+          categoryFolders[cat] = folder.id;
+          // Headers are harmless to rewrite and ensure new categories get a schema.
+          try { await writeSheetHeader(spreadsheet.id, cat, SCHEMAS[cat]); } catch {}
         }
-        for (const cat of unit.categories) {
-          await writeSheetHeader(spreadsheet.spreadsheetId, cat, SCHEMAS[cat]);
-        }
-        setup.units[key] = {folderId:unitFolder.id, docsFolderId:docsFolder.id, categoryFolders, spreadsheetId:spreadsheet.spreadsheetId, sheets:unit.categories};
+        setup.units[key] = {folderId:unitFolder.id, docsFolderId:docsFolder.id, categoryFolders, spreadsheetId:spreadsheet.id, sheets:unit.categories};
       }
       saveGoogleSetup(setup);
-      setStatus("Struktur arsip Google berhasil dibuat satu kali. Struktur ini akan dipakai kembali.", "ok");
+      setStatus("Struktur arsip Google siap. Struktur lama dipertahankan dan unit baru ditambahkan bila diperlukan.", "ok");
       $("setupBtn").disabled = false;
       renderAppReady();
-    } catch (e) {
-      $("setupBtn").disabled = false;
-      throw e;
-    }
+    } catch (e) { $("setupBtn").disabled = false; throw e; }
   }
 
   function renderAppReady() {
@@ -455,7 +463,7 @@
   function genericFieldsHtml(category, r) {
     const v = r || {};
     if (category === "Siswa") return `<div class="grid two" style="margin-top:12px">
-      ${field("Nama Lengkap","f_nama",v.nama)}${field("NIK","f_nik",v.nik)}${field("NIS/NISN","f_nisn",v.nisn)}${field("Tempat Lahir","f_tempat_lahir",v.tempatLahir)}${field("Tanggal Lahir","f_tgl_lahir",v.tglLahir,"date")}${field("Alamat","f_alamat",v.alamat)}${field("Nama Ayah","f_ayah",v.ayah)}${field("Nama Ibu","f_ibu",v.ibu)}${field("Tanggal Masuk","f_tgl_masuk",v.tglMasuk,"date")}${field("Status","f_status",v.status||"Aktif")}${field("Tahun Lulus","f_lulus",v.tahunLulus,"number")}${field("Pindah Ke","f_pindah",v.pindahKe)}${field("Lanjut Ke","f_lanjut",v.lanjutKe)}${field("Keterangan","f_keterangan",v.keterangan,"textarea")}</div>`;
+      ${field("Nama Lengkap","f_nama",v.nama)}${field("NIK","f_nik",v.nik)}${field("NIS/NISN","f_nisn",v.nisn)}${field("Nomor KK","f_nomor_kk",v.nomorKk)}${field("Tempat Lahir","f_tempat_lahir",v.tempatLahir)}${field("Tanggal Lahir","f_tgl_lahir",v.tglLahir,"date")}${field("Alamat","f_alamat",v.alamat)}${field("Nama Ayah","f_ayah",v.ayah)}${field("NIK Ayah","f_nik_ayah",v.nikAyah)}${field("Nomor WhatsApp Ayah (opsional)","f_wa_ayah",v.waAyah)}${field("Pekerjaan Ayah","f_pekerjaan_ayah",v.pekerjaanAyah)}${field("Pendidikan Terakhir Ayah","f_pendidikan_ayah",v.pendidikanAyah)}${field("Nama Ibu","f_ibu",v.ibu)}${field("NIK Ibu","f_nik_ibu",v.nikIbu)}${field("Nomor WhatsApp Ibu (opsional)","f_wa_ibu",v.waIbu)}${field("Pekerjaan Ibu","f_pekerjaan_ibu",v.pekerjaanIbu)}${field("Pendidikan Terakhir Ibu","f_pendidikan_ibu",v.pendidikanIbu)}${field("Tanggal Masuk","f_tgl_masuk",v.tglMasuk,"date")}${field("Status","f_status",v.status||"Aktif")}${field("Tahun Lulus","f_lulus",v.tahunLulus,"number")}${field("Pindah Ke","f_pindah",v.pindahKe)}${field("Lanjut Ke","f_lanjut",v.lanjutKe)}${field("Keterangan","f_keterangan",v.keterangan,"textarea")}</div>`;
     if (category === "Pegawai") return `<div class="grid two" style="margin-top:12px">${field("Nama Lengkap","f_nama",v.nama)}${field("NIK","f_nik",v.nik)}${field("NUPTK/NPK","f_nuptk",v.nuptk)}${field("Tempat Lahir","f_tempat_lahir",v.tempatLahir)}${field("Tanggal Lahir","f_tgl_lahir",v.tglLahir,"date")}${field("Alamat","f_alamat",v.alamat)}${field("Pendidikan","f_pendidikan",v.pendidikan)}${field("Jabatan","f_jabatan",v.jabatan)}${field("Tanggal Mulai","f_tgl_mulai",v.tglMulai,"date")}${field("Status","f_status",v.status||"Aktif")}${field("Unit/Lembaga","f_unit_teks",v.unitTeks)}${field("Keterangan","f_keterangan",v.keterangan,"textarea")}</div>`;
     if (category === "Lembaga") return `<div class="grid two" style="margin-top:12px">${field("Nama Lembaga","f_nama",v.nama)}${field("Nomor Identitas","f_nomor",v.nomor)}${field("Alamat","f_alamat",v.alamat)}${field("Kepala/Pimpinan","f_pimpinan",v.pimpinan)}${field("Tanggal Berdiri","f_tgl_berdiri",v.tglBerdiri,"date")}${field("Status","f_status",v.status||"Aktif")}${field("Keterangan","f_keterangan",v.keterangan,"textarea")}</div>`;
     if (category === "Yayasan") return `<div class="grid two" style="margin-top:12px">${field("Nama Yayasan","f_nama",v.nama)}${field("Nomor Identitas","f_nomor",v.nomor)}${field("Alamat","f_alamat",v.alamat)}${field("Ketua","f_ketua",v.ketua)}${field("Tanggal Berdiri","f_tgl_berdiri",v.tglBerdiri,"date")}${field("Status","f_status",v.status||"Aktif")}${field("Keterangan","f_keterangan",v.keterangan,"textarea")}</div>`;
@@ -606,7 +614,7 @@
   function readGenericForm(category) {
     const unitKey = value("f_unit");
     const common = {unitKey, unitLabel:UNIT_LABELS[unitKey]};
-    if (category === "Siswa") return {...common,nama:value("f_nama"),nik:value("f_nik"),nisn:value("f_nisn"),tempatLahir:value("f_tempat_lahir"),tglLahir:value("f_tgl_lahir"),alamat:value("f_alamat"),ayah:value("f_ayah"),ibu:value("f_ibu"),tglMasuk:value("f_tgl_masuk"),status:value("f_status"),tahunLulus:value("f_lulus"),pindahKe:value("f_pindah"),lanjutKe:value("f_lanjut"),keterangan:value("f_keterangan")};
+    if (category === "Siswa") return {...common,nama:value("f_nama"),nik:value("f_nik"),nisn:value("f_nisn"),nomorKk:value("f_nomor_kk"),tempatLahir:value("f_tempat_lahir"),tglLahir:value("f_tgl_lahir"),alamat:value("f_alamat"),ayah:value("f_ayah"),nikAyah:value("f_nik_ayah"),waAyah:value("f_wa_ayah"),pekerjaanAyah:value("f_pekerjaan_ayah"),pendidikanAyah:value("f_pendidikan_ayah"),ibu:value("f_ibu"),nikIbu:value("f_nik_ibu"),waIbu:value("f_wa_ibu"),pekerjaanIbu:value("f_pekerjaan_ibu"),pendidikanIbu:value("f_pendidikan_ibu"),tglMasuk:value("f_tgl_masuk"),status:value("f_status"),tahunLulus:value("f_lulus"),pindahKe:value("f_pindah"),lanjutKe:value("f_lanjut"),keterangan:value("f_keterangan")};
     if (category === "Pegawai") return {...common,nama:value("f_nama"),nik:value("f_nik"),nuptk:value("f_nuptk"),tempatLahir:value("f_tempat_lahir"),tglLahir:value("f_tgl_lahir"),alamat:value("f_alamat"),pendidikan:value("f_pendidikan"),jabatan:value("f_jabatan"),tglMulai:value("f_tgl_mulai"),status:value("f_status"),unitTeks:value("f_unit_teks"),keterangan:value("f_keterangan")};
     if (category === "Lembaga") return {...common,nama:value("f_nama"),nomor:value("f_nomor"),alamat:value("f_alamat"),pimpinan:value("f_pimpinan"),tglBerdiri:value("f_tgl_berdiri"),status:value("f_status"),keterangan:value("f_keterangan")};
     if (category === "Yayasan") return {...common,nama:value("f_nama"),nomor:value("f_nomor"),alamat:value("f_alamat"),ketua:value("f_ketua"),tglBerdiri:value("f_tgl_berdiri"),status:value("f_status"),keterangan:value("f_keterangan")};
@@ -615,8 +623,8 @@
   function objectToRow(category, r) {
     const c = SCHEMAS[category];
     const map = {
-      "ID":r.id,"Dibuat":r.dibuat,"Diubah":r.diubah,"Nama Lengkap":r.nama,"NIK":r.nik,"NIS/NISN":r.nisn,"Tempat Lahir":r.tempatLahir,"Tanggal Lahir":r.tglLahir,"Alamat":r.alamat,"Nama Ayah":r.ayah,"Nama Ibu":r.ibu,"Tanggal Masuk":r.tglMasuk,"Status":r.status,"Tahun Lulus":r.tahunLulus,"Pindah Ke":r.pindahKe,"Lanjut Ke":r.lanjutKe,"Keterangan":r.keterangan,"NUPTK/NPK":r.nuptk,"Pendidikan":r.pendidikan,"Jabatan":r.jabatan,"Tanggal Mulai":r.tglMulai,"Unit":r.unitLabel,"Unit/Lembaga":r.unitTeks,"Nama Lembaga":r.nama,"Nama Yayasan":r.nama,"Nomor Identitas":r.nomor,"Kepala/Pimpinan":r.pimpinan,"Ketua":r.ketua,"Tanggal Berdiri":r.tglBerdiri,
-      "Akta":r.akta,"KK":r.kk,"KTP Orang Tua":r.ktp_ortu,"KTP":r.ktp,"NPWP":r.npwp,"Rekening":r.rekening,"Ijazah":r.ijazah,"e-Rapor":r.e_rapor,"Sertifikat":r.sertifikat,"SK/Legalitas":r.sk_legalitas,"Akta Notaris":r.akta_notaris,"SK Kemenkumham":r.sk_kemenkumham,"Dokumen Lain":r.dokumen_lain,
+      "ID":r.id,"Dibuat":r.dibuat,"Diubah":r.diubah,"Nama Lengkap":r.nama,"NIK":r.nik,"NIS/NISN":r.nisn,"Nomor KK":r.nomorKk,"Tempat Lahir":r.tempatLahir,"Tanggal Lahir":r.tglLahir,"Alamat":r.alamat,"Nama Ayah":r.ayah,"NIK Ayah":r.nikAyah,"Nomor WhatsApp Ayah":r.waAyah,"Pekerjaan Ayah":r.pekerjaanAyah,"Pendidikan Terakhir Ayah":r.pendidikanAyah,"Nama Ibu":r.ibu,"NIK Ibu":r.nikIbu,"Nomor WhatsApp Ibu":r.waIbu,"Pekerjaan Ibu":r.pekerjaanIbu,"Pendidikan Terakhir Ibu":r.pendidikanIbu,"Tanggal Masuk":r.tglMasuk,"Status":r.status,"Tahun Lulus":r.tahunLulus,"Pindah Ke":r.pindahKe,"Lanjut Ke":r.lanjutKe,"Keterangan":r.keterangan,"NUPTK/NPK":r.nuptk,"Pendidikan":r.pendidikan,"Jabatan":r.jabatan,"Tanggal Mulai":r.tglMulai,"Unit":r.unitLabel,"Unit/Lembaga":r.unitTeks,"Nama Lembaga":r.nama,"Nama Yayasan":r.nama,"Nomor Identitas":r.nomor,"Kepala/Pimpinan":r.pimpinan,"Ketua":r.ketua,"Tanggal Berdiri":r.tglBerdiri,
+      "Akta":r.akta,"KK":r.kk,"KTP Orang Tua":r.ktp_ortu,"Pas Foto Terbaru":r.pas_foto,"KTP":r.ktp,"NPWP":r.npwp,"Rekening":r.rekening,"Ijazah":r.ijazah,"e-Rapor":r.e_rapor,"Sertifikat":r.sertifikat,"SK/Legalitas":r.sk_legalitas,"Akta Notaris":r.akta_notaris,"SK Kemenkumham":r.sk_kemenkumham,"Dokumen Lain":r.dokumen_lain,"Data PPDB Lengkap":r.dataPpdb,
       "Nomor Surat":r.nomorSurat,"Kode Unit":r.kodeUnit,"Jenis Kode":r.jenisKode,"Jenis Surat":r.jenisLabel,"Tanggal Surat":r.tanggal,"Bulan":r.bulan,"Tahun":r.tahun,"Perihal":r.perihal,"File":r.file
     };
     return c.map(h=>map[h] ?? "");
@@ -712,7 +720,8 @@
     const type = $("searchType").value;
     const units = selectedUnit ? [selectedUnit] : availableUnits(category);
     const all=[];
-    const resultsByUnit = await Promise.all(units.map(async unitKey => {
+    // A slow/unavailable spreadsheet must not hide records from other units.
+    const resultsByUnit = await Promise.allSettled(units.map(async unitKey => {
       const vals = await getSheetValues(unitKey, category);
       const matches = [];
       for (const r of rowsToObjects(vals)) {
@@ -724,16 +733,21 @@
       }
       return matches;
     }));
-    resultsByUnit.forEach(matches => all.push(...matches));
+    const failedUnits=[];
+    resultsByUnit.forEach((result,index) => {
+      if (result.status === "fulfilled") all.push(...result.value);
+      else failedUnits.push(UNIT_LABELS[units[index]] || units[index]);
+    });
     all.sort((a,b)=>String(b.diubah||b.dibuat).localeCompare(String(a.diubah||a.dibuat)));
     state.rows=all;
     renderResults(all);
+    if (failedUnits.length) setStatus(`Hasil dari ${failedUnits.length} unit belum dimuat karena Google lambat: ${failedUnits.join(", ")}. Unit lain tetap ditampilkan.`, "warn");
     return all;
   }
 
   function sheetObject(category,r,unitKey) {
     const o={_row:r._row,unitKey,unitLabel:UNIT_LABELS[unitKey],id:r.ID,dibuat:r.Dibuat,diubah:r.Diubah};
-    if (category === "Siswa") Object.assign(o,{nama:r["Nama Lengkap"],nik:r.NIK,nisn:r["NIS/NISN"],tempatLahir:r["Tempat Lahir"],tglLahir:r["Tanggal Lahir"],alamat:r.Alamat,ayah:r["Nama Ayah"],ibu:r["Nama Ibu"],tglMasuk:r["Tanggal Masuk"],status:r.Status,tahunLulus:r["Tahun Lulus"],pindahKe:r["Pindah Ke"],lanjutKe:r["Lanjut Ke"],keterangan:r.Keterangan,akta:r.Akta,kk:r.KK,ktp_ortu:r["KTP Orang Tua"],ijazah:r.Ijazah,e_rapor:r["e-Rapor"],dokumen_lain:r["Dokumen Lain"]});
+    if (category === "Siswa") Object.assign(o,{nama:r["Nama Lengkap"],nik:r.NIK,nisn:r["NIS/NISN"],nomorKk:r["Nomor KK"],tempatLahir:r["Tempat Lahir"],tglLahir:r["Tanggal Lahir"],alamat:r.Alamat,ayah:r["Nama Ayah"],nikAyah:r["NIK Ayah"],waAyah:r["Nomor WhatsApp Ayah"],pekerjaanAyah:r["Pekerjaan Ayah"],pendidikanAyah:r["Pendidikan Terakhir Ayah"],ibu:r["Nama Ibu"],nikIbu:r["NIK Ibu"],waIbu:r["Nomor WhatsApp Ibu"],pekerjaanIbu:r["Pekerjaan Ibu"],pendidikanIbu:r["Pendidikan Terakhir Ibu"],tglMasuk:r["Tanggal Masuk"],status:r.Status,tahunLulus:r["Tahun Lulus"],pindahKe:r["Pindah Ke"],lanjutKe:r["Lanjut Ke"],keterangan:r.Keterangan,akta:r.Akta,kk:r.KK,ktp_ortu:r["KTP Orang Tua"],pas_foto:r["Pas Foto Terbaru"],ijazah:r.Ijazah,e_rapor:r["e-Rapor"],dokumen_lain:r["Dokumen Lain"],dataPpdb:r["Data PPDB Lengkap"]});
     if (category === "Pegawai") Object.assign(o,{nama:r["Nama Lengkap"],nik:r.NIK,nuptk:r["NUPTK/NPK"],tempatLahir:r["Tempat Lahir"],tglLahir:r["Tanggal Lahir"],alamat:r.Alamat,pendidikan:r.Pendidikan,jabatan:r.Jabatan,tglMulai:r["Tanggal Mulai"],status:r.Status,unitTeks:r["Unit/Lembaga"],keterangan:r.Keterangan,kk:r.KK,ktp:r.KTP,npwp:r.NPWP,rekening:r.Rekening,ijazah:r.Ijazah,sertifikat:r.Sertifikat,dokumen_lain:r["Dokumen Lain"]});
     if (category === "Lembaga") Object.assign(o,{nama:r["Nama Lembaga"],nomor:r["Nomor Identitas"],alamat:r.Alamat,pimpinan:r["Kepala/Pimpinan"],tglBerdiri:r["Tanggal Berdiri"],status:r.Status,keterangan:r.Keterangan,akta:r.Akta,sk_legalitas:r["SK/Legalitas"],npwp:r.NPWP,dokumen_lain:r["Dokumen Lain"]});
     if (category === "Yayasan") Object.assign(o,{nama:r["Nama Yayasan"],nomor:r["Nomor Identitas"],alamat:r.Alamat,ketua:r.Ketua,tglBerdiri:r["Tanggal Berdiri"],status:r.Status,keterangan:r.Keterangan,akta_notaris:r["Akta Notaris"],sk_kemenkumham:r["SK Kemenkumham"],npwp:r.NPWP,dokumen_lain:r["Dokumen Lain"]});
@@ -774,7 +788,7 @@
     if (state.category === "Lembaga") detail=`Nomor: ${escapeHtml(r.nomor)}<br>Pimpinan: ${escapeHtml(r.pimpinan)}<br>Alamat: ${escapeHtml(r.alamat)}`;
     if (state.category === "Yayasan") detail=`Nomor: ${escapeHtml(r.nomor)}<br>Ketua: ${escapeHtml(r.ketua)}<br>Alamat: ${escapeHtml(r.alamat)}`;
     if (state.category === "Persuratan") detail=`Perihal: ${escapeHtml(r.perihal)}<br>Keterangan: ${escapeHtml(r.keterangan)}`;
-    const docs = state.category === "Siswa" ? [["Akta",r.akta],["KK",r.kk],["KTP Ortu",r.ktp_ortu],["Ijazah",r.ijazah],["e-Rapor",r.e_rapor],["Lain",r.dokumen_lain]] : state.category === "Pegawai" ? [["KK",r.kk],["KTP",r.ktp],["NPWP",r.npwp],["Rekening",r.rekening],["Ijazah",r.ijazah],["Sertifikat",r.sertifikat],["Lain",r.dokumen_lain]] : state.category === "Lembaga" ? [["Akta",r.akta],["SK/Legalitas",r.sk_legalitas],["NPWP",r.npwp],["Lain",r.dokumen_lain]] : state.category === "Yayasan" ? [["Akta Notaris",r.akta_notaris],["SK Kemenkumham",r.sk_kemenkumham],["NPWP",r.npwp],["Lain",r.dokumen_lain]] : [["File Surat",r.file]];
+    const docs = state.category === "Siswa" ? [["Akta",r.akta],["KK",r.kk],["KTP Ortu",r.ktp_ortu],["Pas Foto",r.pas_foto],["Ijazah",r.ijazah],["e-Rapor",r.e_rapor],["Lain",r.dokumen_lain]] : state.category === "Pegawai" ? [["KK",r.kk],["KTP",r.ktp],["NPWP",r.npwp],["Rekening",r.rekening],["Ijazah",r.ijazah],["Sertifikat",r.sertifikat],["Lain",r.dokumen_lain]] : state.category === "Lembaga" ? [["Akta",r.akta],["SK/Legalitas",r.sk_legalitas],["NPWP",r.npwp],["Lain",r.dokumen_lain]] : state.category === "Yayasan" ? [["Akta Notaris",r.akta_notaris],["SK Kemenkumham",r.sk_kemenkumham],["NPWP",r.npwp],["Lain",r.dokumen_lain]] : [["File Surat",r.file]];
     return `<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><strong>${escapeHtml(title || "Tanpa nama")}</strong><div class="muted">${escapeHtml(subtitle)}</div></div><div class="actions"><button id="edit_${i}" class="btn small">Edit</button><button id="delete_${i}" class="btn danger small">Hapus</button></div></div><div class="muted" style="margin-top:10px;line-height:1.7">${detail}</div><div class="doc-links" style="margin-top:10px">${docs.map(([l,u])=>linkHtml(l,u)).join("")}</div></div>`;
   }
 
@@ -823,6 +837,51 @@
     setStatus("Gagal menyiapkan struktur: " + (e?.message || e),"err");
     $("setupBtn").disabled=false;
   }));
+
+  async function importPpdbStudents() {
+    if (!state.googleReady || !state.setup?.units) throw new Error("Hubungkan Google dan pastikan struktur arsip sudah tersedia.");
+    const sourceId = prompt("Masukkan ID Spreadsheet respons Google Form PPDB:");
+    if (!sourceId) return;
+    const sheetName = prompt("Nama sheet respons (biasanya Form Responses 1):", "Form Responses 1");
+    if (!sheetName) return;
+    const targetUnit = prompt("Unit tujuan: KB / RA / TPQ / MDT / Pesantren / MTs / MA", "RA");
+    const mapUnit = {KB:'kb',RA:'ra',TPQ:'tpq',MDT:'mdt',PESANTREN:'pesantren',MTS:'mts',MA:'ma'};
+    const unitKey = mapUnit[String(targetUnit||'').trim()] || mapUnit[String(targetUnit||'').trim().toUpperCase()];
+    if (!unitKey || !unitHasCategory(unitKey,'Siswa')) throw new Error("Unit tujuan tidak valid.");
+    setStatus("Membaca respons PPDB...", "warn");
+    const range = encodeURIComponent(`${sheetName}!A:ZZ`);
+    const res = await googleFetch(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sourceId)}/values/${range}`);
+    const data = await res.json(); const rows = data.values || [];
+    if (rows.length < 2) throw new Error("Sheet PPDB belum memiliki data siswa.");
+    const headers = rows[0].map(x=>String(x||'').trim().toLowerCase());
+    const find = (...names) => { for (const n of names) { const i=headers.findIndex(h=>h===n || h.includes(n)); if(i>=0) return i; } return -1; };
+    const idx = {
+      nama:find('nama lengkap','nama siswa','nama peserta'), nik:find('nik'), nisn:find('nisn','nis/n'),
+      tempat:find('tempat lahir'), tanggal:find('tanggal lahir'), alamat:find('alamat'), ayah:find('nama ayah','ayah'), ibu:find('nama ibu','ibu'),
+      masuk:find('tanggal masuk','tanggal daftar','timestamp'), status:find('status'), keterangan:find('keterangan')
+    };
+    if(idx.nama<0) throw new Error("Kolom nama siswa tidak ditemukan. Pastikan header Google Form memiliki 'Nama Lengkap' atau 'Nama Siswa'.");
+    const existingVals = await getSheetValues(unitKey,'Siswa');
+    const existing = rowsToObjects(existingVals);
+    const seen = new Set(existing.map(r=>String(r['NIS/NISN']||r.NIK||r['Nama Lengkap']||'').trim().toLowerCase()).filter(Boolean));
+    let imported=0, skipped=0;
+    for(const row of rows.slice(1)) {
+      const val=i=>i>=0?String(row[i]||'').trim():'';
+      const name=val(idx.nama); if(!name){skipped++;continue;}
+      const key=(val(idx.nisn)||val(idx.nik)||name).toLowerCase(); if(seen.has(key)){skipped++;continue;}
+      const rec={unitKey,unitLabel:UNIT_LABELS[unitKey],id:uuid(),dibuat:nowIso(),diubah:nowIso(),nama:name,nik:val(idx.nik),nisn:val(idx.nisn),tempatLahir:val(idx.tempat),tglLahir:val(idx.tanggal),alamat:val(idx.alamat),ayah:val(idx.ayah),ibu:val(idx.ibu),tglMasuk:val(idx.masuk),status:val(idx.status)||'Aktif',tahunLulus:'',pindahKe:'',lanjutKe:'',keterangan:val(idx.keterangan)||'Import PPDB'};
+      await appendRow(unitKey,'Siswa',objectToRow('Siswa',rec)); seen.add(key); imported++;
+    }
+    setStatus(`Import selesai: ${imported} siswa baru, ${skipped} dilewati.`, "ok");
+    await searchRecords();
+    alert(`Import PPDB selesai.\n\nSiswa baru: ${imported}\nDilewati: ${skipped}`);
+  }
+
+  $("importPpdbBtn").addEventListener("click", () => {
+    // PPDB is reviewed in Dashboard so a rejected response can never be copied
+    // into the student archive by the old bulk-import flow.
+    window.location.href = "../dashboard/index.html";
+  });
 
   $("searchBtn").addEventListener("click", async()=>{
     try {

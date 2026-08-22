@@ -46,6 +46,21 @@ Setelah Google terhubung, klik:
 
 **Siapkan Struktur Arsip Google**
 
+## PPDB: tinjau sebelum masuk Arsip
+
+Tombol **Import PPDB → Siswa** kini diganti menjadi **Tinjau PPDB di Dashboard**.
+Di Dashboard, klik **Atur Sumber PPDB** dan isi sekali:
+
+- ID spreadsheet Google Form PPDB;
+- nama tab respons, misalnya `Form Responses 1`;
+- unit tujuan.
+
+Konfigurasi ini disimpan pada browser. Klik **Muat Pendaftar PPDB** untuk
+menampilkan pendaftar yang belum diputuskan. **Diterima** menambahkan satu
+baris ke tab `Siswa` pada Arsip unit yang dipilih; **Ditolak** tidak menulis
+apa pun ke Arsip. Jika yang tersedia adalah angka `gid` (contoh `597982302`),
+angka itu juga dapat ditempel—Dashboard akan mencari nama tab yang sesuai.
+
 Sistem otomatis membuat satu folder induk dan folder unit:
 
 - Yayasan

@@ -21,7 +21,6 @@
     ],
     "ppdb": true
   },
-
   {
     "id": "tpq",
     "nama": "TPQ Al-Amin",
@@ -44,7 +43,6 @@
     ],
     "ppdb": true
   },
-
   {
     "id": "mdt",
     "nama": "MDT Al-Amin",
@@ -68,7 +66,6 @@
     ],
     "ppdb": true
   },
-
   {
     "id": "pesantren",
     "nama": "Pesantren Salafiyah Khusus Putri Al-Amin",
@@ -97,7 +94,6 @@
     ],
     "ppdb": true
   },
-
   {
     "id": "majelis-taklim",
     "nama": "Majelis Taklim Al-Hasanah",
@@ -120,5 +116,66 @@
       "Kegiatan sosial dan kemasyarakatan."
     ],
     "ppdb": false
+  },
+  {
+    "id": "kb",
+    "nama": "KB Al-Amin",
+    "jenis": "Kelompok Bermain",
+    "icon": "child_care",
+    "warna": "#7B1FA2",
+    "profil": "InsyaAllah akan segera dibangun Kelompok Bermain (KB) Al-Amin yang merupakan satuan pendidikan anak usia dini berusia 3-4 tahun yang berfokus pada pengenalan lingkungan belajar pertama bagi anak melalui kegiatan bermain yang terarah, islami, dan penuh kasih sayang. KB Al-Amin dirancang untuk membantu anak beradaptasi, bersosialisasi, serta melatih motorik dan kemandirian dasar sejak dini dalam suasana yang aman dan menyenangkan.",
+    "jadwal": {
+      "label": "Jadwal Belajar",
+      "hari": "Menyesuaikan Program",
+      "waktu": "Menyesuaikan Program"
+    },
+    "program": [
+      "Pembiasaan akhlak dan adab Islami.",
+      "Stimulasi perkembangan anak melalui bermain.",
+      "Pengenalan doa dan nilai agama.",
+      "Pengembangan bahasa, motorik, sosial, kreativitas dan percaya diri."
+    ],
+    "ppdb": true
+  },
+  {
+    "id": "mts",
+    "nama": "MTs Al-Amin",
+    "jenis": "Madrasah Tsanawiyah",
+    "icon": "school",
+    "warna": "#0277BD",
+    "profil": "InsyaAllah akan segera dibangun Madrasah Tsanawiyah (MTs) Al-Amin yang merupakan satuan pendidikan formal tingkat menengah pertama yang menyelenggarakan pendidikan berlandaskan nilai-nilai Islam dan kurikulum nasional. MTs Al-Amin berfokus pada pembentukan karakter remaja yang berakhlak mulia, cerdas secara akademis, berwawasan luas, serta memiliki fondasi keagamaan dan literasi digital yang kuat.",
+    "jadwal": {
+      "label": "Jadwal Belajar",
+      "hari": "Menyesuaikan Program",
+      "waktu": "Menyesuaikan Program"
+    },
+    "program": [
+      "Pendidikan umum dan keislaman.",
+      "Pembinaan akhlak dan karakter islami.",
+      "Pembiasaan ibadah berkelanjutan (shalat dhuha dan dhuhur berjamaah, tahfiz Al-Qur'an).",
+      "Penguatan literasi, numerasi, dan penguasaan sains serta teknologi dasar."
+    ],
+    "ppdb": true
+  },
+  {
+    "id": "ma",
+    "nama": "MA Al-Amin",
+    "jenis": "Madrasah Aliyah",
+    "icon": "school",
+    "warna": "#00838F",
+    "profil": "InsyaAllah akan segera dibangun Madrasah Aliyah (MA) Al-Amin yang merupakan satuan pendidikan formal tingkat menengah atas yang memadukan keunggulan akademis, pengetatan karakter islami, dan kesiapan karir atau studi lanjut. MA Al-Amin berkomitmen mencetak lulusan yang bertakwa, berfikir kritis, mandiri, unggul dalam ilmu pengetahuan dan teknologi, serta siap berkontribusi aktif di masyarakat maupun jenjang perguruan tinggi.",
+    "jadwal": {
+      "label": "Jadwal Belajar",
+      "hari": "Menyesuaikan Program",
+      "waktu": "Menyesuaikan Program"
+    },
+    "program": [
+      "Pendidikan umum dan keislaman.",
+      "Pembinaan akhlak dan karakter islami.",
+      "Program intensif Tahfiz Al-Qur'an dan kajian kitab/literatur keislaman.",
+      "Pengembangan akademik dan keterampilan kepemimpinan kepemudaan, organisasi siswa, dan pengabdian masyarakat.",
+      "Bimbingan karir, kewirausahaan (entrepreneurship), dan persiapan masuk Perguruan Tinggi."
+    ],
+    "ppdb": true
   }
 ]

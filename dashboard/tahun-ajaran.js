@@ -6,7 +6,7 @@ const DASHBOARD_DEFAULT_YEAR = "2026/2027";
 const DASHBOARD_YEAR_STORAGE_KEY = "dashboard_tahun_ajaran";
 const DASHBOARD_DEFAULT_UNIT = "RA";
 const DASHBOARD_UNIT_STORAGE_KEY = "dashboard_unit";
-const DASHBOARD_FIXED_UNITS = ["RA", "MDT", "TPQ", "Pesantren"];
+const DASHBOARD_FIXED_UNITS = ["KB", "RA", "TPQ", "MDT", "Pesantren", "Majelis Taklim", "MTs", "MA"];
 
 function getDashboardYearFromUrl() {
   const params = new URLSearchParams(window.location.search);

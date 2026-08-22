@@ -472,6 +472,38 @@
       color: #b91c1c;
     }
 
+    .ppdb-review {
+      margin: 30px 0;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #dbe7e1;
+      border-radius: 12px;
+    }
+
+    .ppdb-review-head, .ppdb-review-actions, .ppdb-student-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ppdb-review-head { justify-content: space-between; }
+    .ppdb-review h2 { margin: 0; font-size: 20px; }
+    .ppdb-review p { color: #6b7280; font-size: 14px; }
+    .ppdb-student-list { display: grid; gap: 10px; margin-top: 16px; }
+    .ppdb-student {
+      display: flex; justify-content: space-between; gap: 14px; align-items: center;
+      padding: 13px; border: 1px solid #e5e7eb; border-radius: 9px; background: #fafafa;
+    }
+    .ppdb-student h3 { margin: 0 0 4px; font-size: 16px; }
+    .ppdb-student small { color: #6b7280; }
+    .ppdb-accept, .ppdb-reject, .ppdb-config {
+      border: 0; border-radius: 7px; padding: 8px 12px; font-weight: 600; cursor: pointer;
+    }
+    .ppdb-accept { background: #0f766e; color: #fff; }
+    .ppdb-reject { background: #fee2e2; color: #b91c1c; }
+    .ppdb-config { background: #e0f2fe; color: #0369a1; }
+
     /* ==========================================
        RESPONSIVE
     ========================================== */
@@ -613,6 +645,20 @@
 
     </div>
 
+    <section class="ppdb-review" aria-labelledby="ppdbReviewTitle">
+      <div class="ppdb-review-head">
+        <div>
+          <h2 id="ppdbReviewTitle">PPDB — Menunggu Keputusan</h2>
+          <p id="ppdbReviewInfo">Hubungkan Google untuk menampilkan respons pendaftar baru.</p>
+        </div>
+        <div class="ppdb-review-actions">
+          <button id="ppdbLoadButton" class="search-button" type="button">Muat Pendaftar PPDB</button>
+          <button id="ppdbConfigButton" class="ppdb-config" type="button">Atur Sumber PPDB</button>
+        </div>
+      </div>
+      <div id="ppdbStudentList" class="ppdb-student-list"></div>
+    </section>
+
 
 
     <!-- ========================================
@@ -752,6 +798,28 @@
       </a>
 
 
+
+      <a
+        href="pembayaran.html"
+        class="menu-card"
+      >
+
+        <div class="menu-icon">
+          💳
+        </div>
+
+        <h2>
+          Pembayaran
+        </h2>
+
+        <p>
+          Rekap transaksi pembayaran.
+        </p>
+
+      </a>
+
+
+      
     </div>
 
 
@@ -1273,6 +1341,9 @@
 
   <script src="config.js"></script>
   <script src="tahun-ajaran.js"></script>
+  <script src="https://accounts.google.com/gsi/client"></script>
+  <script src="../arsip/config.js"></script>
+  <script src="ppdb-review.js"></script>
 
 
   <script>

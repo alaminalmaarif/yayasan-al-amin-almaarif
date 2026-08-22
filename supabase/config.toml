@@ -1,0 +1,16 @@
+project_id = "gtqvuymhtdfpnvlyzdun"
+
+[functions.create-payment]
+verify_jwt = false
+
+[functions.midtrans-webhook]
+verify_jwt = false
+
+[functions.verify-upload-pin]
+verify_jwt = false
+
+[functions.feedback]
+verify_jwt = false
+
+[functions.payment-report]
+verify_jwt = true
