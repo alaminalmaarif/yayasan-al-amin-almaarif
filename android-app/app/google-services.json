@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "307150012102",
+    "project_id": "yayasan-al-amin-al-ma-arif",
+    "storage_bucket": "yayasan-al-amin-al-ma-arif.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307150012102:android:d451473833d32eeb9021c7",
+        "android_client_info": {
+          "package_name": "id.alamin.yayasan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFufqR7ynN3aPhTY_EinTm1Tsfn4gsh8k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

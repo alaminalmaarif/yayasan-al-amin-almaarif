@@ -4,12 +4,33 @@
   const money = n => new Intl.NumberFormat('id-ID').format(Number(n||0));
   const fn = name => `${APP_CONFIG.supabaseUrl}/functions/v1/${name}`;
 
-  function setView(id) {
+  // Simpan setiap menu pada browser history agar tombol Back Android kembali
+  // ke Beranda, bukan langsung keluar dari aplikasi.
+  const viewIds = new Set(['home', 'upload', 'payment', 'register', 'feedback']);
+
+  function viewFromUrl() {
+    const id = window.location.hash.replace('#', '');
+    return viewIds.has(id) ? id : 'home';
+  }
+
+  function setView(id, saveHistory = true) {
+    if (!viewIds.has(id)) id = 'home';
     document.querySelectorAll('.app-view').forEach(v => v.hidden = v.id !== id);
     document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === id));
+
+    if (saveHistory && viewFromUrl() !== id) {
+      const url = id === 'home'
+        ? `${window.location.pathname}${window.location.search}`
+        : `${window.location.pathname}${window.location.search}#${id}`;
+      window.history.pushState({ view: id }, '', url);
+    }
+
     window.scrollTo({top:0,behavior:'smooth'});
   }
+
   document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+  window.addEventListener('popstate', () => setView(viewFromUrl(), false));
+  setView(viewFromUrl(), false);
 
   // Public website
   $('openWebsite')?.addEventListener('click', () => location.href = APP_CONFIG.siteUrl);

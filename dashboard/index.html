@@ -503,6 +503,19 @@
     .ppdb-accept { background: #0f766e; color: #fff; }
     .ppdb-reject { background: #fee2e2; color: #b91c1c; }
     .ppdb-config { background: #e0f2fe; color: #0369a1; }
+    .ppdb-source-form {
+      display: grid; gap: 12px; margin-top: 16px; padding: 16px;
+      border: 1px solid #bfdbfe; border-radius: 9px; background: #f8fbff;
+    }
+    .ppdb-source-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: #374151; }
+    .ppdb-source-form input, .ppdb-source-form select {
+      width: 100%; padding: 10px 12px; border: 1px solid #bfdbfe;
+      border-radius: 7px; font: inherit; background: #fff;
+    }
+    .ppdb-source-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .notification-form { display: grid; gap: 12px; margin: 0 0 30px; padding: 20px; background: #fff; border: 1px solid #dbe7e1; border-radius: 12px; }
+    .notification-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: #374151; }
+    .notification-form input, .notification-form textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; }
 
     /* ==========================================
        RESPONSIVE
@@ -657,6 +670,38 @@
         </div>
       </div>
       <div id="ppdbStudentList" class="ppdb-student-list"></div>
+      <form id="ppdbSourceForm" class="ppdb-source-form" hidden>
+        <strong>Atur Sumber PPDB</strong>
+        <small>Form ini tidak tertutup saat Anda pindah tab untuk menyalin ID Spreadsheet atau GID.</small>
+        <label>Unit
+          <select id="ppdbSourceUnit" required></select>
+        </label>
+        <label>ID Spreadsheet respons Google Form
+          <input id="ppdbSpreadsheetId" type="text" autocomplete="off" required placeholder="Contoh: 1AbCdEf...">
+        </label>
+        <label>Nama tab respons atau GID
+          <input id="ppdbSheetName" type="text" autocomplete="off" required placeholder="Contoh: Form Responses 1 atau 597982302">
+        </label>
+        <div class="ppdb-source-actions">
+          <button class="search-button" type="submit">Simpan Sumber PPDB</button>
+          <button id="ppdbSourceCancel" class="reset-button" type="button">Batal</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="notification-form" aria-labelledby="notificationTitle">
+      <h2 id="notificationTitle">🔔 Kirim Notifikasi Wali Murid</h2>
+      <p>Notifikasi dikirim langsung ke HP pengguna yang memasang aplikasi dan mengizinkan notifikasi.</p>
+      <form id="notificationSendForm">
+        <label>Judul
+          <input id="notificationTitleInput" maxlength="100" required placeholder="Contoh: Pengumuman Maulid Nabi">
+        </label>
+        <label>Isi notifikasi
+          <textarea id="notificationBodyInput" rows="4" maxlength="1000" required placeholder="Tulis informasi penting untuk wali murid."></textarea>
+        </label>
+        <button class="search-button" type="submit">Kirim ke Semua Pengguna</button>
+        <div id="notificationStatus" class="status" aria-live="polite"></div>
+      </form>
     </section>
 
 
@@ -1343,7 +1388,8 @@
   <script src="tahun-ajaran.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <script src="../arsip/config.js"></script>
-  <script src="ppdb-review.js"></script>
+   <script src="ppdb-review.js"></script>
+   <script src="notifications.js"></script>
 
 
   <script>

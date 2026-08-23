@@ -1,0 +1,14 @@
+# Android / Gradle build output
+.gradle/
+**/build/
+*.apk
+*.aab
+
+# Konfigurasi lokal Android Studio
+android-app/local.properties
+.idea/
+*.iml
+
+# Sistem
+.DS_Store
+Thumbs.db

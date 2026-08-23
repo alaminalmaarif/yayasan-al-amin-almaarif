@@ -1,8 +1,24 @@
-plugins { id 'com.android.application' }
-
-android { namespace 'id.alamin.yayasan'; compileSdk 35
-    defaultConfig { applicationId 'id.alamin.yayasan'; minSdk 23; targetSdk 35; versionCode 1; versionName '1.0.0' }
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
+android {
+    namespace 'id.alamin.yayasan'
+    compileSdk 35
 
-dependencies { implementation "androidx.browser:browser:1.8.0" }
+    defaultConfig {
+        applicationId 'id.alamin.yayasan'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+}
+
+dependencies {
+    implementation 'androidx.activity:activity:1.10.1'
+    implementation 'androidx.core:core:1.15.0'
+    implementation platform('com.google.firebase:firebase-bom:34.18.0')
+    implementation 'com.google.firebase:firebase-messaging'
+}

@@ -83,17 +83,33 @@
   function configure() {
     const configs = sourceConfigs();
     const suggested = unitMap[String(window.getDashboardUnit?.() || "RA").toUpperCase()] || "ra";
-    const unit = prompt("Unit yang akan diatur: KB / RA / TPQ / MDT / Pesantren / MTs / MA", Object.entries(unitMap).find(([, v]) => v === suggested)?.[0] || "RA");
-    const unitKey = unitMap[String(unit || "").trim().toUpperCase()];
-    if (!unitKey) { setInfo("Unit tujuan tidak valid.", true); return; }
-    const prior = configs[unitKey] || {};
-    const spreadsheetId = prompt(`ID Spreadsheet respons Google Form PPDB — ${ARSIP_UNITS[unitKey].label} (cukup sekali):`, prior.spreadsheetId || "");
-    if (!spreadsheetId) return;
-    const sheetName = prompt("Nama tab respons (misalnya Form Responses 1; gid angka juga boleh):", prior.sheetName || "Form Responses 1");
-    if (!sheetName) return;
-    configs[unitKey] = { spreadsheetId: spreadsheetId.trim(), sheetName: sheetName.trim(), unitKey };
-    localStorage.setItem(SOURCE_KEY, JSON.stringify(configs));
-    setInfo(`Sumber PPDB ${ARSIP_UNITS[unitKey].label} disimpan. Ulangi Atur Sumber PPDB untuk unit lain, lalu klik Muat Pendaftar PPDB.`);
+    const form = $("ppdbSourceForm");
+    const unitSelect = $("ppdbSourceUnit");
+    const spreadsheetInput = $("ppdbSpreadsheetId");
+    const sheetInput = $("ppdbSheetName");
+    if (!form || !unitSelect || !spreadsheetInput || !sheetInput) {
+      setInfo("Form pengaturan PPDB tidak ditemukan. Muat ulang Dashboard.", true);
+      return;
+    }
+    if (!unitSelect.options.length) {
+      Object.entries(unitMap).forEach(([label, key]) => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = ARSIP_UNITS[key]?.label || label;
+        unitSelect.appendChild(option);
+      });
+    }
+    const fill = unitKey => {
+      const prior = sourceConfigs()[unitKey] || {};
+      spreadsheetInput.value = prior.spreadsheetId || "";
+      sheetInput.value = prior.sheetName || "Form Responses 1";
+    };
+    unitSelect.value = configs[suggested] ? suggested : (unitSelect.value || suggested);
+    fill(unitSelect.value);
+    unitSelect.onchange = () => fill(unitSelect.value);
+    form.hidden = false;
+    spreadsheetInput.focus();
+    setInfo("Isi sumber PPDB. Anda dapat pindah tab untuk menyalin ID Spreadsheet atau GID, lalu kembali ke form ini.");
   }
 
   function headerIndex(headers, ...names) {
@@ -155,7 +171,7 @@
 
   async function load() {
     let configs = sourceConfigs();
-    if (!Object.keys(configs).length) { configure(); configs = sourceConfigs(); if (!Object.keys(configs).length) return; }
+    if (!Object.keys(configs).length) { configure(); return; }
     setInfo("Membaca respons PPDB...");
     const all = []; const loadedUnits = []; const errors = [];
     for (const config of Object.values(configs)) {
@@ -204,5 +220,21 @@
   }
 
   $("ppdbConfigButton")?.addEventListener("click", configure);
+  $("ppdbSourceCancel")?.addEventListener("click", () => { $("ppdbSourceForm").hidden = true; });
+  $("ppdbSourceForm")?.addEventListener("submit", event => {
+    event.preventDefault();
+    const unitKey = $("ppdbSourceUnit").value;
+    const spreadsheetId = $("ppdbSpreadsheetId").value.trim();
+    const sheetName = $("ppdbSheetName").value.trim();
+    if (!ARSIP_UNITS[unitKey] || !spreadsheetId || !sheetName) {
+      setInfo("Lengkapi unit, ID Spreadsheet, dan nama tab/GID.", true);
+      return;
+    }
+    const configs = sourceConfigs();
+    configs[unitKey] = { spreadsheetId, sheetName, unitKey };
+    localStorage.setItem(SOURCE_KEY, JSON.stringify(configs));
+    $("ppdbSourceForm").hidden = true;
+    setInfo(`Sumber PPDB ${ARSIP_UNITS[unitKey].label} disimpan. Atur unit lain bila perlu, lalu klik Muat Pendaftar PPDB.`);
+  });
   $("ppdbLoadButton")?.addEventListener("click", () => load().catch(error => { console.error(error); setInfo(error.message || String(error), true); }));
 })();
