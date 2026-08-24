@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.payment-report]
 verify_jwt = true
+
+[functions.notification-feed]
+verify_jwt = false

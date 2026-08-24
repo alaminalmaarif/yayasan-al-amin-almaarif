@@ -73,7 +73,8 @@ Deno.serve(async req => {
     const { title, body, topic = "all" } = await req.json();
     const cleanTitle = String(title || "").trim();
     const cleanBody = String(body || "").trim();
-    if (!cleanTitle || cleanTitle.length > 100 || !cleanBody || cleanBody.length > 1000 || topic !== "all") {
+    const allowedTopics = new Set(["all", "kb", "ra", "tpq", "mdt", "pesantren", "mts", "ma"]);
+    if (!cleanTitle || cleanTitle.length > 100 || !cleanBody || cleanBody.length > 1000 || !allowedTopics.has(topic)) {
       return json({ error: "Judul atau isi notifikasi tidak valid." }, 400);
     }
 

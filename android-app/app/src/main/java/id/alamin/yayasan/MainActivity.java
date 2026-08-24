@@ -13,6 +13,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.JavascriptInterface;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
@@ -26,6 +27,9 @@ public class MainActivity extends ComponentActivity {
 
   private static final String HOME_URL =
           "https://yayasan-alamin-almaarif.netlify.app/app.html";
+
+  private static final String ALL_TOPIC = "all";
+  private static final String UNIT_TOPIC_PREFERENCE = "notification_unit_topic";
 
   private WebView webView;
 
@@ -137,10 +141,41 @@ public class MainActivity extends ComponentActivity {
   private void subscribeToAnnouncements() {
 
     FirebaseMessaging.getInstance()
-            .subscribeToTopic("all")
+            .subscribeToTopic(ALL_TOPIC)
             .addOnFailureListener(error -> {
               // Pengguna tetap dapat memakai aplikasi bila FCM sedang tidak tersedia.
             });
+
+    String unitTopic = getSharedPreferences("yayasan", MODE_PRIVATE)
+            .getString(UNIT_TOPIC_PREFERENCE, "");
+    if (!unitTopic.isEmpty()) subscribeToTopic(unitTopic);
+  }
+
+  private void subscribeToTopic(String topic) {
+    FirebaseMessaging.getInstance().subscribeToTopic(topic);
+  }
+
+  private boolean isAllowedUnitTopic(String topic) {
+    return "kb".equals(topic) || "ra".equals(topic) || "tpq".equals(topic)
+            || "mdt".equals(topic) || "pesantren".equals(topic)
+            || "mts".equals(topic) || "ma".equals(topic);
+  }
+
+  private class NotificationBridge {
+    @JavascriptInterface
+    public void setUnit(String requestedTopic) {
+      final String newTopic = requestedTopic == null ? "" : requestedTopic.trim().toLowerCase();
+      if (!newTopic.isEmpty() && !isAllowedUnitTopic(newTopic)) return;
+
+      String previousTopic = getSharedPreferences("yayasan", MODE_PRIVATE)
+              .getString(UNIT_TOPIC_PREFERENCE, "");
+      if (previousTopic.equals(newTopic)) return;
+
+      getSharedPreferences("yayasan", MODE_PRIVATE).edit()
+              .putString(UNIT_TOPIC_PREFERENCE, newTopic).apply();
+      if (!previousTopic.isEmpty()) FirebaseMessaging.getInstance().unsubscribeFromTopic(previousTopic);
+      if (!newTopic.isEmpty()) subscribeToTopic(newTopic);
+    }
   }
 
   // =========================================================
@@ -151,6 +186,7 @@ public class MainActivity extends ComponentActivity {
 
     // JavaScript diperlukan oleh aplikasi web
     webView.getSettings().setJavaScriptEnabled(true);
+    webView.addJavascriptInterface(new NotificationBridge(), "YayasanNotifications");
 
     // Supabase/session/localStorage
     webView.getSettings().setDomStorageEnabled(true);

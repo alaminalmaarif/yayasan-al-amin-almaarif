@@ -515,7 +515,7 @@
     .ppdb-source-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .notification-form { display: grid; gap: 12px; margin: 0 0 30px; padding: 20px; background: #fff; border: 1px solid #dbe7e1; border-radius: 12px; }
     .notification-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: #374151; }
-    .notification-form input, .notification-form textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; }
+    .notification-form input, .notification-form textarea, .notification-form select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; }
 
     /* ==========================================
        RESPONSIVE
@@ -699,7 +699,19 @@
         <label>Isi notifikasi
           <textarea id="notificationBodyInput" rows="4" maxlength="1000" required placeholder="Tulis informasi penting untuk wali murid."></textarea>
         </label>
-        <button class="search-button" type="submit">Kirim ke Semua Pengguna</button>
+        <label>Tujuan notifikasi
+          <select id="notificationTopicInput" required>
+            <option value="all">Kirim ke Semua Pengguna</option>
+            <option value="kb">Kirim ke KB</option>
+            <option value="ra">Kirim ke RA</option>
+            <option value="tpq">Kirim ke TPQ</option>
+            <option value="mdt">Kirim ke MDT</option>
+            <option value="pesantren">Kirim ke Pesantren</option>
+            <option value="mts">Kirim ke MTs</option>
+            <option value="ma">Kirim ke MA</option>
+          </select>
+        </label>
+        <button class="search-button" type="submit" id="notificationSendButton">Kirim Notifikasi</button>
         <div id="notificationStatus" class="status" aria-live="polite"></div>
       </form>
     </section>

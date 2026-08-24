@@ -9,6 +9,7 @@ const APP_CONFIG = Object.freeze({
   paymentFunction: 'create-payment',
   uploadPinFunction: 'verify-upload-pin',
   feedbackFunction: 'feedback',
+  notificationFeedFunction: 'notification-feed',
   whatsapp: '6285717797429',
   units: ['KB','RA','TPQ','MDT','Pesantren','Majelis Taklim','MTs','MA'],
   ppdb: {

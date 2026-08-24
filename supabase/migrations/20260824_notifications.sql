@@ -9,3 +9,7 @@ create table if not exists public.notifications (
 
 alter table public.notifications enable row level security;
 create policy "notifications_not_public" on public.notifications for select using (false);
+
+alter table public.notifications
+  add constraint notifications_topic_check
+  check (topic in ('all', 'kb', 'ra', 'tpq', 'mdt', 'pesantren', 'mts', 'ma'));

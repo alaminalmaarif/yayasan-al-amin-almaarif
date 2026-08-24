@@ -6,7 +6,7 @@
 
   // Simpan setiap menu pada browser history agar tombol Back Android kembali
   // ke Beranda, bukan langsung keluar dari aplikasi.
-  const viewIds = new Set(['home', 'upload', 'payment', 'register', 'feedback']);
+  const viewIds = new Set(['home', 'upload', 'payment', 'register', 'feedback', 'notifications']);
 
   function viewFromUrl() {
     const id = window.location.hash.replace('#', '');
@@ -26,6 +26,7 @@
     }
 
     window.scrollTo({top:0,behavior:'smooth'});
+    if (id === 'notifications') markNotificationsRead();
   }
 
   document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
@@ -36,6 +37,94 @@
   $('openWebsite')?.addEventListener('click', () => location.href = APP_CONFIG.siteUrl);
   $('openDashboard')?.addEventListener('click', () => location.href = APP_CONFIG.dashboardUrl);
   $('openArchive')?.addEventListener('click', () => location.href = APP_CONFIG.archiveUrl);
+
+  // Notifikasi: unit dipilih sekali per perangkat. Aplikasi Android meneruskan
+  // pilihan ini ke Firebase agar perangkat hanya menerima topik unit tersebut.
+  const notificationTopics = Object.freeze({
+    KB: 'kb', RA: 'ra', TPQ: 'tpq', MDT: 'mdt', Pesantren: 'pesantren', MTs: 'mts', MA: 'ma'
+  });
+  const notificationUnit = $('notificationUnit');
+  const notificationHistory = $('notificationHistory');
+  let notifications = [];
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[char]));
+  }
+
+  function selectedNotificationTopic() {
+    return notificationTopics[notificationUnit?.value] || '';
+  }
+
+  function readNotificationIds() {
+    try { return new Set(JSON.parse(localStorage.getItem('read_notification_ids') || '[]')); }
+    catch { return new Set(); }
+  }
+
+  function updateNotificationBadge() {
+    const read = readNotificationIds();
+    const count = notifications.filter(item => !read.has(item.id)).length;
+    ['notificationUnreadCount', 'notificationTileUnread'].forEach(id => {
+      const badge = $(id);
+      if (!badge) return;
+      badge.hidden = count === 0;
+      badge.textContent = count > 99 ? '99+' : String(count);
+    });
+  }
+
+  function renderNotifications() {
+    if (!notificationHistory) return;
+    if (!notifications.length) {
+      notificationHistory.innerHTML = '<p class="small">Belum ada notifikasi untuk Anda.</p>';
+      return;
+    }
+    notificationHistory.innerHTML = notifications.map(item => {
+      const date = new Date(item.sent_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+      return `<article class="notification-item"><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p><time>${date}</time></article>`;
+    }).join('');
+  }
+
+  function markNotificationsRead() {
+    if (!notifications.length) return;
+    localStorage.setItem('read_notification_ids', JSON.stringify(notifications.map(item => item.id)));
+    updateNotificationBadge();
+  }
+
+  async function loadNotifications() {
+    if (!notificationHistory) return;
+    notificationHistory.textContent = 'Memuat riwayat notifikasi...';
+    try {
+      const unit = selectedNotificationTopic();
+      const response = await fetch(`${fn(APP_CONFIG.notificationFeedFunction)}?unit=${encodeURIComponent(unit)}`, {
+        headers: { apikey: APP_CONFIG.supabasePublishableKey }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Riwayat notifikasi tidak dapat dimuat.');
+      notifications = Array.isArray(data.notifications) ? data.notifications : [];
+      renderNotifications();
+      updateNotificationBadge();
+      if (viewFromUrl() === 'notifications') markNotificationsRead();
+    } catch (error) {
+      notificationHistory.textContent = error.message || 'Riwayat notifikasi tidak dapat dimuat.';
+    }
+  }
+
+  if (notificationUnit) {
+    Object.keys(notificationTopics).forEach(unit => {
+      const option = document.createElement('option');
+      option.value = unit;
+      option.textContent = unit;
+      notificationUnit.appendChild(option);
+    });
+    notificationUnit.value = localStorage.getItem('notification_unit') || '';
+    window.YayasanNotifications?.setUnit(selectedNotificationTopic());
+    notificationUnit.addEventListener('change', () => {
+      localStorage.setItem('notification_unit', notificationUnit.value);
+      // Antarmuka ini hanya tersedia di APK Android; browser tetap menampilkan riwayat.
+      window.YayasanNotifications?.setUnit(selectedNotificationTopic());
+      loadNotifications();
+    });
+  }
+  loadNotifications();
 
   // Upload PIN: the PIN itself is never stored in this public application.
   $('verifyPin')?.addEventListener('click', async () => {
