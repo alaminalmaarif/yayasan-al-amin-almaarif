@@ -27,10 +27,24 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const message = String(body?.message ?? "").trim();
+    const senderName = String(body?.name ?? "").trim();
 
     if (!message) {
       return new Response(
         JSON.stringify({ error: "Pesan feedback wajib diisi." }),
+        {
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
+
+    if (senderName.length > 150) {
+      return new Response(
+        JSON.stringify({ error: "Nama terlalu panjang." }),
         {
           status: 400,
           headers: {
@@ -61,7 +75,7 @@ Deno.serve(async (req) => {
 
     const { data, error } = await supabase
       .from("feedback_messages")
-      .insert({ message })
+      .insert({ message, sender_name: senderName || null })
       .select("id, created_at")
       .single();
 

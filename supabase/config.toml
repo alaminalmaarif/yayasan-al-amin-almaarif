@@ -12,8 +12,11 @@ verify_jwt = false
 [functions.feedback]
 verify_jwt = false
 
-[functions.payment-report]
-verify_jwt = true
-
 [functions.notification-feed]
+verify_jwt = false
+
+[functions.public-students]
+verify_jwt = false
+
+[functions.student-pin]
 verify_jwt = false

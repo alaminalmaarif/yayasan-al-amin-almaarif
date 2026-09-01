@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rekap Keuangan</title>
+<style>
+body{font:15px system-ui;margin:0;background:#f5f7f6;color:#17231d}.wrap{max-width:1200px;margin:auto;padding:20px}
+.card{background:#fff;border:1px solid #e3e9e5;border-radius:14px;padding:18px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}.input,select{box-sizing:border-box;width:100%;padding:9px;border:1px solid #ccd7d0;border-radius:8px;background:#fff}
+.btn{padding:10px 14px;border:0;border-radius:8px;background:#0b5d3b;color:#fff;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-danger{background:#9b2c2c}.btn-secondary{background:#66736c}.scroll{overflow:auto}
+table{border-collapse:collapse;width:100%}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left;font-size:13px;vertical-align:top}
+.summary{font-weight:700}.summary-item{padding:12px;border:1px solid #e3e9e5;border-radius:10px;background:#fafcfb}
+.muted{color:#66736c}.actions{display:flex;gap:6px;flex-wrap:wrap}.status{margin-top:8px;min-height:20px}
+</style>
+</head>
+<body>
+<main class="wrap">
+<a href="index.html">← Dashboard</a>
+<h1>Rekap Keuangan</h1>
+
+<div class="card grid">
+  <div class="field"><label for="year">Tahun Ajaran</label>
+    <select id="year"></select>
+    <input id="yearCustom" class="input" placeholder="Contoh: 2031/2032" hidden>
+    <button id="yearApply" class="btn btn-secondary" type="button" hidden>Gunakan Tahun Ajaran</button>
+  </div>
+  <div class="field"><label for="unit">Unit</label>
+    <select id="unit"><option value="KB">KB</option><option value="RA">RA</option><option value="TPQ">TPQ</option><option value="MDT">MDT</option><option value="Pesantren">Pesantren</option><option value="MTs">MTs</option><option value="MA">MA</option></select>
+  </div>
+  <div class="field" style="justify-content:end"><button id="load" class="btn" type="button">Muat Rekap</button></div>
+</div>
+
+<div class="card">
+  <h2>Tambah Data Siswa</h2>
+  <p class="muted">Siswa dicatat khusus untuk <strong id="studentContext">Tahun Ajaran 2026/2027 – Unit KB</strong>. Tahun ajaran dan unit mengikuti pilihan di atas. Jika data siswa untuk konteks ini sudah ada, Anda dapat langsung melanjutkan ke pencatatan pembayaran.</p>
+  <div class="grid">
+    <div class="field"><label for="newStudent">Nama siswa</label><input id="newStudent" class="input" placeholder="Nama siswa"></div>
+    <div class="field" style="justify-content:end"><button id="addStudent" class="btn" type="button">+ Tambah Siswa</button></div>
+  </div>
+  <div class="scroll" style="margin-top:14px"><table><thead><tr><th>No</th><th>Nama Siswa</th><th>Tahun Ajaran</th><th>Unit</th><th>PIN Anak</th></tr></thead><tbody id="studentRows"></tbody></table></div>
+</div>
+
+<div class="card">
+  <h2>SPP Anak yang Belum Bayar</h2>
+  <p class="muted">Ringkasan otomatis berdasarkan tahun ajaran dan unit yang dipilih. Bulan berjalan ikut dihitung sebagai tunggakan.</p>
+  <div class="scroll"><table><thead><tr><th>Nama</th><th>Status Nunggak</th></tr></thead><tbody id="sppArrearsRows"></tbody></table></div>
+</div>
+
+<div class="card">
+  <h2>Catat Pembayaran Langsung/Cash</h2>
+  <div class="grid">
+    <div class="field"><label for="student">Nama siswa</label><select id="student"><option value="">Pilih siswa</option></select></div>
+    <div class="field"><label for="type">Jenis pembayaran</label>
+      <select id="type">
+        <option value="">Pilih jenis pembayaran</option><option>Tabungan Wajib</option><option>Tabungan Sukarela</option><option>SPP</option><option>Kegiatan</option><option>PPDB</option><option>Infak</option>
+      </select>
+    </div>
+  </div>
+  <div id="details" class="grid" style="margin-top:12px"></div>
+  <button id="save" class="btn" type="button" style="margin-top:12px">Simpan</button>
+  <p id="msg" class="status"></p>
+</div>
+
+<div class="card">
+  <h2>Ringkasan</h2>
+  <div id="summary" class="grid summary"></div><div class="summary-item">Pengeluaran<br><span id="expenseSummaryInline">Rp 0</span></div>
+</div>
+
+<div class="card">
+  <h2>Pengeluaran</h2>
+  <div class="grid">
+    <div class="field"><label for="expenseAmount">Nominal (Rp)</label><input id="expenseAmount" class="input" type="number" min="1000" step="1000" placeholder="Nominal pengeluaran"></div>
+    <div class="field"><label for="expensePurpose">Keperluan</label><input id="expensePurpose" class="input" placeholder="Contoh: Pembelian ATK"></div>
+    <div class="field"><label for="expenseNote">Keterangan</label><input id="expenseNote" class="input" placeholder="Keterangan tambahan (opsional)"></div>
+    <div class="field" style="justify-content:end"><button id="saveExpense" class="btn" type="button">Simpan Pengeluaran</button></div>
+  </div>
+  <div id="expenseSummary" class="summary-item" style="margin-top:12px">Total Pengeluaran: Rp 0</div>
+  <div class="scroll" style="margin-top:14px"><table><thead><tr><th>Tanggal</th><th>Nominal</th><th>Keperluan</th><th>Keterangan</th></tr></thead><tbody id="expenseRows"></tbody></table></div>
+</div>
+
+<div class="card">
+  <h2>Transaksi & Verifikasi QRIS</h2>
+  <div class="scroll"><table><thead><tr><th>Tanggal</th><th>Siswa</th><th>Jenis</th><th>Nominal</th><th>Sumber</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+</main>
+
+<script src="config.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const rupiah=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+const TYPES=['Tabungan Wajib','Tabungan Sukarela','SPP','Kegiatan','PPDB','Infak'];
+const UNITS=['KB','RA','TPQ','MDT','Pesantren','MTs','MA'];
+const ACTIVITIES=['Maulid','Agustusan','Karyawisata','Manasik Haji','Renang','Lomba','Isi Manual'];
+const PURPOSES=['Pembangunan','Guru','Sarana & Prasarana','Operasional','Isi Manual'];
+const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+let data=[]; let studentsData=[]; let expensesData=[];
+
+const session=()=>JSON.parse(localStorage.getItem('supabase_session')||'null');
+function currentYear(){return $('year').value==='custom'?$('yearCustom').value.trim():$('year').value}
+function context(){return {year:currentYear(),unit:$('unit').value}}
+async function api(action,extra={}){
+  const s=session(); if(!s?.access_token) throw Error('Silakan login dashboard terlebih dahulu.');
+  const r=await fetch(`${SUPABASE_URL}/functions/v1/finance-admin`,{method:'POST',headers:{'content-type':'application/json',apikey:SUPABASE_KEY,authorization:`Bearer ${s.access_token}`},body:JSON.stringify({action,...context(),...extra})});
+  const d=await r.json(); if(!r.ok) throw Error(d.error||'Gagal memproses.'); return d;
+}
+function validYear(v){return /^\d{4}\/\d{4}$/.test(v)}
+function ensureYears(selected){
+  const sel=$('year'), custom=sel.querySelector('option[value="custom"]');
+  if(selected && validYear(selected) && !Array.from(sel.options).some(o=>o.value===selected)){
+    const o=document.createElement('option');o.value=selected;o.textContent=selected;sel.insertBefore(o,custom||null);
+  }
+  const m=String(selected||sel.value).match(/^(\d{4})\/(\d{4})$/);
+  if(m){const start=Number(m[1]);for(let i=1;i<=4;i++){const y=`${start+i}/${start+i+1}`;if(!Array.from(sel.options).some(o=>o.value===y)){const o=document.createElement('option');o.value=y;o.textContent=y;sel.insertBefore(o,custom||null)}}}
+}
+function initYears(){
+  const sel=$('year');sel.innerHTML='';
+  ['2026/2027','2027/2028','2028/2029','2029/2030','2030/2031'].forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;sel.appendChild(o)});
+  const c=document.createElement('option');c.value='custom';c.textContent='Custom (ketik sendiri)';sel.appendChild(c);
+  sel.value=localStorage.getItem('finance_year')||'2026/2027';
+  ensureYears(sel.value);
+}
+function renderDetails(){
+  const type=$('type').value,d=$('details');
+  let html='';
+  const money='<div class="field"><label>Nominal (Rp)</label><input id="amount" class="input" type="number" min="1000" step="1000" placeholder="Nominal" required></div>';
+  if(type==='Tabungan Wajib'||type==='Tabungan Sukarela') html=`<div class="field"><label>Tanggal</label><input id="date" class="input" type="date" required></div>${money}`;
+  else if(type==='SPP') html=`<div class="field"><label>Bulan</label><select id="month">${MONTHS.map(x=>`<option>${x}</option>`).join('')}</select></div>${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div>`;
+  else if(type==='Kegiatan') html=`<div class="field"><label>Kegiatan</label><select id="activity">${ACTIVITIES.map(x=>`<option>${x}</option>`).join('')}</select><input id="activityCustom" class="input" placeholder="Isi nama kegiatan" hidden></div>${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div><div class="field"><label>Keterangan</label><select id="deduct"><option value="false">Tidak potong dari Tabungan Wajib</option><option value="true">Potong dari Tabungan Wajib</option></select></div>`;
+  else if(type==='PPDB') html=`${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div>`;
+  else if(type==='Infak') html=`${money}<div class="field"><label>Peruntukan Infak</label><select id="purpose">${PURPOSES.map(x=>`<option>${x}</option>`).join('')}</select><input id="purposeCustom" class="input" placeholder="Isi peruntukan infak" hidden></div>`;
+  d.innerHTML=html;
+  $('activity')?.addEventListener('change',()=>{$('activityCustom').hidden=$('activity').value!=='Isi Manual'});
+  $('purpose')?.addEventListener('change',()=>{$('purposeCustom').hidden=$('purpose').value!=='Isi Manual'});
+}
+function draw(){
+  const sums={}; TYPES.forEach(k=>sums[k]=0);
+  data.filter(x=>x.verification_status==='accepted').forEach(x=>{
+    const displayType=x.payment_type==='Bantuan'?'Infak':x.payment_type; sums[displayType]=(sums[displayType]||0)+Number(x.amount);
+    if(x.payment_type==='Kegiatan'&&x.deduct_mandatory) sums['Tabungan Wajib']-=Number(x.amount);
+  });
+  $('summary').innerHTML=TYPES.map(k=>`<div class="summary-item">${k}<br>${rupiah(sums[k])}</div>`).join('');
+  const totalExpense=expensesData.reduce((n,x)=>n+Number(x.amount||0),0);
+  $('expenseSummary').textContent=`Total Pengeluaran: ${rupiah(totalExpense)}`;$('expenseSummaryInline').textContent=rupiah(totalExpense);
+  $('expenseRows').innerHTML=expensesData.map(x=>`<tr><td>${esc((x.created_at||'').slice(0,16).replace('T',' '))}</td><td>${rupiah(x.amount)}</td><td>${esc(x.purpose)}</td><td>${esc(x.note||'-')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Belum ada pengeluaran untuk tahun ajaran dan unit ini.</td></tr>';
+  $('rows').innerHTML=data.map(x=>`<tr><td>${esc((x.payment_date||x.created_at||'').slice(0,16).replace('T',' '))}</td><td>${esc(x.student_name)}</td><td>${esc(x.payment_type==='Bantuan'?'Infak':x.payment_type)}${x.activity?'<br>'+esc(x.activity):''}${x.payment_month?'<br>'+esc(x.payment_month):''}${x.purpose?'<br>'+esc(x.purpose):''}</td><td>${rupiah(x.amount)}</td><td>${esc(x.source)}</td><td>${esc(x.verification_status)}${x.payment_status?'<br>'+esc(x.payment_status):''}</td><td>${esc(x.verification_note||'')}</td><td class="actions">${x.verification_status==='pending'?`<button class="btn" onclick="verifyRow('${x.id}','accepted')">Terima</button><button class="btn btn-danger" onclick="verifyRow('${x.id}','rejected')">Tolak</button>`:''}</td></tr>`).join('');
+}
+async function load(){
+  try{
+    if(!validYear(currentYear())) throw Error('Tahun ajaran harus berformat YYYY/YYYY.');
+    localStorage.setItem('finance_year',currentYear());
+    const [students,transactions,expenses]=await Promise.all([api('students'),api('transactions'),api('expenses')]);
+    studentsData=students.rows||[];
+    $('studentContext').textContent=`Tahun Ajaran ${currentYear()} – Unit ${$('unit').value}`;
+    $('student').innerHTML='<option value="">Pilih siswa</option>'+studentsData.map(x=>`<option value="${esc(x.id)}">${esc(x.student_name)}</option>`).join('');
+    $('studentRows').innerHTML=studentsData.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.student_name)}</td><td>${esc(x.academic_year)}</td><td>${esc(x.unit)}</td><td><strong>${esc(x.pin||'Belum dibuat')}</strong></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Belum ada siswa untuk tahun ajaran dan unit ini.</td></tr>';
+    const arrears=await api('spp_arrears');
+    $('sppArrearsRows').innerHTML=(arrears.rows||[]).map(x=>`<tr><td>${esc(x.student_name)}</td><td>${esc(x.unpaid_months.join(', '))}</td></tr>`).join('') || '<tr><td colspan="2" class="muted">Tidak ada tunggakan SPP untuk siswa pada konteks ini.</td></tr>';
+    data=transactions.rows||[];expensesData=expenses.rows||[];draw();$('msg').textContent='';
+  }catch(e){$('msg').textContent=e.message}
+}
+window.verifyRow=async(id,status)=>{
+  let note='';
+  if(status==='rejected'){note=prompt('Keterangan penolakan (wajib), misalnya typo nominal atau fake nominal:')||'';if(!note.trim())return}
+  try{await api('verify',{id,status,note});await load()}catch(e){alert(e.message)}
+};
+$('type').addEventListener('change',renderDetails);
+$('load').addEventListener('click',load);
+$('unit').addEventListener('change',load);
+$('year').addEventListener('change',()=>{
+  const custom=$('year').value==='custom';$('yearCustom').hidden=!custom;$('yearApply').hidden=!custom;
+  if(!custom){ensureYears($('year').value);load()}
+});
+$('yearCustom').addEventListener('input',()=>{if(validYear($('yearCustom').value.trim()))ensureYears($('yearCustom').value.trim())});
+$('yearApply').addEventListener('click',()=>{if(!validYear(currentYear()))return alert('Format tahun ajaran harus seperti 2026/2027.');load()});
+$('addStudent').addEventListener('click',async()=>{
+  const name=$('newStudent').value.trim();if(!name)return $('msg').textContent='Nama siswa wajib diisi.';
+  try{await api('add_student',{student_name:name});$('newStudent').value='';await load()}catch(e){$('msg').textContent=e.message}
+});
+$('saveExpense').addEventListener('click',async()=>{
+  try{
+    const amount=Number($('expenseAmount').value),purpose=$('expensePurpose').value.trim(),note=$('expenseNote').value.trim();
+    if(!Number.isFinite(amount)||amount<1000)throw Error('Nominal pengeluaran minimal Rp1.000.');
+    if(!purpose)throw Error('Keperluan pengeluaran wajib diisi.');
+    await api('add_expense',{amount,purpose,note});
+    $('expenseAmount').value='';$('expensePurpose').value='';$('expenseNote').value='';
+    $('msg').textContent='Pengeluaran tersimpan.';await load();
+  }catch(e){$('msg').textContent=e.message}
+});
+$('save').addEventListener('click',async()=>{
+  try{
+    const type=$('type').value,studentId=$('student').value,student=studentsData.find(x=>x.id===studentId)?.student_name||'',amount=Number($('amount')?.value);
+    if(!student||!type||!Number.isFinite(amount)||amount<1000)throw Error('Lengkapi nama siswa, jenis pembayaran, dan nominal minimal Rp1.000.');
+    const payload={student_id:studentId,student_name:student,payment_type:type,amount,payment_date:$('date')?.value||null,payment_month:$('month')?.value||null,payment_status:$('status')?.value||null,activity:($('activity')?.value==='Isi Manual'?$('activityCustom')?.value.trim():$('activity')?.value)||null,purpose:($('purpose')?.value==='Isi Manual'?$('purposeCustom')?.value.trim():$('purpose')?.value)||null,deduct_mandatory:$('deduct')?.value==='true'};
+    if(type==='Tabungan Wajib'||type==='Tabungan Sukarela'){if(!payload.payment_date)throw Error('Tanggal wajib diisi.');payload.payment_status=null}
+    if(type==='SPP'&&!payload.payment_month)throw Error('Bulan SPP wajib dipilih.');
+    if(type==='Kegiatan'&&(!payload.activity||!payload.payment_status))throw Error('Kegiatan dan status wajib diisi.');
+    if(type==='PPDB'&&!payload.payment_status)throw Error('Status wajib diisi.');
+    if(type==='Infak'&&!payload.purpose)throw Error('Peruntukan infak wajib diisi.');
+    if(type!=='Kegiatan')payload.deduct_mandatory=false;
+    await api('add_transaction',payload);$('msg').textContent='Transaksi tersimpan.';renderDetails();await load();
+  }catch(e){$('msg').textContent=e.message}
+});
+initYears();renderDetails();load();
+</script>
+</body>
+</html>

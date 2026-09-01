@@ -27,34 +27,57 @@ PIN tidak ditulis di frontend. Deploy Supabase Edge Function `verify-upload-pin`
 
 Catatan: link upload lama tetap dipertahankan agar sistem lama tidak rusak. PIN pada aplikasi menjadi gerbang akses fitur upload di aplikasi. Jika ingin memblokir akses langsung ke URL upload, ubah upload Cloudinary menjadi signed upload atau tambahkan gate server-side pada endpoint upload.
 
-## 3. Pembayaran
+## 3. Pembayaran QRIS dan Rekap Keuangan
 
-Backend berada di:
+Pembayaran baru menggunakan QRIS statis Yayasan dan tidak lagi membuat QR melalui Midtrans.
+
+Komponen baru:
 
 - `supabase/functions/create-payment`
-- `supabase/functions/midtrans-webhook`
-- `supabase/functions/payment-report`
-- `supabase/migrations/20260820_masterplan.sql`
+- `supabase/functions/public-students`
+- `supabase/functions/finance-admin`
+- `supabase/functions/feedback-admin`
+- `supabase/migrations/20260829_finance_feedback_qris.sql`
+- `dashboard/rekap-keuangan.html`
+- `dashboard/rekap-saran.html`
+- `assets/qris-yayasan.jpeg`
 
-Set Supabase secrets:
+Data baru disimpan pada:
 
-- `MIDTRANS_SERVER_KEY`
-- `MIDTRANS_CLIENT_KEY`
-- `MIDTRANS_ENV` = `sandbox` untuk pengujian atau `production` untuk live
-- `SUPABASE_SERVICE_ROLE_KEY` (tersedia sebagai secret/service role di project)
-- `ADMIN_EMAILS` = email admin Dashboard yang boleh melihat rekap, dipisahkan koma jika lebih dari satu
+- `finance_students`
+- `finance_transactions`
 
-Set notification URL di Midtrans ke:
+Transaksi dari aplikasi wali murid masuk sebagai `pending` dan harus diverifikasi admin. Transaksi cash yang dicatat admin langsung berstatus `accepted`.
 
-`https://gtqvuymhtdfpnvlyzdun.supabase.co/functions/v1/midtrans-webhook`
+Set Supabase secret:
 
-Jalankan migration lalu deploy Edge Functions. Setelah itu fitur Pembayaran di `app.html` dapat membuat transaksi Snap dan menerima pembayaran melalui metode yang disediakan Midtrans pada akun yayasan.
+- `ADMIN_EMAILS` = email admin Dashboard; jika lebih dari satu, pisahkan dengan koma.
+
+`SUPABASE_SERVICE_ROLE_KEY` digunakan hanya oleh Edge Functions dan tidak boleh dimasukkan ke frontend.
+
+Deploy Edge Functions baru:
+
+- `create-payment`
+- `feedback`
+- `public-students`
+- `finance-admin`
+- `feedback-admin`
+
+QRIS bersifat statis, sehingga pembayaran tetap perlu dikonfirmasi kepada bendahara/guru dan diverifikasi admin. Website tidak menerima notifikasi pembayaran GoPay secara otomatis.
 
 ## 4. Rekap bendahara
 
-Dashboard → `pembayaran.html` menampilkan transaksi dan menyediakan Download CSV.
+Dashboard → `rekap-keuangan.html` menjadi pusat rekap:
 
-Akses dilindungi oleh Supabase Auth + daftar `ADMIN_EMAILS` pada Edge Function.
+- data siswa;
+- transaksi cash;
+- transaksi QRIS;
+- verifikasi transaksi;
+- ringkasan per jenis pembayaran.
+
+Dashboard → `rekap-saran.html` menampilkan saran wali murid dan menyediakan perubahan status serta Download CSV.
+
+Fitur lama `pembayaran.html` / Rekap Transaksi Pembayaran Midtrans sudah dihapus dari source dashboard.
 
 ## 5. PPDB → Arsip Siswa
 
