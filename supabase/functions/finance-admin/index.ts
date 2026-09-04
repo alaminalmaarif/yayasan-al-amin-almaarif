@@ -78,23 +78,85 @@ Deno.serve(async req=>{
       if(!validYear(b.year)||!UNITS.has(String(b.unit||'')))return json({error:'Tahun ajaran atau unit tidak valid.'},400);
       const startYear=Number(String(b.year).slice(0,4));
       const monthNames=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      // Urutan SPP mengikuti tahun ajaran: Juli -> Juni.
       const academicMonths=[6,7,8,9,10,11,0,1,2,3,4,5];
+      // Gunakan tanggal Indonesia (WIB), bukan UTC, agar penentuan bulan SPP
+      // konsisten dengan tanggal yang dilihat admin/wali murid di Indonesia.
       const now=new Date();
-      const academicStart=new Date(Date.UTC(startYear,6,1));
-      const academicEnd=new Date(Date.UTC(startYear+1,5,30,23,59,59));
+      const jakartaParts=new Intl.DateTimeFormat('en-US',{
+        timeZone:'Asia/Jakarta',
+        year:'numeric',
+        month:'numeric',
+        day:'numeric'
+      }).formatToParts(now);
+      const jakartaYear=Number(jakartaParts.find((p:any)=>p.type==='year')?.value);
+      const jakartaMonth=Number(jakartaParts.find((p:any)=>p.type==='month')?.value)-1;
       let dueCount=0;
-      if(now>=academicEnd) dueCount=12;
-      else if(now>=academicStart){ const pos=academicMonths.indexOf(now.getUTCMonth()); dueCount=pos<0?0:pos+1; }
-      const dueMonths=academicMonths.slice(0,dueCount);
+      if(jakartaYear>startYear+1 || (jakartaYear===startYear+1 && jakartaMonth>=6)){
+        dueCount=12;
+      }else if(jakartaYear===startYear && jakartaMonth>=6){
+        const pos=academicMonths.indexOf(jakartaMonth);
+        dueCount=pos<0?0:pos+1;
+      }else if(jakartaYear===startYear+1 && jakartaMonth<6){
+        const pos=academicMonths.indexOf(jakartaMonth);
+        dueCount=pos<0?0:pos+1;
+      }
+      const dueMonths=new Set(academicMonths.slice(0,dueCount));
       const {data:students,error:studentError}=await sb.from('finance_students').select('id,student_name').eq('academic_year',b.year).eq('unit',b.unit).order('student_name');
       if(studentError)throw studentError;
-      const {data:tx,error:txError}=await sb.from('finance_transactions').select('student_id,student_name,payment_type,payment_status,payment_month,verification_status').eq('academic_year',b.year).eq('unit',b.unit).eq('payment_type','SPP').eq('verification_status','accepted');
+      const {data:tx,error:txError}=await sb.from('finance_transactions')
+        .select('student_id,student_name,amount,payment_status,payment_month,verification_status')
+        .eq('academic_year',b.year).eq('unit',b.unit).eq('payment_type','SPP').eq('verification_status','accepted');
+      if(txError)throw txError;
+
+      const rows=(students||[]).map((st:any)=>{
+        const studentTx=(tx||[]).filter((x:any)=>(x.student_id===st.id||(x.student_id==null&&x.student_name===st.student_name)));
+        const months=academicMonths.map((monthIndex:number)=>{
+          const monthTx=studentTx.filter((x:any)=>monthNames.indexOf(String(x.payment_month||''))===monthIndex);
+          const monthDue=dueMonths.has(monthIndex);
+          if(!monthDue) return {month:monthNames[monthIndex],status:'-',amount:0};
+          // Abaikan transaksi dengan status kosong/null atau status lain yang tidak
+          // dikenal. Transaksi tersebut tidak boleh mengubah status bulan menjadi
+          // "Cicil Rp0" atau dianggap sebagai pembayaran SPP yang valid.
+          const validMonthTx=monthTx.filter((x:any)=>['Lunas','Cicil','Lunasi Cicilan'].includes(String(x.payment_status||'')));
+          if(!validMonthTx.length) return {month:monthNames[monthIndex],status:'-',amount:0};
+
+          // Jika sudah lunas / melunasi cicilan, tampilkan status penyelesaian.
+          if(validMonthTx.some((x:any)=>['Lunas','Lunasi Cicilan'].includes(String(x.payment_status||'')))){
+            const finalTx=validMonthTx.filter((x:any)=>String(x.payment_status||'')==='Lunasi Cicilan');
+            return {month:monthNames[monthIndex],status:finalTx.length?'Lunasi Cicilan':'Lunas',amount:validMonthTx.reduce((n:number,x:any)=>n+Number(x.amount||0),0)};
+          }
+
+          // Untuk cicilan, jumlahkan seluruh pembayaran cicil pada bulan tersebut.
+          const cicilAmount=validMonthTx.filter((x:any)=>String(x.payment_status||'')==='Cicil')
+            .reduce((n:number,x:any)=>n+Number(x.amount||0),0);
+          return {month:monthNames[monthIndex],status:'Cicil',amount:cicilAmount};
+        });
+        return {student_id:st.id,student_name:st.student_name,months};
+      });
+      return json({rows});
+    }
+    if(a==='ppdb_recap'){
+      if(!validYear(b.year)||!UNITS.has(String(b.unit||'')))return json({error:'Tahun ajaran atau unit tidak valid.'},400);
+      const {data:students,error:studentError}=await sb.from('finance_students')
+        .select('id,student_name').eq('academic_year',b.year).eq('unit',b.unit).order('student_name');
+      if(studentError)throw studentError;
+      const {data:tx,error:txError}=await sb.from('finance_transactions')
+        .select('student_id,student_name,amount,payment_status,verification_status')
+        .eq('academic_year',b.year).eq('unit',b.unit).eq('payment_type','PPDB').eq('verification_status','accepted');
       if(txError)throw txError;
       const rows=(students||[]).map((st:any)=>{
-        const paid=new Set((tx||[]).filter((x:any)=>(x.student_id===st.id||(x.student_id==null&&x.student_name===st.student_name))&&['Lunas','Lunasi Cicilan'].includes(String(x.payment_status||''))).map((x:any)=>monthNames.indexOf(String(x.payment_month||''))));
-        const unpaid=dueMonths.filter(i=>!paid.has(i)).map(i=>{const y=i>=6?startYear:startYear+1;return `${monthNames[i]} ${y}`});
-        return {student_id:st.id,student_name:st.student_name,unpaid_months:unpaid};
-      }).filter((x:any)=>x.unpaid_months.length);
+        const studentTx=(tx||[]).filter((x:any)=>(x.student_id===st.id||(x.student_id==null&&x.student_name===st.student_name)));
+        if(!studentTx.length)return {student_id:st.id,student_name:st.student_name,status:'-',amount:0};
+        const total=studentTx.reduce((n:number,x:any)=>n+Number(x.amount||0),0);
+        const completed=studentTx.some((x:any)=>['Lunas','Lunasi Cicilan'].includes(String(x.payment_status||'')));
+        return {
+          student_id:st.id,
+          student_name:st.student_name,
+          status:completed?'Lunas':'Cicil',
+          amount:total
+        };
+      });
       return json({rows});
     }
     if(a==='expenses'){

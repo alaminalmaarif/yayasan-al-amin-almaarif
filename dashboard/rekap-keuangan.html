@@ -44,9 +44,15 @@ table{border-collapse:collapse;width:100%}th,td{padding:8px;border-bottom:1px so
 </div>
 
 <div class="card">
-  <h2>SPP Anak yang Belum Bayar</h2>
-  <p class="muted">Ringkasan otomatis berdasarkan tahun ajaran dan unit yang dipilih. Bulan berjalan ikut dihitung sebagai tunggakan.</p>
-  <div class="scroll"><table><thead><tr><th>Nama</th><th>Status Nunggak</th></tr></thead><tbody id="sppArrearsRows"></tbody></table></div>
+  <h2>Rekap SPP</h2>
+  <p class="muted">Rekap SPP per siswa berdasarkan tahun ajaran dan unit. Tanda <strong>-</strong> berarti belum ada pembayaran untuk bulan tersebut. Cicilan menampilkan total nominal yang sudah dibayar pada bulan itu.</p>
+  <div class="scroll"><table id="sppArrearsTable"><thead><tr><th>Siswa</th><th>Juli</th><th>Agustus</th><th>September</th><th>Oktober</th><th>November</th><th>Desember</th><th>Januari</th><th>Februari</th><th>Maret</th><th>April</th><th>Mei</th><th>Juni</th></tr></thead><tbody id="sppArrearsRows"></tbody></table></div>
+</div>
+
+<div class="card">
+  <h2>Rekap PPDB</h2>
+  <p class="muted">Rekap PPDB per siswa berdasarkan tahun ajaran dan unit. Tanda <strong>-</strong> berarti belum ada pembayaran. Cicilan menampilkan total nominal yang sudah dibayar.</p>
+  <div class="scroll"><table id="ppdbRecapTable"><thead><tr><th>Siswa</th><th>Status Pembayaran</th><th>Total Nominal</th></tr></thead><tbody id="ppdbRecapRows"></tbody></table></div>
 </div>
 
 <div class="card">
@@ -158,7 +164,9 @@ async function load(){
     $('student').innerHTML='<option value="">Pilih siswa</option>'+studentsData.map(x=>`<option value="${esc(x.id)}">${esc(x.student_name)}</option>`).join('');
     $('studentRows').innerHTML=studentsData.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.student_name)}</td><td>${esc(x.academic_year)}</td><td>${esc(x.unit)}</td><td><strong>${esc(x.pin||'Belum dibuat')}</strong></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Belum ada siswa untuk tahun ajaran dan unit ini.</td></tr>';
     const arrears=await api('spp_arrears');
-    $('sppArrearsRows').innerHTML=(arrears.rows||[]).map(x=>`<tr><td>${esc(x.student_name)}</td><td>${esc(x.unpaid_months.join(', '))}</td></tr>`).join('') || '<tr><td colspan="2" class="muted">Tidak ada tunggakan SPP untuk siswa pada konteks ini.</td></tr>';
+    $('sppArrearsRows').innerHTML=(arrears.rows||[]).map(x=>`<tr><td><strong>${esc(x.student_name)}</strong></td>${(x.months||[]).map(m=>{ const status=String(m.status||'-'); const label=status==='Cicil'?`Cicil ${rupiah(m.amount)}`:status; return `<td>${esc(label)}</td>`; }).join('')}</tr>`).join('') || '<tr><td colspan="13" class="muted">Belum ada data siswa untuk konteks ini.</td></tr>';
+    const ppdb=await api('ppdb_recap');
+    $('ppdbRecapRows').innerHTML=(ppdb.rows||[]).map(x=>`<tr><td><strong>${esc(x.student_name)}</strong></td><td>${esc(x.status||'-')}</td><td>${x.amount?rupiah(x.amount):'-'}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">Belum ada data siswa untuk konteks ini.</td></tr>';
     data=transactions.rows||[];expensesData=expenses.rows||[];draw();$('msg').textContent='';
   }catch(e){$('msg').textContent=e.message}
 }
