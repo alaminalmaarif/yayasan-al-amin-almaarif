@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0B5D3B">
+  <title>PIN Dashboard - Yayasan Al-Amin</title>
+  <style>
+    :root{--green:#0b5d3b;--bg:#f5f7f6;--text:#17231d;--muted:#64706a}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{width:100%;max-width:460px;background:#fff;border:1px solid #e3e9e5;border-radius:16px;padding:24px;box-shadow:0 8px 30px #0000000d}
+    h1{margin:0 0 8px;font-size:24px}.sub{margin:0 0 22px;color:var(--muted);line-height:1.5}
+    .field{margin:10px 0}.field label{display:block;font-weight:600;margin-bottom:6px}
+    .input{width:100%;border:1px solid #ccd7d0;border-radius:10px;padding:12px;font:inherit}
+    button{width:100%;border:0;border-radius:10px;padding:13px 15px;background:var(--green);color:#fff;cursor:pointer;font-weight:600;font-size:15px}
+    button:disabled{opacity:.6;cursor:not-allowed}.status{margin-top:10px;color:var(--muted);min-height:21px}.error{color:#a12828}
+    .note{margin-top:18px;padding:12px 14px;border-radius:10px;background:#f4f7f5;color:var(--muted);font-size:13px;line-height:1.5}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>🔐 PIN Dashboard</h1>
+    <p class="sub">Masukkan PIN Yayasan untuk membuka Dashboard Kepala/Admin.</p>
+    <div class="field">
+      <label for="dashboardPin">PIN Yayasan</label>
+      <input id="dashboardPin" class="input" type="password" inputmode="numeric" autocomplete="off" autofocus>
+    </div>
+    <button id="verifyDashboardPin" type="button">Verifikasi PIN</button>
+    <div id="dashboardPinMessage" class="status" aria-live="polite"></div>
+    <div class="note">Setelah PIN benar, Dashboard akan berjalan seperti sebelumnya. PIN tidak disimpan di aplikasi.</div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://gtqvuymhtdfpnvlyzdun.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_ZC_m5cCrpNuLWsWz4G3v4Q_fvzI5Dta';
+    const VERIFY_FUNCTION = 'verify-upload-pin';
+    const pinInput = document.getElementById('dashboardPin');
+    const verifyButton = document.getElementById('verifyDashboardPin');
+    const message = document.getElementById('dashboardPinMessage');
+
+    async function verifyDashboardPin() {
+      const pin = pinInput.value.trim();
+      if (!pin) {
+        message.className = 'status error';
+        message.textContent = 'Masukkan PIN terlebih dahulu.';
+        pinInput.focus();
+        return;
+      }
+
+      verifyButton.disabled = true;
+      message.className = 'status';
+      message.textContent = 'Memeriksa PIN...';
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/${VERIFY_FUNCTION}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY
+          },
+          body: JSON.stringify({ pin })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'PIN salah.');
+
+        sessionStorage.setItem('dashboard_pin_verified', JSON.stringify({
+          at: Date.now(),
+          token: data.token
+        }));
+        window.location.replace('index.html');
+      } catch (error) {
+        message.className = 'status error';
+        message.textContent = error.message || 'Gagal memverifikasi PIN.';
+        verifyButton.disabled = false;
+        pinInput.focus();
+        pinInput.select();
+      }
+    }
+
+    verifyButton.addEventListener('click', verifyDashboardPin);
+    pinInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') verifyDashboardPin();
+    });
+  </script>
+</body>
+</html>
