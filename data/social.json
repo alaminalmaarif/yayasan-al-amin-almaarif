@@ -5,7 +5,7 @@
   },
 
   "kontak": {
-    "alamat": "Kp. Lebakwangi RT 003. RW 002, Desa Parung, Kecamatan Parung, Kabupaten Bogor, Jawa Barat, 16330",
+    "alamat": "Kp. Lebakwangi RT. 003 RW. 002, Desa. Parung, Kecamatan. Parung, Kabupaten. Bogor, Provinsi. Jawa Barat, 16330",
     "email": "alaminalmaarif@gmail.com",
     "whatsapp": {
       "nomor": "6289629908190",
@@ -28,13 +28,13 @@
 
     "facebook": {
       "nama": "Facebook",
-      "url": "https://www.facebook.com/profile.php?id=61572574427050",
+      "url": "https://www.facebook.com/yayasanalaminalmaarif",
       "aktif": true
     },
 
     "instagram": {
       "nama": "Instagram",
-      "url": "https://www.instagram.com/alaminalmaarif/",
+      "url": "https://www.instagram.com/yayasanalaminalmaarif",
       "aktif": true
     },
 
