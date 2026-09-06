@@ -310,6 +310,7 @@ function getSocialIcon(name) {
   if (normalizedName.includes("facebook")) return "fa-facebook";
   if (normalizedName.includes("instagram")) return "fa-instagram";
   if (normalizedName.includes("tiktok")) return "fa-tiktok";
+  if (normalizedName.includes("x")) return "fa-x";
   return "fa-link";
 }
 

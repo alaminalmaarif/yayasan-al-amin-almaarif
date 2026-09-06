@@ -10,7 +10,7 @@ const APP_CONFIG = Object.freeze({
   uploadPinFunction: 'verify-upload-pin',
   feedbackFunction: 'feedback',
   notificationFeedFunction: 'notification-feed',
-  whatsapp: '6285717797429',
+  whatsapp: '6289629908190',
   units: ['KB','RA','TPQ','MDT','Pesantren','Majelis Taklim','MTs','MA'],
   ppdb: {
     RA: 'https://docs.google.com/forms/d/e/1FAIpQLSeYh4vePmmT_47J-B2gG_0zR59xleegOWxCYd0cl_Bkx0_ePQ/viewform',

@@ -608,7 +608,12 @@
   $('pinWhatsapp')?.addEventListener('click', e => {
     e.preventDefault();
     const number = String(APP_CONFIG.whatsapp || '').replace(/\D/g, '');
-    if (number) location.href = `https://wa.me/${number}`;
+    if (number) {
+      const message = "Assalamu'alaikum, saya ingin meminta bantuan terkait PIN pembayaran.";
+      const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
+      window.location.href = url;
+    }
   });
 
   // ============================================================
