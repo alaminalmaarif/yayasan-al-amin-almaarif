@@ -166,7 +166,7 @@
   // -> Jenis pembayaran -> detail sesuai jenis -> bayar -> QRIS.
   // Hanya data siswa dari finance_students yang ditampilkan.
   // ============================================================
-  const FINANCE_UNITS = ['KB','RA','TPQ','MDT','Pesantren','MTs','MA'];
+  const FINANCE_UNITS = ['KB','RA','TPQ','MDT','Pesantren','Majelis Taklim','MTs','MA'];
   const PAYMENT_TYPES = ['Tabungan Wajib','Tabungan Sukarela','SPP','Kegiatan','PPDB','Infak'];
   const PAYMENT_STATUSES = ['Lunas','Cicil','Lunasi Cicilan'];
   const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -387,7 +387,14 @@
           </select>`
         ),
         statusField(),
-        amountField()
+        amountField(),
+        field('Sumber pemotongan saldo',
+          `<select id="deductionSource" class="select">
+            <option value="none">Tidak dipotong</option>
+            <option value="mandatory">Potong dari Tabungan Wajib</option>
+            <option value="voluntary">Potong dari Tabungan Sukarela</option>
+          </select>`
+        )
       ].join('');
     } else if (type === 'Kegiatan') {
       details.innerHTML = [
@@ -400,7 +407,13 @@
         ),
         statusField(),
         amountField(),
-        `<div class="field"><label style="font-weight:400"><input id="deductMandatory" type="checkbox"> Potong dari saldo Tabungan Wajib</label></div>`
+        field('Sumber pemotongan saldo',
+          `<select id="deductionSource" class="select">
+            <option value="none">Tidak dipotong</option>
+            <option value="mandatory">Potong dari Tabungan Wajib</option>
+            <option value="voluntary">Potong dari Tabungan Sukarela</option>
+          </select>`
+        )
       ].join('');
       $('activity')?.addEventListener('change', () => {
         $('activityCustom').hidden = $('activity').value !== 'Isi Manual';
@@ -420,7 +433,14 @@
           </select>
           <input id="purposeCustom" class="input" placeholder="Tulis peruntukan" hidden>`
         ),
-        amountField()
+        amountField(),
+        field('Sumber pemotongan saldo',
+          `<select id="deductionSource" class="select">
+            <option value="none">Tidak dipotong</option>
+            <option value="mandatory">Potong dari Tabungan Wajib</option>
+            <option value="voluntary">Potong dari Tabungan Sukarela</option>
+          </select>`
+        )
       ].join('');
       $('purpose')?.addEventListener('change', () => {
         $('purposeCustom').hidden = $('purpose').value !== 'Isi Manual';
@@ -449,7 +469,8 @@
       purpose: purposeChoice === 'Isi Manual'
         ? ($('purposeCustom')?.value || '').trim()
         : purposeChoice,
-      deduct_mandatory: $('deductMandatory')?.checked === true,
+      deduction_source: $('deductionSource')?.value || 'none',
+      deduct_mandatory: $('deductionSource')?.value === 'mandatory',
       pin_session_token: paymentSessionToken
     };
   }
@@ -490,7 +511,8 @@
 
     const button = $('payButton');
     if (button) button.disabled = true;
-    setPaymentStatus('Mencatat pembayaran dan menyiapkan QRIS...');
+    const usesSavings = payload.deduction_source !== 'none';
+    setPaymentStatus(usesSavings ? 'Memproses pemotongan dari saldo tabungan...' : 'Mencatat pembayaran dan menyiapkan QRIS...');
 
     try {
       const r = await fetch(fn(APP_CONFIG.paymentFunction), {
@@ -504,11 +526,17 @@
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || 'Gagal mencatat pembayaran.');
 
-      // Pembayaran pada alur yayasan menggunakan QRIS gambar statis.
-      // Transaksi dibuat sebagai "pending" dan admin memverifikasinya di dashboard.
-      $('qrisBox').hidden = false;
-      setPaymentStatus(`Pembayaran tercatat. ID transaksi: ${d.order_id}. Silakan scan QRIS di bawah, lalu konfirmasikan kepada admin.`);
-      $('qrisBox').scrollIntoView({behavior:'smooth', block:'center'});
+      if (d.requires_qris) {
+        // Hanya pilihan "Tidak dipotong" yang menggunakan QRIS.
+        // Pemotongan dari tabungan tidak langsung accepted; admin harus memverifikasi.
+        $('qrisBox').hidden = false;
+        setPaymentStatus(`Pembayaran tercatat. ID transaksi: ${d.order_id}. Silakan scan QRIS di bawah, lalu konfirmasikan kepada admin.`);
+        $('qrisBox').scrollIntoView({behavior:'smooth', block:'center'});
+      } else {
+        $('qrisBox').hidden = true;
+        const sourceLabel = payload.deduction_source === 'mandatory' ? 'Tabungan Wajib' : 'Tabungan Sukarela';
+        setPaymentStatus(`Pengajuan pembayaran Rp ${money(payload.amount)} dari ${sourceLabel} berhasil dicatat dan menunggu konfirmasi admin.`);
+      }
     } catch (error) {
       setPaymentStatus(error.message || 'Pembayaran gagal.', true);
     } finally {
@@ -557,16 +585,20 @@
       ['Infak', `Rp ${money(report.infak_balance)}`]
     ];
     const spp = Array.isArray(report.spp_paid) && report.spp_paid.length
-      ? `<ul>${report.spp_paid.map(x => `<li>${esc(x.label || x.month || '-')}</li>`).join('')}</ul>`
+      ? `<ul>${report.spp_paid.map(x => { const source=x.deduction_source==='mandatory'?' • Potong Tabungan Wajib':x.deduction_source==='voluntary'?' • Potong Tabungan Sukarela':''; return `<li>${esc(x.label || x.month || '-')} — ${esc(x.payment_status || '-')} — Rp ${money(x.amount || 0)}${esc(source)}</li>`; }).join('')}</ul>`
       : '<p class="small">Belum ada pembayaran SPP diterima.</p>';
     const kegiatan = Array.isArray(report.kegiatan) && report.kegiatan.length
-      ? `<ul>${report.kegiatan.map(x => `<li>${esc(x.activity || '-')}</li>`).join('')}</ul>`
+      ? `<ul>${report.kegiatan.map(x => { const source=x.deduction_source==='mandatory'?' • Potong Tabungan Wajib':x.deduction_source==='voluntary'?' • Potong Tabungan Sukarela':''; return `<li>${esc(x.activity || '-')} — ${esc(x.payment_status || '-')} — Rp ${money(x.amount || 0)}${esc(source)}</li>`; }).join('')}</ul>`
       : '<p class="small">Belum ada pembayaran kegiatan diterima.</p>';
+    const ppdb = Array.isArray(report.ppdb_paid) && report.ppdb_paid.length
+      ? `<ul>${report.ppdb_paid.map(x => { const d=x.accepted_at ? new Date(x.accepted_at).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) : '-'; return `<li>${esc(d)} — ${esc(x.payment_status || '-')} — Rp ${money(x.amount || 0)}</li>`; }).join('')}</ul>`
+      : '<p class="small">Belum ada pembayaran PPDB diterima.</p>';
 
     $('studentReportBody').innerHTML =
       `<div class="grid">${rows.map(x => `<div class="summary-item"><strong>${esc(x[0])}</strong><br>${esc(x[1])}</div>`).join('')}</div>
-       <div class="card" style="margin-top:12px"><strong>SPP yang sudah dibayar</strong>${spp}</div>
-       <div class="card" style="margin-top:12px"><strong>Kegiatan yang sudah dibayar</strong>${kegiatan}</div>`;
+       <div class="card" style="margin-top:12px"><strong>SPP yang sudah dibayarkan</strong>${spp}</div>
+       <div class="card" style="margin-top:12px"><strong>Kegiatan yang sudah dibayarkan</strong>${kegiatan}</div>
+       <div class="card" style="margin-top:12px"><strong>PPDB yang sudah dibayarkan</strong>${ppdb}</div>`;
     $('studentReportContext').textContent =
       `${data.student_name || paymentStudent?.studentName || ''} • ${data.unit || paymentStudent?.unit || ''} • Tahun Ajaran ${data.year || paymentStudent?.year || ''}`;
   }

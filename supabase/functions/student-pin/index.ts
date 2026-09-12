@@ -47,15 +47,57 @@ function monthYearLabel(month:string,startYear:number){
 }
 function report(transactions:any[],startYear:number){
   const accepted=transactions.filter(x=>x.verification_status==='accepted');
+  const deductionSource=(x:any)=>{
+    const raw=String(x.deduction_source||'').trim();
+    if(raw==='mandatory'||raw==='voluntary'||raw==='none')return raw;
+    return x.deduct_mandatory===true?'mandatory':'none';
+  };
   const balance=(type:string)=>accepted.filter(x=>x.payment_type===type).reduce((n,x)=>n+Number(x.amount||0),0);
-  const mandatory=balance('Tabungan Wajib')-accepted.filter(x=>x.payment_type==='Kegiatan'&&x.deduct_mandatory).reduce((n,x)=>n+Number(x.amount||0),0);
-  const spp=accepted.filter(x=>x.payment_type==='SPP' && ['Lunas','Lunasi Cicilan'].includes(String(x.payment_status||'')))
-    .map(x=>({month:x.payment_month,label:monthYearLabel(String(x.payment_month||''),startYear)}));
-  const sppMap=new Map<string,any>(); spp.forEach(x=>{if(x.month)sppMap.set(x.month,x)});
-  const kegiatan=accepted.filter(x=>x.payment_type==='Kegiatan').map(x=>({activity:x.activity||'-',deduct_mandatory:!!x.deduct_mandatory,description:x.verification_note||''}));
-  const ppdb=balance('PPDB');
+  const mandatory=balance('Tabungan Wajib')-accepted.filter(x=>deductionSource(x)==='mandatory').reduce((n,x)=>n+Number(x.amount||0),0);
+  const sukarela=balance('Tabungan Sukarela')-accepted.filter(x=>deductionSource(x)==='voluntary').reduce((n,x)=>n+Number(x.amount||0),0);
+
+  // Semua transaksi SPP yang sudah diterima ditampilkan, termasuk Cicil.
+  // Jangan membatasi berdasarkan bulan berjalan karena wali murid dapat membayar
+  // SPP bulan-bulan mendatang sekaligus.
+  const spp=accepted.filter(x=>x.payment_type==='SPP' && ['Lunas','Cicil','Lunasi Cicilan'].includes(String(x.payment_status||'')))
+    .map(x=>({
+      month:x.payment_month,
+      label:monthYearLabel(String(x.payment_month||''),startYear),
+      amount:Number(x.amount||0),
+      payment_status:String(x.payment_status||'-'),
+      deduction_source:deductionSource(x),
+      created_at:x.created_at
+    }));
+
+  const kegiatan=accepted.filter(x=>x.payment_type==='Kegiatan' && String(x.activity||'').trim())
+    .map(x=>({
+      activity:x.activity,
+      amount:Number(x.amount||0),
+      payment_status:String(x.payment_status||'-'),
+      deduction_source:deductionSource(x),
+      deduct_mandatory:deductionSource(x)==='mandatory',
+      description:x.verification_note||'',
+      created_at:x.created_at
+    }));
+
+  const ppdb=accepted.filter(x=>x.payment_type==='PPDB')
+    .map(x=>({
+      amount:Number(x.amount||0),
+      payment_status:String(x.payment_status||'-'),
+      accepted_at:x.verified_at || x.created_at,
+      created_at:x.created_at
+    }));
+
   const infak=accepted.filter(x=>x.payment_type==='Infak'||x.payment_type==='Bantuan').reduce((n,x)=>n+Number(x.amount||0),0);
-  return {mandatory_balance:mandatory,sukarela_balance:balance('Tabungan Sukarela'),spp_paid:Array.from(sppMap.values()),kegiatan,ppdb_balance:ppdb,infak_balance:infak};
+  return {
+    mandatory_balance:mandatory,
+    sukarela_balance:sukarela,
+    spp_paid:spp,
+    kegiatan,
+    ppdb_paid:ppdb,
+    ppdb_balance:ppdb.reduce((n,x)=>n+x.amount,0),
+    infak_balance:infak
+  };
 }
 
 Deno.serve(async req=>{
@@ -94,7 +136,7 @@ Deno.serve(async req=>{
       if(!validContext(b)) return json({error:'Data anak tidak valid.'},400);
       const session=await validSession(sb,clean(b.session_token),b);
       if(!session) return json({error:'Sesi PIN sudah berakhir. Silakan verifikasi PIN lagi.'},401);
-      const {data,error}=await sb.from('finance_transactions').select('student_id,student_name,payment_type,amount,payment_status,payment_month,activity,purpose,deduct_mandatory,verification_status,verification_note,created_at')
+      const {data,error}=await sb.from('finance_transactions').select('student_id,student_name,payment_type,amount,payment_status,payment_month,activity,purpose,deduct_mandatory,deduction_source,verification_status,verification_note,created_at')
         .eq('academic_year',clean(b.year)).eq('unit',clean(b.unit)).eq('verification_status','accepted').order('created_at',{ascending:true});
       if(error) throw error;
       const tx=(data||[]).filter((x:any)=>x.student_id===clean(b.student_id)||(x.student_id==null&&x.student_name===clean(b.student_name)));

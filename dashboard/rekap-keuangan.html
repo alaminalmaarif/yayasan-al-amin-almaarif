@@ -56,6 +56,12 @@ table{border-collapse:collapse;width:100%}th,td{padding:8px;border-bottom:1px so
 </div>
 
 <div class="card">
+  <h2>Rekap Kegiatan</h2>
+  <p class="muted">Rekap pembayaran kegiatan per siswa. Kegiatan yang diisi manual juga ditampilkan.</p>
+  <div class="scroll"><table id="activityRecapTable"><thead><tr><th>Siswa</th><th>Kegiatan</th><th>Status Pembayaran</th><th>Total Nominal</th></tr></thead><tbody id="activityRecapRows"></tbody></table></div>
+</div>
+
+<div class="card">
   <h2>Catat Pembayaran Langsung/Cash</h2>
   <div class="grid">
     <div class="field"><label for="student">Nama siswa</label><select id="student"><option value="">Pilih siswa</option></select></div>
@@ -134,10 +140,10 @@ function renderDetails(){
   let html='';
   const money='<div class="field"><label>Nominal (Rp)</label><input id="amount" class="input" type="number" min="1000" step="1000" placeholder="Nominal" required></div>';
   if(type==='Tabungan Wajib'||type==='Tabungan Sukarela') html=`<div class="field"><label>Tanggal</label><input id="date" class="input" type="date" required></div>${money}`;
-  else if(type==='SPP') html=`<div class="field"><label>Bulan</label><select id="month">${MONTHS.map(x=>`<option>${x}</option>`).join('')}</select></div>${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div>`;
-  else if(type==='Kegiatan') html=`<div class="field"><label>Kegiatan</label><select id="activity">${ACTIVITIES.map(x=>`<option>${x}</option>`).join('')}</select><input id="activityCustom" class="input" placeholder="Isi nama kegiatan" hidden></div>${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div><div class="field"><label>Keterangan</label><select id="deduct"><option value="false">Tidak potong dari Tabungan Wajib</option><option value="true">Potong dari Tabungan Wajib</option></select></div>`;
+  else if(type==='SPP') html=`<div class="field"><label>Bulan</label><select id="month">${MONTHS.map(x=>`<option>${x}</option>`).join('')}</select></div>${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div><div class="field"><label>Sumber pemotongan saldo</label><select id="deduction"><option value="none">Tidak dipotong</option><option value="mandatory">Potong dari Tabungan Wajib</option><option value="voluntary">Potong dari Tabungan Sukarela</option></select></div>`;
+  else if(type==='Kegiatan') html=`<div class="field"><label>Kegiatan</label><select id="activity">${ACTIVITIES.map(x=>`<option>${x}</option>`).join('')}</select><input id="activityCustom" class="input" placeholder="Isi nama kegiatan" hidden></div>${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div><div class="field"><label>Sumber pemotongan saldo</label><select id="deduction"><option value="none">Tidak dipotong</option><option value="mandatory">Potong dari Tabungan Wajib</option><option value="voluntary">Potong dari Tabungan Sukarela</option></select></div>`;
   else if(type==='PPDB') html=`${money}<div class="field"><label>Status</label><select id="status"><option>Lunas</option><option>Cicil</option><option>Lunasi Cicilan</option></select></div>`;
-  else if(type==='Infak') html=`${money}<div class="field"><label>Peruntukan Infak</label><select id="purpose">${PURPOSES.map(x=>`<option>${x}</option>`).join('')}</select><input id="purposeCustom" class="input" placeholder="Isi peruntukan infak" hidden></div>`;
+  else if(type==='Infak') html=`${money}<div class="field"><label>Peruntukan Infak</label><select id="purpose">${PURPOSES.map(x=>`<option>${x}</option>`).join('')}</select><input id="purposeCustom" class="input" placeholder="Isi peruntukan infak" hidden></div><div class="field"><label>Sumber pemotongan saldo</label><select id="deduction"><option value="none">Tidak dipotong</option><option value="mandatory">Potong dari Tabungan Wajib</option><option value="voluntary">Potong dari Tabungan Sukarela</option></select></div>`;
   d.innerHTML=html;
   $('activity')?.addEventListener('change',()=>{$('activityCustom').hidden=$('activity').value!=='Isi Manual'});
   $('purpose')?.addEventListener('change',()=>{$('purposeCustom').hidden=$('purpose').value!=='Isi Manual'});
@@ -146,13 +152,26 @@ function draw(){
   const sums={}; TYPES.forEach(k=>sums[k]=0);
   data.filter(x=>x.verification_status==='accepted').forEach(x=>{
     const displayType=x.payment_type==='Bantuan'?'Infak':x.payment_type; sums[displayType]=(sums[displayType]||0)+Number(x.amount);
-    if(x.payment_type==='Kegiatan'&&x.deduct_mandatory) sums['Tabungan Wajib']-=Number(x.amount);
+    const deduction=x.deduction_source || (x.deduct_mandatory?'mandatory':'none');
+    if(deduction==='mandatory') sums['Tabungan Wajib']-=Number(x.amount);
+    if(deduction==='voluntary') sums['Tabungan Sukarela']-=Number(x.amount);
   });
   $('summary').innerHTML=TYPES.map(k=>`<div class="summary-item">${k}<br>${rupiah(sums[k])}</div>`).join('');
   const totalExpense=expensesData.reduce((n,x)=>n+Number(x.amount||0),0);
   $('expenseSummary').textContent=`Total Pengeluaran: ${rupiah(totalExpense)}`;$('expenseSummaryInline').textContent=rupiah(totalExpense);
   $('expenseRows').innerHTML=expensesData.map(x=>`<tr><td>${esc((x.created_at||'').slice(0,16).replace('T',' '))}</td><td>${rupiah(x.amount)}</td><td>${esc(x.purpose)}</td><td>${esc(x.note||'-')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Belum ada pengeluaran untuk tahun ajaran dan unit ini.</td></tr>';
-  $('rows').innerHTML=data.map(x=>`<tr><td>${esc((x.payment_date||x.created_at||'').slice(0,16).replace('T',' '))}</td><td>${esc(x.student_name)}</td><td>${esc(x.payment_type==='Bantuan'?'Infak':x.payment_type)}${x.activity?'<br>'+esc(x.activity):''}${x.payment_month?'<br>'+esc(x.payment_month):''}${x.purpose?'<br>'+esc(x.purpose):''}</td><td>${rupiah(x.amount)}</td><td>${esc(x.source)}</td><td>${esc(x.verification_status)}${x.payment_status?'<br>'+esc(x.payment_status):''}</td><td>${esc(x.verification_note||'')}</td><td class="actions">${x.verification_status==='pending'?`<button class="btn" onclick="verifyRow('${x.id}','accepted')">Terima</button><button class="btn btn-danger" onclick="verifyRow('${x.id}','rejected')">Tolak</button>`:''}</td></tr>`).join('');
+  const activityMap=new Map();
+  data.filter(x=>x.verification_status==='accepted'&&x.payment_type==='Kegiatan'&&x.activity).forEach(x=>{
+    const key=`${x.student_id||x.student_name}\u0000${x.activity}`;
+    const prev=activityMap.get(key)||{student_name:x.student_name,activity:x.activity,total:0,status:'Cicil'};
+    prev.total+=Number(x.amount||0);
+    if(x.payment_status==='Lunasi Cicilan') prev.status='Lunasi Cicilan';
+    else if(x.payment_status==='Lunas' && prev.status!=='Lunasi Cicilan') prev.status='Lunas';
+    else if(prev.status!=='Lunas'&&prev.status!=='Lunasi Cicilan') prev.status='Cicil';
+    activityMap.set(key,prev);
+  });
+  $('activityRecapRows').innerHTML=Array.from(activityMap.values()).map(x=>`<tr><td><strong>${esc(x.student_name)}</strong></td><td>${esc(x.activity)}</td><td>${esc(x.status)}</td><td>${rupiah(x.total)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Belum ada pembayaran kegiatan diterima.</td></tr>';
+  $('rows').innerHTML=data.map(x=>`<tr><td>${esc((x.payment_date||x.created_at||'').slice(0,16).replace('T',' '))}</td><td>${esc(x.student_name)}</td><td>${esc(x.payment_type==='Bantuan'?'Infak':x.payment_type)}${x.activity?'<br>'+esc(x.activity):''}${x.payment_month?'<br>'+esc(x.payment_month):''}${x.purpose?'<br>'+esc(x.purpose):''}</td><td>${rupiah(x.amount)}</td><td>${esc(x.source)}</td><td>${esc(x.verification_status)}${x.payment_status?'<br>'+esc(x.payment_status):''}${(x.deduction_source&&x.deduction_source!=='none')?'<br>Potong '+esc(x.deduction_source==='mandatory'?'Tabungan Wajib':'Tabungan Sukarela'):''}</td><td>${esc(x.verification_note||'')}</td><td class="actions">${x.verification_status==='pending'?`<button class="btn" onclick="verifyRow('${x.id}','accepted')">Terima</button><button class="btn btn-danger" onclick="verifyRow('${x.id}','rejected')">Tolak</button>`:''}</td></tr>`).join('');
 }
 async function load(){
   try{
@@ -164,7 +183,7 @@ async function load(){
     $('student').innerHTML='<option value="">Pilih siswa</option>'+studentsData.map(x=>`<option value="${esc(x.id)}">${esc(x.student_name)}</option>`).join('');
     $('studentRows').innerHTML=studentsData.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.student_name)}</td><td>${esc(x.academic_year)}</td><td>${esc(x.unit)}</td><td><strong>${esc(x.pin||'Belum dibuat')}</strong></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Belum ada siswa untuk tahun ajaran dan unit ini.</td></tr>';
     const arrears=await api('spp_arrears');
-    $('sppArrearsRows').innerHTML=(arrears.rows||[]).map(x=>`<tr><td><strong>${esc(x.student_name)}</strong></td>${(x.months||[]).map(m=>{ const status=String(m.status||'-'); const label=status==='Cicil'?`Cicil ${rupiah(m.amount)}`:status; return `<td>${esc(label)}</td>`; }).join('')}</tr>`).join('') || '<tr><td colspan="13" class="muted">Belum ada data siswa untuk konteks ini.</td></tr>';
+    $('sppArrearsRows').innerHTML=(arrears.rows||[]).map(x=>`<tr><td><strong>${esc(x.student_name)}</strong></td>${(x.months||[]).map(m=>{ const status=String(m.status||'-'); const label=(status==='Cicil'||status==='Lunasi Cicilan')?`${status} ${rupiah(m.amount)}`:status; return `<td>${esc(label)}</td>`; }).join('')}</tr>`).join('') || '<tr><td colspan="13" class="muted">Belum ada data siswa untuk konteks ini.</td></tr>';
     const ppdb=await api('ppdb_recap');
     $('ppdbRecapRows').innerHTML=(ppdb.rows||[]).map(x=>`<tr><td><strong>${esc(x.student_name)}</strong></td><td>${esc(x.status||'-')}</td><td>${x.amount?rupiah(x.amount):'-'}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">Belum ada data siswa untuk konteks ini.</td></tr>';
     data=transactions.rows||[];expensesData=expenses.rows||[];draw();$('msg').textContent='';
@@ -202,13 +221,15 @@ $('save').addEventListener('click',async()=>{
   try{
     const type=$('type').value,studentId=$('student').value,student=studentsData.find(x=>x.id===studentId)?.student_name||'',amount=Number($('amount')?.value);
     if(!student||!type||!Number.isFinite(amount)||amount<1000)throw Error('Lengkapi nama siswa, jenis pembayaran, dan nominal minimal Rp1.000.');
-    const payload={student_id:studentId,student_name:student,payment_type:type,amount,payment_date:$('date')?.value||null,payment_month:$('month')?.value||null,payment_status:$('status')?.value||null,activity:($('activity')?.value==='Isi Manual'?$('activityCustom')?.value.trim():$('activity')?.value)||null,purpose:($('purpose')?.value==='Isi Manual'?$('purposeCustom')?.value.trim():$('purpose')?.value)||null,deduct_mandatory:$('deduct')?.value==='true'};
+    const deductionSource=$('deduction')?.value||'none';
+    const payload={student_id:studentId,student_name:student,payment_type:type,amount,payment_date:$('date')?.value||null,payment_month:$('month')?.value||null,payment_status:$('status')?.value||null,activity:($('activity')?.value==='Isi Manual'?$('activityCustom')?.value.trim():$('activity')?.value)||null,purpose:($('purpose')?.value==='Isi Manual'?$('purposeCustom')?.value.trim():$('purpose')?.value)||null,deduction_source:deductionSource,deduct_mandatory:deductionSource==='mandatory'};
     if(type==='Tabungan Wajib'||type==='Tabungan Sukarela'){if(!payload.payment_date)throw Error('Tanggal wajib diisi.');payload.payment_status=null}
     if(type==='SPP'&&!payload.payment_month)throw Error('Bulan SPP wajib dipilih.');
     if(type==='Kegiatan'&&(!payload.activity||!payload.payment_status))throw Error('Kegiatan dan status wajib diisi.');
     if(type==='PPDB'&&!payload.payment_status)throw Error('Status wajib diisi.');
     if(type==='Infak'&&!payload.purpose)throw Error('Peruntukan infak wajib diisi.');
-    if(type!=='Kegiatan')payload.deduct_mandatory=false;
+    if(type!=='SPP'&&type!=='Kegiatan'&&type!=='Infak'){payload.deduction_source='none';payload.deduct_mandatory=false;}
+    if(type==='SPP'||type==='Kegiatan'||type==='Infak'){payload.deduct_mandatory=payload.deduction_source==='mandatory';}
     await api('add_transaction',payload);$('msg').textContent='Transaksi tersimpan.';renderDetails();await load();
   }catch(e){$('msg').textContent=e.message}
 });

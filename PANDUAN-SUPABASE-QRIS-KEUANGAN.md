@@ -9,6 +9,9 @@ Panduan ini dibuat untuk versi aplikasi yang menggunakan **QRIS statis Yayasan**
 Setelah ZIP diekstrak, pastikan terdapat:
 
 - `supabase/migrations/20260829_finance_feedback_qris.sql`
+- `supabase/migrations/20260829_finance_infak.sql`
+- `supabase/migrations/20260910_finance_deduction_sources.sql`
+- `supabase/migrations/20260910_finance_deduction_infak.sql`
 - `supabase/functions/create-payment/index.ts`
 - `supabase/functions/feedback/index.ts`
 - `supabase/functions/public-students/index.ts`
@@ -31,11 +34,25 @@ File dashboard lama `dashboard/pembayaran.html` sudah dihapus karena fitur **Rek
 
 ### 2.2 Salin migration
 
-Buka file:
+Jalankan migration sesuai urutan nama file. Untuk project yang sudah pernah menjalankan migration lama, **jangan menghapus data**; cukup jalankan migration tambahan yang belum diterapkan.
+
+Migration utama:
 
 `supabase/migrations/20260829_finance_feedback_qris.sql`
 
-Salin **seluruh isi file**, lalu tempel ke SQL Editor.
+Migration Infak:
+
+`supabase/migrations/20260829_finance_infak.sql`
+
+Migration pemotongan SPP/Kegiatan dan perbaikan constraint Infak:
+
+`supabase/migrations/20260910_finance_deduction_sources.sql`
+
+Migration tambahan agar Infak juga boleh dipotong dari Tabungan Wajib/Sukarela:
+
+`supabase/migrations/20260910_finance_deduction_infak.sql`
+
+Salin **seluruh isi migration yang belum pernah dijalankan**, lalu tempel ke SQL Editor dan klik **Run**.
 
 Klik **Run**.
 
@@ -176,7 +193,7 @@ supabase link --project-ref gtqvuymhtdfpnvlyzdun
 
 Jika diminta password database, masukkan password database project Supabase.
 
-### 6.3 Deploy lima fungsi baru
+### 6.3 Deploy fungsi yang digunakan fitur keuangan
 
 Jalankan satu per satu:
 
@@ -200,7 +217,11 @@ supabase functions deploy finance-admin
 supabase functions deploy feedback-admin
 ```
 
-Setelah semuanya selesai, buka **Edge Functions** di Supabase dan pastikan kelima fungsi tersebut sudah terdeploy.
+```bash
+supabase functions deploy student-pin
+```
+
+Setelah semuanya selesai, buka **Edge Functions** di Supabase dan pastikan fungsi-fungsi tersebut sudah terdeploy. Untuk perubahan pemotongan saldo, **wajib deploy ulang `finance-admin`, `create-payment`, dan `student-pin`**.
 
 ### 6.4 Catatan penting `public-students`
 
@@ -268,50 +289,56 @@ Rp500.000.
 
 Jika memasukkan Rp150.000, sistem menolak karena melewati batas Rp500.000.
 
-## 9. Potong Tabungan Wajib untuk Kegiatan
+## 9. Pemotongan Saldo untuk SPP dan Kegiatan
 
-Pilihan **Potong dari Tabungan Wajib** hanya berlaku untuk jenis pembayaran:
+Untuk **SPP** dan **Kegiatan**, baik admin maupun wali murid memiliki tiga pilihan sumber pembayaran:
 
-**Kegiatan**
+- **Tidak dipotong** — pembayaran menggunakan nominal baru dan tidak mengurangi saldo tabungan;
+- **Potong dari Tabungan Wajib** — saldo Tabungan Wajib harus mencukupi;
+- **Potong dari Tabungan Sukarela** — saldo Tabungan Sukarela harus mencukupi.
 
-Kegiatan yang tersedia:
+Nama kegiatan/peruntukan yang dipilih melalui **Isi Manual** disimpan sebagai nilai yang diketik pengguna, bukan sebagai teks `Isi Manual`.
 
-- Maulid
-- Agustusan
-- Karyawisata
-- Manasik Haji
-- Renang
-- Lomba
-- Isi Manual
+Untuk pembayaran QRIS wali murid:
 
-Jika dipilih potong dari Tabungan Wajib:
-
-- saldo Tabungan Wajib harus mencukupi;
-- transaksi QRIS awalnya berstatus `pending`;
-- saldo belum berkurang ketika masih `pending`;
+- transaksi awalnya berstatus `pending`;
+- saldo belum berkurang selama masih `pending`;
 - jika admin memilih **Tolak**, saldo tidak berkurang;
-- jika admin memilih **Terima**, saldo Tabungan Wajib berkurang sesuai nominal.
+- jika admin memilih **Terima**, saldo tabungan yang dipilih berkurang sesuai nominal.
+
+Untuk pencatatan langsung/cash oleh admin, transaksi langsung berstatus `accepted`, sehingga saldo langsung berkurang pada rekap.
 
 Contoh:
 
 Saldo Tabungan Wajib = Rp500.000.
 
-Pembayaran Kegiatan = Rp100.000.
+Pembayaran Kegiatan = Rp100.000 dengan pilihan **Potong dari Tabungan Wajib**.
 
-Setelah transaksi diterima:
+Setelah diterima:
 
 - Ringkasan Kegiatan bertambah Rp100.000;
 - saldo Tabungan Wajib menjadi Rp400.000.
+
+Contoh lain:
+
+Saldo Tabungan Sukarela = Rp300.000.
+
+Pembayaran SPP = Rp100.000 dengan pilihan **Potong dari Tabungan Sukarela**.
+
+Setelah diterima:
+
+- Ringkasan SPP bertambah Rp100.000;
+- saldo Tabungan Sukarela menjadi Rp200.000.
 
 ## 10. Tabungan Sukarela
 
 Tabungan Sukarela:
 
 - tidak memiliki batas maksimum;
-- tidak dipotong untuk pembayaran lain;
-- tidak digunakan otomatis untuk membayar Kegiatan, SPP, PPDB, atau Bantuan.
+- tidak dipotong otomatis untuk pembayaran lain;
+- hanya berkurang jika SPP atau Kegiatan secara eksplisit memilih **Potong dari Tabungan Sukarela**.
 
-Jangan memilih opsi potong Tabungan Wajib untuk jenis pembayaran selain Kegiatan.
+Saldo tidak boleh menjadi negatif. Jika saldo sumber tidak mencukupi, transaksi ditolak atau, untuk QRIS yang masih pending, tidak dapat diterima sampai kondisi saldo memenuhi.
 
 ## 11. Tahun Ajaran
 
